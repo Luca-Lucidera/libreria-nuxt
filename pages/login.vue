@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Login from "~~/interface/login";
-
 const userLogin = useState<Login>("userLogin", () => {
   return {
     email: "",
@@ -12,24 +11,26 @@ const isLoading = useState(() => false);
 
 const handleSubmit = async () => {
   try {
+    error.value = "";
+    isLoading.value = true;
     const user = await login(userLogin.value);
-    console.log("user: ", user);
-  } catch (error: any) {
-    console.log(
-      "error: ",
-      error.message,
-      error.statusCode,
-      error.statusMessage
-    );
+    isLoading.value = false;
+    const router = useRouter()
+    router.push('/');
+  } catch (err) {
+    if(err instanceof Error) {
+      error.value = err.message;
+    }
   }
 };
 </script>
 
 <template>
   <div class="page">
-    <VSheet>
+    <NuxtLink to="/">Home</NuxtLink>
+    <VSheet rounded="xl">
       <VForm @submit.prevent="handleSubmit">
-        <h1 class="title">Login</h1>
+        <h1 class="title">LOGIN</h1>
         <div class="input-separator">
           <VTextField
             type="email"
@@ -52,6 +53,12 @@ const handleSubmit = async () => {
           <VBtn type="submit" color="primary" variant="tonal" rounded
             >Login</VBtn
           >
+        </div>
+        <div v-if="isLoading"  class="m-top-10">
+          <VProgressLinear indeterminate color="primary" />
+        </div>
+        <div v-if="error" class="m-top-10">
+          <p class="error-message">{{ error }}</p>
         </div>
       </VForm>
     </VSheet>
@@ -91,5 +98,14 @@ const handleSubmit = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+}
+
+.m-top-10 {
+  margin-top: 10%;
 }
 </style>

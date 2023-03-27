@@ -7,30 +7,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Libri {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  comprati Int
-  editore  String
-  letti    Int
-  prezzo   Float
-  status   String
-  tipo     String
-  titolo   String
-  userId   String @db.ObjectId
+model BookType {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String  @unique
+  books Books[]
 }
 
-model Logins {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  expires     DateTime @db.Date
-  lastLogin   DateTime @db.Date
-  sessionUUID String
-  userId      String   @unique @db.ObjectId
+model Editor {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String  @unique
+  books Books[]
+}
+
+model Books {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  buy          Int
+  read         Int
+  bookTypeId   String     @db.ObjectId
+  statusBookId String     @db.ObjectId
+  editorId     String     @db.ObjectId
+  price        Float
+  rating       Float
+  comments     String
+  userId       String     @db.ObjectId
+  user         Users      @relation(fields: [userId], references: [id])
+  bookType     BookType   @relation(fields: [bookTypeId], references: [id])
+  statusBook   StatusBook @relation(fields: [statusBookId], references: [id])
+  editor       Editor     @relation(fields: [editorId], references: [id])
+}
+
+model StatusBook {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String  @unique
+  statusBooks Books[]
+}
+
+model TableHeaders {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
 }
 
 model Users {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  cognome  String
-  email    String @unique
-  nome     String
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  lastName String
+  email    String  @unique
   password String
+  jwt      String  @unique
+  books    Books[]
 }

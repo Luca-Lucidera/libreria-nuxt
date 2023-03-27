@@ -1,7 +1,8 @@
 import ILogin from "@/interface/login";
-import { PrismaClient } from "@prisma/client";
-import { v5 as uuid } from "uuid";
+import bcrypt from "bcrypt";
 import User from "~~/interface/user";
+import { createJwt } from "../utils/jwt";
+import { prisma } from "../utils/prisma";
 export default defineEventHandler(async (event) => {
   const body = (await readBody(event)) as ILogin;
   if (!body || !body.email || !body.password) {
@@ -10,49 +11,38 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid request body",
     });
   }
-  const prisma = new PrismaClient();
-  const user = (await prisma.users.findUnique({
+  const userFound = (await prisma.users.findUnique({
     where: {
       email: body.email,
     },
   })) as User | null;
-  if (!user) {
+  if (!userFound) {
+    throw createError({ statusCode: 404, statusMessage: "User not found" });
+  }
+  const isPasswordCorrect = await bcrypt.compare(
+    body.password,
+    userFound.password
+  );
+  if (!isPasswordCorrect) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid email or password",
+      statusCode: 401,
+      statusMessage: "Invalid credentials",
     });
   }
-  if (user.password !== body.password) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid email or password",
-    });
-  }
-
-  const { value, ...sessionCookiePayload } = {
-    value: uuid(user.id, uuid.URL),
-    expires: new Date(Date.now() + 60 * 60 * 24 * 1000),
+  const jwtSessionToken = createJwt(userFound.id);
+  const updateUserLoginJwt = await prisma.users.update({
+    where: {
+      id: userFound.id,
+    },
+    data: {
+      jwt: jwtSessionToken,
+    },
+  }) as User;
+  setCookie(event,'session', jwtSessionToken, {
     httpOnly: true,
     secure: true,
-    SameSite: "lax",
-  };
-  setCookie(event, "session", value, { ...sessionCookiePayload });
-  await prisma.logins.upsert({
-    where: {
-      userId: user.id,
-    },
-    create: {
-      userId: user.id,
-      lastLogin: new Date(),
-      expires: sessionCookiePayload.expires,
-      sessionUUID: value,
-    },
-    update: {
-      lastLogin: new Date(),
-      expires: sessionCookiePayload.expires,
-      sessionUUID: value,
-    },
+    sameSite: "lax",
+    expires: new Date(Date.now() + 86400000),
   });
-  await prisma.$disconnect();
-  return user;
+  return updateUserLoginJwt; 
 });
