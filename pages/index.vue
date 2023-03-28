@@ -3,16 +3,22 @@ import { VDataTable } from "vuetify/labs/VDataTable";
 import { useBooksStore } from "~~/store/books.store";
 import { useUserStore } from "~~/store/user.store";
 
+const dialogTest = useState(() => false);
+
 const error = useState(() => "");
 const isLoading = useState(() => true);
 
 const booksStore = useBooksStore();
+const { filteredBooks } = booksStore;
 const userStore = useUserStore();
-const selectedFilter = {
-  type: "",
-  status: "",
-  editor: "",
-};
+const selectedFilter = useState("selected-filter", () => {
+  return {
+    type: "All",
+    editor: "All",
+    status: "All",
+    search: "",
+  };
+});
 
 let tableHeaders: any[] = [];
 
@@ -63,7 +69,6 @@ try {
       </VAppBar>
       <VMain>
         <VContainer class="full-height">
-          {{ selectedFilter }}
           <VRow align="center" class="full-height">
             <VCol class="" cols="2">
               <VAutocomplete
@@ -74,18 +79,25 @@ try {
               <VAutocomplete
                 label="Editor"
                 :items="tableFilter.editor"
-                v-model="selectedFilter.type"
+                v-model="selectedFilter.editor"
               />
               <VAutocomplete
                 label="Status"
                 :items="tableFilter.status"
-                v-model="selectedFilter.type"
+                v-model="selectedFilter.status"
               />
             </VCol>
             <VCol>
               <VDataTable
                 :headers="tableHeaders"
-                :items="booksStore.computedBooks"
+                :items="
+                  filteredBooks(
+                    selectedFilter.type,
+                    selectedFilter.editor,
+                    selectedFilter.status
+                  )
+                "
+                :search="selectedFilter.search"
                 height="80%"
                 fixed-header
                 fixed-footer
@@ -93,15 +105,22 @@ try {
                 <template v-slot:top>
                   <VToolbar>
                     <VToolbarTitle>Books</VToolbarTitle>
+                    <VTextField
+                      v-model="selectedFilter.search"
+                      label="Search title"
+                      single-line
+                      hide-details
+                      class="search-bar-spacing"
+                    />
                     <VBtn>New Book</VBtn>
                   </VToolbar>
                 </template>
                 <template v-slot:item.price="{ item }">
-                  {{ item.raw.price }} €
+                  {{ (item as any).raw.price }} €
                 </template>
                 <template v-slot:item.rating="{ item }">
                   <VRating
-                    v-model="item.raw.rating"
+                    v-model="(item as any).raw.rating"
                     :max="5"
                     color="amber"
                     half-increments
@@ -109,7 +128,11 @@ try {
                   />
                 </template>
                 <template v-slot:item.comments="{ item }">
-                  <VBtn icon="mdi-comment-outline" color="primary" variant="tonal"/>
+                  <VBtn
+                    icon="mdi-comment-outline"
+                    color="primary"
+                    variant="tonal"
+                  />
                 </template>
                 <template v-slot:item.action="{ item }">
                   <VBtnGroup>
@@ -134,6 +157,9 @@ try {
   height: 100%;
 }
 
+.search-bar-spacing {
+  margin-right: 25vw;
+}
 .debug {
   border: 2px solid red;
 }

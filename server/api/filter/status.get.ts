@@ -1,3 +1,7 @@
+import IFilter from "~~/interface/filter";
+
 export default defineEventHandler(async (event) => {
-  return await prisma.statusBook.findMany();
+  let status = await prisma.statusBook.findMany() as IFilter[];
+  status.push({ id: "", name: "All" });
+  return status;
 });
