@@ -58,9 +58,7 @@ try {
     <VLayout class="page-height">
       <VAppBar elevation="12">
         <VAppBarNavIcon>
-          <VBtn color="primary">
-            <VIcon icon="mdi-account-circle" />
-          </VBtn>
+          <VBtn color="primary" icon="mdi-account-circle" />
         </VAppBarNavIcon>
         <VAppBarTitle
           >Your library {{ userStore.computedUser?.name }}</VAppBarTitle
@@ -70,7 +68,7 @@ try {
       <VMain>
         <VContainer class="full-height">
           <VRow align="center" class="full-height">
-            <VCol class="" cols="2">
+            <VCol cols="2">
               <VAutocomplete
                 label="Type"
                 :items="tableFilter.type"
@@ -98,9 +96,9 @@ try {
                   )
                 "
                 :search="selectedFilter.search"
-                height="80%"
                 fixed-header
                 fixed-footer
+                height="70vh"
               >
                 <template v-slot:top>
                   <VToolbar>
@@ -112,7 +110,7 @@ try {
                       hide-details
                       class="search-bar-spacing"
                     />
-                    <VBtn>New Book</VBtn>
+                    <VBtn color="secondary" variant="tonal">New Book</VBtn>
                   </VToolbar>
                 </template>
                 <template v-slot:item.price="{ item }">
@@ -156,11 +154,7 @@ try {
 .full-height {
   height: 100%;
 }
-
 .search-bar-spacing {
   margin-right: 25vw;
-}
-.debug {
-  border: 2px solid red;
 }
 </style>
