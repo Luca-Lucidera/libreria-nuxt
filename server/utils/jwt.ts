@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+
 export function createJwt(userId: string): string {
   const jwtSessionToken = jwt.sign({userId: userId}, useRuntimeConfig().jwt.secret, {
     issuer: useRuntimeConfig().jwt.iss,

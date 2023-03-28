@@ -1,24 +1,26 @@
 <script setup lang="ts">
-import ILogin from "~~/interface/login";
+import IRegister from "~~/interface/register";
 import { useUserStore } from "~~/store/user.store";
 
-const userLogin = useState<ILogin>("userLogin", () => {
+const registerForm = useState<IRegister>("register-form", () => {
   return {
+    name: "",
+    lastName: "",
     email: "",
     password: "",
   };
 });
-const error = useState(() => "");
 const isLoading = useState(() => false);
+const error = useState(() => "");
 
 const userStore = useUserStore();
+const router = useRouter();
 
-const handleSubmit = async () => {
+async function handleSubmit() {
   try {
-    error.value = "";
     isLoading.value = true;
-    await userStore.authenticate(userLogin.value);
-    const router = useRouter();
+    error.value = "";
+    await userStore.createUser(registerForm.value);
     router.push("/");
   } catch (err) {
     if (err instanceof Error) {
@@ -27,27 +29,44 @@ const handleSubmit = async () => {
   } finally {
     isLoading.value = false;
   }
-};
+}
 </script>
 
 <template>
   <div class="page">
     <VSheet rounded="xl">
       <VForm @submit.prevent="handleSubmit">
-        <h1 class="title">LOGIN</h1>
+        <h1 class="title">REGISTER</h1>
         <div class="input-separator">
           <VTextField
             type="email"
-            v-model="userLogin.email"
-            label="Email"
+            v-model="registerForm.name"
+            label="First name"
             outlined
             required
           ></VTextField>
         </div>
         <div class="input-separator">
           <VTextField
+            v-model="registerForm.lastName"
+            label="Last name"
+            outlined
+            required
+          />
+        </div>
+        <div class="input-separator">
+          <VTextField
+            type="email"
+            v-model="registerForm.email"
+            label="Email"
+            outlined
+            required
+          />
+        </div>
+        <div class="input-separator">
+          <VTextField
             type="password"
-            v-model="userLogin.password"
+            v-model="registerForm.password"
             label="Password"
             outlined
             required
@@ -55,12 +74,13 @@ const handleSubmit = async () => {
         </div>
         <div class="div-submit-btn">
           <VBtn type="submit" color="primary" variant="tonal" rounded
-            >Login</VBtn
+            >Register</VBtn
           >
         </div>
+
         <div class="m-top-10">
           <VBtn color="primary" variant="tonal">
-            <NuxtLink to="/register">Register</NuxtLink>
+            <NuxtLink to="/login">Login</NuxtLink>
           </VBtn>
         </div>
         <div v-if="isLoading" class="m-top-10">
@@ -85,7 +105,7 @@ const handleSubmit = async () => {
 
 .v-sheet {
   margin: auto;
-  height: 50vh;
+  height: 70vh;
   width: 50vw;
   display: flex;
   justify-content: center;

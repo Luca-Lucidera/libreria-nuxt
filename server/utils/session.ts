@@ -1,5 +1,10 @@
 import { H3Event, parseCookies } from "h3";
 
+/**
+ * 
+ * @param event {H3Event}
+ * @returns Return the jwt with the user id
+ */
 export function getSessionValue(event: H3Event) {
   const headers = parseCookies(event);
   if (!headers["session"]) {
