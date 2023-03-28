@@ -2,12 +2,8 @@ import IBook from "~~/interface/book";
 
 export const getBooks = async () => {
   try {
-    const books = await $fetch<IBook[]>("/api/books", { credentials: "include" });
-    return books
+    return await $fetch<IBook[]>("/api/books", { credentials: "include" });
   } catch (error: any) {
-    if (error.status !== 500) {
-      throw new Error(error.statusMessage);
-    }
-    throw new Error("Something went wrong");
+    return handleErrorApi(error)
   }
 }

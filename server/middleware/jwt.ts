@@ -1,6 +1,7 @@
 import IUser from '~/interface/user';
 export default defineEventHandler(async (event) => {
-  if (!event.node.req.url?.includes("auth")) {
+  if (event.node.req.url?.startsWith("/api") && !event.node.req.url?.startsWith("/api/auth") && !event.node.req.url?.startsWith("/api/table")) {
+    console.log("event.node.req.url", event.node.req.url)
     const sessionJwt = getSessionValue(event);
     const userId = verifyJwt(sessionJwt);
     const user = await prisma.users.findFirst({

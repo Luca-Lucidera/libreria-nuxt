@@ -20,7 +20,7 @@ export const useUserStore = defineStore("user", () => {
     try {
       user.value = await retriveUserViaSession();
     } catch (err) {
-      handleErrorApi(err);
+      throw err;
     }
   };
 

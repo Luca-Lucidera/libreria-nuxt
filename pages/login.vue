@@ -58,6 +58,9 @@ const handleSubmit = async () => {
             >Login</VBtn
           >
         </div>
+        <div class="m-top-10">
+          <NuxtLink to="/register">Register</NuxtLink>
+        </div>
         <div v-if="isLoading" class="m-top-10">
           <VProgressLinear indeterminate color="primary" />
         </div>

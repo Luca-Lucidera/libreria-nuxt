@@ -6,12 +6,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     const userStore = useUserStore();
     if (!userStore.isLogged) {
       try {
-        console.log("try to authenticate via session")
         await userStore.authenticateViaSession();
         return navigateTo("/");
       } catch (error) {
-        console.log('Sessione non trovata', 'to.path', to.path)
-        if (to.path !== "/login") {
+        if (to.path != "/login" && to.path != "/register") {
           return navigateTo("/login");
         } else {
           return;

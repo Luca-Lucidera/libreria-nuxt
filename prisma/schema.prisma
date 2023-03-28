@@ -21,7 +21,7 @@ model Editor {
 
 model Books {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  title         String
+  title        String
   buy          Int
   read         Int
   bookTypeId   String     @db.ObjectId
@@ -44,8 +44,11 @@ model StatusBook {
 }
 
 model TableHeaders {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String @unique
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  title    String  @unique
+  key      String  @unique
+  sortable Boolean
+  align    String? @default("center")
 }
 
 model Users {
