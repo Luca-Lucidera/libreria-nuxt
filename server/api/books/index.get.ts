@@ -1,19 +1,8 @@
-import Book from "~~/interface/book";
-import { verifyJwt } from "../utils/jwt";
-import { prisma } from "../utils/prisma";
-import { getSessionValue } from "../utils/session";
+import IUser from "~/interface/user";
+import IBook from "~~/interface/book";
+
 export default defineEventHandler(async (event) => {
-  const sessionJwt = getSessionValue(event);
-  const userId = verifyJwt(sessionJwt);
-  const user = await prisma.users.findFirst({
-    where: {
-      id: userId,
-      jwt: sessionJwt,
-    }
-  });
-  if(!user) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
+  const { id: userId }: IUser = event.context.user;
   const booksDB = await prisma.books.findMany({
     where: {
       userId: userId,
@@ -24,14 +13,13 @@ export default defineEventHandler(async (event) => {
     include: {
       bookType: true,
       editor: true,
-      statusBook: true,      
-    }
+      statusBook: true,
+    },
   });
   if (booksDB.length === 0) {
     return booksDB;
   }
-
-  const books: Book[] = booksDB.map((book) => {
+  const books: IBook[] = booksDB.map((book) => {
     return {
       id: book.id,
       title: book.title,

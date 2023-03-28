@@ -1,9 +1,12 @@
 <script setup lang="ts">
-const books = await getBooks()
+import { useUserStore } from "~~/store/user.store";
+
+const userStore = useUserStore();
+//const books = await getBooks()
 </script>
 
 <template>
   <div>
-    logged
+    logged {{ userStore.computedUser }}
   </div>
 </template>

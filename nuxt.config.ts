@@ -17,7 +17,6 @@ export default defineNuxtConfig({
       iss: "la-tua-libreria-api",
       aud: "la-tua-libreria",
     },
-    mario: "rossi",
     public: {
       api: "/api",
       env: "development",

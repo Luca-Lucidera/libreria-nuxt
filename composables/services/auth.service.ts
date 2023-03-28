@@ -1,20 +1,24 @@
 import ILogin from "@/interface/login";
-import User from "~~/interface/user";
-import { useUserStore } from "~~/store/user.store";
+import IUser from "~~/interface/user";
 
 export const login = async (userLogin: ILogin) => {
   try {
-    const user = await $fetch<User>("/api/auth/login", {
+    const user = await $fetch<IUser>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(userLogin),
     });
-    const userStore = useUserStore();
-    userStore.setUser(user);
     return user;
   } catch (error: any) {
-    if(error.status !== 500){
-      throw new Error(error.statusMessage);
-    }
-    throw new Error("Something went wrong");
+    return handleErrorApi(error);
+  }
+};
+
+export const retriveUserViaSession = async () => {
+  try {
+    return await $fetch<IUser>("/api/auth/session", {
+      credentials: "include",
+    });
+  } catch (error) {
+    return handleErrorApi(error);
   }
 };

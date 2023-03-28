@@ -1,8 +1,7 @@
 import ILogin from "@/interface/login";
 import bcrypt from "bcrypt";
-import User from "~~/interface/user";
-import { createJwt } from "../utils/jwt";
-import { prisma } from "../utils/prisma";
+import IUser from "~~/interface/user";
+
 export default defineEventHandler(async (event) => {
   const body = (await readBody(event)) as ILogin;
   if (!body || !body.email || !body.password) {
@@ -15,7 +14,7 @@ export default defineEventHandler(async (event) => {
     where: {
       email: body.email,
     },
-  })) as User | null;
+  })) as IUser | null;
   if (!userFound) {
     throw createError({ statusCode: 404, statusMessage: "User not found" });
   }
@@ -37,7 +36,7 @@ export default defineEventHandler(async (event) => {
     data: {
       jwt: jwtSessionToken,
     },
-  }) as User;
+  }) as IUser;
   setCookie(event,'session', jwtSessionToken, {
     httpOnly: true,
     secure: true,

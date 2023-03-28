@@ -1,28 +1,24 @@
-import User from "~~/interface/user";
 import { useUserStore } from "~~/store/user.store";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   if (process.client) {
+    console.log(to.path);
     const userStore = useUserStore();
     if (!userStore.isLogged) {
       try {
-        try {
-          console.log("fetching user");
-          const user = await $fetch<User>("/api/auth/session", {
-            credentials: "include",
-          });
-          userStore.setUser(user);
-          return;
-        } catch (error) {
-          console.log("errore middleware", error);
-          return navigateTo("/login");
-        }
+        console.log("try to authenticate via session")
+        await userStore.authenticateViaSession();
+        return navigateTo("/");
       } catch (error) {
-        console.log("errore middleware", error);
-        return navigateTo("/login");
+        console.log('Sessione non trovata', 'to.path', to.path)
+        if (to.path !== "/login") {
+          return navigateTo("/login");
+        } else {
+          return;
+        }
       }
-    } else if (to.path === "/login") {
-      return navigateTo("/");
+    } else {
+      return;
     }
   }
 });

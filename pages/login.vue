@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import Login from "~~/interface/login";
-const userLogin = useState<Login>("userLogin", () => {
+import ILogin from "~~/interface/login";
+import { useUserStore } from "~~/store/user.store";
+
+const userLogin = useState<ILogin>("userLogin", () => {
   return {
     email: "",
     password: "",
@@ -9,25 +11,27 @@ const userLogin = useState<Login>("userLogin", () => {
 const error = useState(() => "");
 const isLoading = useState(() => false);
 
+const userStore = useUserStore();
+
 const handleSubmit = async () => {
   try {
     error.value = "";
     isLoading.value = true;
-    const user = await login(userLogin.value);
-    isLoading.value = false;
-    const router = useRouter()
-    router.push('/');
+    await userStore.authenticate(userLogin.value);
+    const router = useRouter();
+    router.push("/");
   } catch (err) {
-    if(err instanceof Error) {
+    if (err instanceof Error) {
       error.value = err.message;
     }
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
 
 <template>
   <div class="page">
-    <NuxtLink to="/">Home</NuxtLink>
     <VSheet rounded="xl">
       <VForm @submit.prevent="handleSubmit">
         <h1 class="title">LOGIN</h1>
@@ -54,7 +58,7 @@ const handleSubmit = async () => {
             >Login</VBtn
           >
         </div>
-        <div v-if="isLoading"  class="m-top-10">
+        <div v-if="isLoading" class="m-top-10">
           <VProgressLinear indeterminate color="primary" />
         </div>
         <div v-if="error" class="m-top-10">

@@ -1,23 +1,37 @@
 import { defineStore } from "pinia";
-import User from "~~/interface/user";
+import ILogin from "~~/interface/login";
+import IUser from "~~/interface/user";
 
 export const useUserStore = defineStore("user", () => {
-  const user = ref<User | null>(null);
+  const user = ref<IUser | null>(null);
   const computedUser = computed(() => user.value);
-  const setUser = (newUser: User) => {
-    user.value = newUser;
-  };
   const reset = () => {
     user.value = null;
   };
 
+  const authenticate = async (loginCredential: ILogin) => {
+    try {
+      user.value = await login(loginCredential);
+    } catch (err) {
+      throw err;
+    }
+  };
+  const authenticateViaSession = async () => {
+    try {
+      user.value = await retriveUserViaSession();
+    } catch (err) {
+      handleErrorApi(err);
+    }
+  };
+
   const isLogged = computed(
-    () => user.value?.jwt !== null || user.value?.jwt !== ""
+    () => user.value !== null && user.value !== undefined
   );
 
   return {
     computedUser,
-    setUser,
+    authenticate,
+    authenticateViaSession,
     reset,
     isLogged,
   };
