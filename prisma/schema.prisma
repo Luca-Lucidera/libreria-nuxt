@@ -29,7 +29,7 @@ model Books {
   editorId     String     @db.ObjectId
   price        Float
   rating       Float
-  comments     String
+  comment     String
   userId       String     @db.ObjectId
   user         Users      @relation(fields: [userId], references: [id])
   bookType     BookType   @relation(fields: [bookTypeId], references: [id])
