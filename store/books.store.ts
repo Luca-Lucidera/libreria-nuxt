@@ -26,6 +26,7 @@ export const useBooksStore = defineStore("books", () => {
       throw error;
     }
   };
+
   const createBook = async (book: IBook) => {
     try {
       await postBook(book);
@@ -44,6 +45,15 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
+  const removeBook = async (book: IBook) => {
+    try {
+      await deleteBook(book);
+      await fetchBooks();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     books,
     computedBooks,
@@ -51,5 +61,6 @@ export const useBooksStore = defineStore("books", () => {
     fetchBooks,
     createBook,
     updateBook,
+    removeBook,
   };
 });

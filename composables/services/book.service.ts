@@ -32,3 +32,15 @@ export const putBook = async (book: IBook) => {
     return handleErrorApi(error)
   }
 }
+
+export const deleteBook = async (book: IBook) => {
+  try {
+    return await $fetch<IBook>(`/api/books`, {
+      method: "DELETE",
+      credentials: "include",
+      body: JSON.stringify(book),
+    });
+  } catch (error: any) {
+    return handleErrorApi(error)
+  }
+}

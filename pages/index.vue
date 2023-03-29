@@ -16,7 +16,6 @@ const selectedFilter = useState("selected-filter", () => {
   };
 });
 const openBookModal = useState("open-book-modal", () => false);
-const openDeleteBookModal = useState("open-delete-book-modal", () => false);
 const bookToCreateOrUpdate = useState("book-to-create-or-update", () => {
   return {
     id: "",
@@ -60,41 +59,43 @@ function handleChangeFilter(key: string, value: string) {
     type filterKey = keyof typeof selectedFilter.value;
     const k: filterKey = key as filterKey;
     selectedFilter.value[k] = value;
-  } catch (error) {
-  }
+  } catch (error) {}
 }
 
-function handleNewOrChangeBookUpdate(open: boolean, book: IBook) {
-  openBookModal.value = open;
+function handleNewOrChangeBookUpdate(book: IBook) {
+  openBookModal.value = true;
   bookToCreateOrUpdate.value = { ...book };
 }
 
-function handleDeleteBook(value: boolean, bookId: string) {
-  openDeleteBookModal.value = value;
-}
 
 const createBook = async (book: IBook) => {
   openBookModal.value = false;
-  try {  
+  try {
     await booksStore.createBook(book);
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 
 const updateBook = async (book: IBook) => {
   openBookModal.value = false;
   try {
     await booksStore.updateBook(book);
+  } catch (error) {}
+};
+
+const deleteBook = async (book: IBook) => {
+  try {
+    await booksStore.removeBook(book);
   } catch (error) {
+    console.log(error);
   }
 };
+
 const handleLogout = async () => {
   try {
     await userStore.endSession();
     router.push("/login");
-  } catch (error) {
-  }
-}
+  } catch (error) {}
+};
 </script>
 
 <template>
@@ -112,7 +113,7 @@ const handleLogout = async () => {
           <VAppBarTitle
             >Your library {{ userStore.computedUser?.name }}</VAppBarTitle
           >
-          <VBtn icon="mdi-logout" @click="handleLogout"/>
+          <VBtn icon="mdi-logout" @click="handleLogout" />
         </VAppBar>
         <VMain>
           <VContainer class="full-height">
@@ -134,14 +135,10 @@ const handleLogout = async () => {
                     )
                   "
                   :headers="booksTableStore.getHeaders"
-                  :open-book-modal="openBookModal"
-                  :open-delete-book-modal="openDeleteBookModal"
                   @update-book-modal="
-                    (open, book) => handleNewOrChangeBookUpdate(open, book)
+                    (book) => handleNewOrChangeBookUpdate(book)
                   "
-                  @update-delete-book-modal="
-                    (open, bookId) => handleDeleteBook(open, bookId)
-                  "
+                  @delete-book="(book) => deleteBook(book)"
                 />
                 <NewOrUpdateBook
                   v-if="booksTableStore.getFilters"
@@ -150,9 +147,9 @@ const handleLogout = async () => {
                   :status="booksTableStore.getFilters?.status!"
                   :type="booksTableStore.getFilters?.type!"
                   :editor="booksTableStore.getFilters?.editor!"
-                  @create-new-book="book => createBook(book)"
-                  @update-book="bookId => updateBook(bookId)"
-                  @only-close="$event => openBookModal = false"
+                  @create-new-book="(book) => createBook(book)"
+                  @update-book="(bookId) => updateBook(bookId)"
+                  @only-close="($event) => (openBookModal = false)"
                 />
               </VCol>
             </VRow>

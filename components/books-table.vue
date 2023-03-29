@@ -5,16 +5,13 @@ import ITableHeaders from "~~/interface/table/tableHeaders";
 interface Props {
   books: IBook[];
   headers: ITableHeaders[];
-  openBookModal: boolean;
-  openDeleteBookModal: boolean;
 }
 
-const { headers, books, openBookModal, openDeleteBookModal } =
-  defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  (e: "updateBookModal", value: boolean, book: IBook): void;
-  (e: "updateDeleteBookModal", value: boolean, bookId: string): void;
-}>()
+  (e: "updateBookModal", book: IBook): void;
+  (e: "deleteBook", book: IBook): void;
+}>();
 
 const emptyBook: IBook = {
   id: "",
@@ -27,14 +24,14 @@ const emptyBook: IBook = {
   price: 0,
   rating: 0,
   comment: "",
-}
+};
 const search = useState(() => "");
 </script>
 
 <template>
   <VDataTable
-    :headers="(headers as any)"
-    :items="books"
+    :headers="(props.headers as any)"
+    :items="props.books"
     :search="search"
     height="70vh"
     fixed-header
@@ -50,7 +47,12 @@ const search = useState(() => "");
           hide-details
           class="search-bar-spacing"
         />
-        <VBtn color="secondary" variant="tonal" @click="emit('updateBookModal', true, { ...emptyBook })">New Book</VBtn>
+        <VBtn
+          color="secondary"
+          variant="tonal"
+          @click="emit('updateBookModal', { ...emptyBook })"
+          >New Book</VBtn
+        >
       </VToolbar>
     </template>
     <template v-slot:item.price="{ item }">
@@ -66,12 +68,49 @@ const search = useState(() => "");
       />
     </template>
     <template v-slot:item.comment="{ item }">
-      <VBtn icon="mdi-comment-outline" color="primary" variant="tonal" />
+      <VMenu location="start">
+        <template v-slot:activator="{ props }">
+          <VBtn
+            icon="mdi-comment-outline"
+            color="primary"
+            variant="tonal"
+            v-bind="props"
+          />
+        </template>
+        <VCard>
+          <VListItem>
+            <VTextarea readonly v-model="(item as any).raw.comment"
+          /></VListItem>
+        </VCard>
+      </VMenu>
     </template>
     <template v-slot:item.action="{ item }">
       <VBtnGroup>
-        <VBtn icon="mdi-pencil" color="secondary" variant="tonal" @click="emit('updateBookModal', true, (item as any).raw)"/>
-        <VBtn icon="mdi-delete" color="error" variant="tonal" />
+        <VBtn
+          icon="mdi-pencil"
+          color="secondary"
+          variant="tonal"
+          @click="emit('updateBookModal', (item as any).raw)"
+        />
+
+        <VDialog width="auto" height="auto">
+          <template v-slot:activator="{ props }">
+            <VBtn
+              icon="mdi-delete"
+              color="error"
+              variant="tonal"
+              v-bind="props"
+            />
+          </template>
+          <VCard>
+            <VCardTitle>Sicuro di voler eliminare {{ (item as any).raw.title }}?</VCardTitle>
+            <VCardActions class="justify-center my-5">
+              <VBtn color="green" variant="elevated">Torna indietro</VBtn>
+              <VBtn color="red" variant="outlined" @click="$emit('deleteBook', (item as any).raw)">Elimina</VBtn>
+              <!-- torna indietro __ -->
+            </VCardActions>
+          </VCard>
+        </VDialog>
       </VBtnGroup>
     </template>
   </VDataTable>
