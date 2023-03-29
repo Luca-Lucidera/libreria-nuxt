@@ -4,7 +4,6 @@ import IUser from "~~/interface/user";
 
 export const login = async (userLogin: ILogin) => {
   try {
-    console.log('SERVICE RAGGIUNTO')
     const user = await $fetch<IUser>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(userLogin),

@@ -6,7 +6,6 @@ export default defineEventHandler(async (event) => {
     !event.node.req.url?.startsWith("/api/table") &&
     !event.node.req.url?.startsWith("/api/filter")
   ) {
-    console.log("event.node.req.url", event.node.req.url);
     const sessionJwt = getSessionValue(event);
     const userId = verifyJwt(sessionJwt);
     const user = (await prisma.users.findFirst({

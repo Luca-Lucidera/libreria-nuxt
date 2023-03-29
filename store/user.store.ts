@@ -12,7 +12,6 @@ export const useUserStore = defineStore("user", () => {
 
   const authenticate = async (loginCredential: ILogin) => {
     try {
-      console.log('STORE RAGGIUNTO')
       user.value = await login(loginCredential);
     } catch (err) {
       throw err;

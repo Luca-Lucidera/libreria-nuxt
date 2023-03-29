@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import IBook from "~~/interface/book";
+import IBook from "~~/interface/book/book";
 import IFilter from "~~/interface/filter";
 interface Props {
   openModal: boolean;
@@ -59,9 +59,9 @@ async function handleSave() {
     return;
   } 
   if (props.book.id === "") {
-    emit("createNewBook", props.book);
+    emit("createNewBook", book.value);
   } else {
-    emit("updateBook", props.book);
+    emit("updateBook", book.value);
   }
 }
 </script>
@@ -87,7 +87,7 @@ async function handleSave() {
                 <VTextField
                   type="number"
                   label="Buy"
-                  v-model="book.buy"
+                  v-model.number="book.buy"
                   :rules="rules.buy"
                 />
               </VCol>
@@ -95,7 +95,7 @@ async function handleSave() {
                 <VTextField
                   type="number"
                   label="Read"
-                  v-model="book.read"
+                  v-model.number="book.read"
                   :rules="rules.read"
                 />
               </VCol>
@@ -116,7 +116,7 @@ async function handleSave() {
                 <VTextField
                   type="number"
                   label="Price"
-                  v-model="book.price"
+                  v-model.number="book.price"
                   :rules="rules.price"
                 />
               </VCol>

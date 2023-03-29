@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import IBook from "~~/interface/book";
+import IBook from "~~/interface/book/book";
 import { useBooksStore } from "~~/store/books.store";
 import { useBooksTableStore } from "~~/store/table.store";
 import { useUserStore } from "~~/store/user.store";
@@ -61,14 +61,12 @@ function handleChangeFilter(key: string, value: string) {
     const k: filterKey = key as filterKey;
     selectedFilter.value[k] = value;
   } catch (error) {
-    console.log(error);
   }
 }
 
 function handleNewOrChangeBookUpdate(open: boolean, book: IBook) {
   openBookModal.value = open;
   bookToCreateOrUpdate.value = { ...book };
-  console.log(book, openBookModal.value);
 }
 
 function handleDeleteBook(value: boolean, bookId: string) {
@@ -77,12 +75,18 @@ function handleDeleteBook(value: boolean, bookId: string) {
 
 const createBook = async (book: IBook) => {
   openBookModal.value = false;
-  booksStore.createBook(book);
+  try {  
+    await booksStore.createBook(book);
+  } catch (error) {
+  }
 };
 
 const updateBook = async (book: IBook) => {
   openBookModal.value = false;
-  booksStore.updateBook(book);
+  try {
+    await booksStore.updateBook(book);
+  } catch (error) {
+  }
 };
 
 </script>
@@ -141,7 +145,7 @@ const updateBook = async (book: IBook) => {
                   :type="booksTableStore.getFilters?.type!"
                   :editor="booksTableStore.getFilters?.editor!"
                   @create-new-book="book => createBook(book)"
-                  @update-book="book => updateBook(book)"
+                  @update-book="bookId => updateBook(bookId)"
                   @only-close="$event => openBookModal = false"
                 />
               </VCol>

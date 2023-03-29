@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VDataTable } from "vuetify/labs/VDataTable";
-import IBook from "~~/interface/book";
+import IBook from "~~/interface/book/book";
 import ITableHeaders from "~~/interface/table/tableHeaders";
 interface Props {
   books: IBook[];
@@ -22,7 +22,7 @@ const emptyBook: IBook = {
   buy: 0,
   read: 0,
   type: "Manga",
-  status: "To read",
+  status: "To Read",
   editor: "J-POP",
   price: 0,
   rating: 0,

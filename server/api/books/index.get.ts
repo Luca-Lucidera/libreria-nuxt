@@ -1,5 +1,5 @@
 import IUser from "~/interface/user";
-import IBook from "~~/interface/book";
+import IBook from "~~/interface/book/book";
 
 export default defineEventHandler(async (event) => {
   const { id: userId }: IUser = event.context.user;
