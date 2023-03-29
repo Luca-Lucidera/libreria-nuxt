@@ -21,7 +21,7 @@ async function handleSubmit() {
     isLoading.value = true;
     error.value = "";
     await userStore.createUser(registerForm.value);
-    router.push("/");
+    await router.push("/");
   } catch (err) {
     if (err instanceof Error) {
       error.value = err.message;

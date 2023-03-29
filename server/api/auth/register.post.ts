@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
       lastName,
       email,
       password: encryptedPassword,
-      jwt: "",
     }
   })
   const jwt = createJwt(user.id);

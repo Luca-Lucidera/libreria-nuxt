@@ -19,7 +19,7 @@ const handleSubmit = async () => {
     isLoading.value = true;
     await userStore.authenticate(userLogin.value);
     const router = useRouter();
-    router.push("/");
+    await router.push("/");
   } catch (err) {
     if (err instanceof Error) {
       error.value = err.message;

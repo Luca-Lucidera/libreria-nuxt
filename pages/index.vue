@@ -51,7 +51,7 @@ try {
 }
 
 if (error.value === "Unauthorized") {
-  router.push("/login");
+  await router.push("/login");
 }
 
 function handleChangeFilter(key: string, value: string) {
@@ -93,7 +93,7 @@ const deleteBook = async (book: IBook) => {
 const handleLogout = async () => {
   try {
     await userStore.endSession();
-    router.push("/login");
+    await router.push("/login");
   } catch (error) {}
 };
 </script>
