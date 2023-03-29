@@ -5,9 +5,29 @@ import ITableHeaders from "~~/interface/table/tableHeaders";
 interface Props {
   books: IBook[];
   headers: ITableHeaders[];
+  openBookModal: boolean;
+  openDeleteBookModal: boolean;
 }
 
-const { headers, books } = defineProps<Props>();
+const { headers, books, openBookModal, openDeleteBookModal } =
+  defineProps<Props>();
+const emit = defineEmits<{
+  (e: "updateBookModal", value: boolean, book: IBook): void;
+  (e: "updateDeleteBookModal", value: boolean, bookId: string): void;
+}>()
+
+const emptyBook: IBook = {
+  id: "",
+  title: "",
+  buy: 0,
+  read: 0,
+  type: "Manga",
+  status: "To read",
+  editor: "J-POP",
+  price: 0,
+  rating: 0,
+  comment: "",
+}
 const search = useState(() => "");
 </script>
 
@@ -30,7 +50,7 @@ const search = useState(() => "");
           hide-details
           class="search-bar-spacing"
         />
-        <VBtn color="secondary" variant="tonal">New Book</VBtn>
+        <VBtn color="secondary" variant="tonal" @click="emit('updateBookModal', true, { ...emptyBook })">New Book</VBtn>
       </VToolbar>
     </template>
     <template v-slot:item.price="{ item }">
@@ -50,7 +70,7 @@ const search = useState(() => "");
     </template>
     <template v-slot:item.action="{ item }">
       <VBtnGroup>
-        <VBtn icon="mdi-pencil" color="secondary" variant="tonal" />
+        <VBtn icon="mdi-pencil" color="secondary" variant="tonal" @click="emit('updateBookModal', true, (item as any).raw)"/>
         <VBtn icon="mdi-delete" color="error" variant="tonal" />
       </VBtnGroup>
     </template>

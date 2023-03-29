@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import IBook from "~~/interface/book";
 import { useBooksStore } from "~~/store/books.store";
 import { useBooksTableStore } from "~~/store/table.store";
 import { useUserStore } from "~~/store/user.store";
@@ -12,7 +13,22 @@ const selectedFilter = useState("selected-filter", () => {
     type: "All",
     editor: "All",
     status: "All",
-    search: "",
+  };
+});
+const openBookModal = useState("open-book-modal", () => false);
+const openDeleteBookModal = useState("open-delete-book-modal", () => false);
+const bookToCreateOrUpdate = useState("book-to-create-or-update", () => {
+  return {
+    id: "",
+    title: "",
+    buy: 0,
+    read: 0,
+    type: "Manga",
+    status: "To read",
+    editor: "J-POP",
+    price: 0,
+    rating: 0,
+    comment: "",
   };
 });
 
@@ -45,9 +61,30 @@ function handleChangeFilter(key: string, value: string) {
     const k: filterKey = key as filterKey;
     selectedFilter.value[k] = value;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
+
+function handleNewOrChangeBookUpdate(open: boolean, book: IBook) {
+  openBookModal.value = open;
+  bookToCreateOrUpdate.value = { ...book };
+  console.log(book, openBookModal.value);
+}
+
+function handleDeleteBook(value: boolean, bookId: string) {
+  openDeleteBookModal.value = value;
+}
+
+const createBook = async (book: IBook) => {
+  openBookModal.value = false;
+  booksStore.createBook(book);
+};
+
+const updateBook = async (book: IBook) => {
+  openBookModal.value = false;
+  booksStore.updateBook(book);
+};
+
 </script>
 
 <template>
@@ -87,6 +124,25 @@ function handleChangeFilter(key: string, value: string) {
                     )
                   "
                   :headers="booksTableStore.getHeaders"
+                  :open-book-modal="openBookModal"
+                  :open-delete-book-modal="openDeleteBookModal"
+                  @update-book-modal="
+                    (open, book) => handleNewOrChangeBookUpdate(open, book)
+                  "
+                  @update-delete-book-modal="
+                    (open, bookId) => handleDeleteBook(open, bookId)
+                  "
+                />
+                <NewOrUpdateBook
+                  v-if="booksTableStore.getFilters"
+                  :open-modal="openBookModal"
+                  :book="bookToCreateOrUpdate"
+                  :status="booksTableStore.getFilters?.status!"
+                  :type="booksTableStore.getFilters?.type!"
+                  :editor="booksTableStore.getFilters?.editor!"
+                  @create-new-book="book => createBook(book)"
+                  @update-book="book => updateBook(book)"
+                  @only-close="$event => openBookModal = false"
                 />
               </VCol>
             </VRow>
