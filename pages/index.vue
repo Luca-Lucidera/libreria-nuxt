@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { VDataTable } from 'vuetify/labs/VDataTable';
 import { useBooksStore } from "~~/store/books.store";
+import { useBooksTableStore } from "~~/store/table.store";
 import { useUserStore } from "~~/store/user.store";
+
+//page state
 const router = useRouter();
 const error = useState(() => "");
 const isLoading = useState(() => true);
-
-const booksStore = useBooksStore();
-const { filteredBooks } = booksStore;
-const userStore = useUserStore();
 const selectedFilter = useState("selected-filter", () => {
   return {
     type: "All",
@@ -18,25 +16,17 @@ const selectedFilter = useState("selected-filter", () => {
   };
 });
 
-let tableHeaders: any[] = [];
-
-let tableFilter = {
-  type: [] as string[],
-  status: [] as string[],
-  editor: [] as string[],
-};
+//store
+const userStore = useUserStore();
+const booksStore = useBooksStore();
+const { fetchBooks, filteredBooks } = booksStore;
+const booksTableStore = useBooksTableStore();
+const { fetchBooksTableHeaders, fetchBooksTableFilters } = booksTableStore;
 
 try {
-  await booksStore.fetchBooks();
-  tableHeaders = await fetchBooksTableHeaders();
-  const bookType = await getType()!;
-  const bookStatus = await getStatus()!;
-  const bookEditor = await getEditor()!;
-  tableFilter = {
-    type: bookType!.map((item) => item.name),
-    status: bookStatus!.map((item) => item.name),
-    editor: bookEditor!.map((item) => item.name),
-  };
+  await fetchBooks();
+  await fetchBooksTableHeaders();
+  await fetchBooksTableFilters();
 } catch (err) {
   if (err instanceof Error) {
     error.value = err.message;
@@ -47,6 +37,16 @@ try {
 
 if (error.value === "Unauthorized") {
   router.push("/login");
+}
+
+function handleChangeFilter(key: string, value: string) {
+  try {
+    type filterKey = keyof typeof selectedFilter.value;
+    const k: filterKey = key as filterKey;
+    selectedFilter.value[k] = value;
+  } catch (error) {
+    console.log(error)
+  }
 }
 </script>
 
@@ -71,80 +71,23 @@ if (error.value === "Unauthorized") {
           <VContainer class="full-height">
             <VRow align="center" class="full-height">
               <VCol cols="2">
-                <VAutocomplete
-                  label="Type"
-                  :items="tableFilter.type"
-                  v-model="selectedFilter.type"
-                />
-                <VAutocomplete
-                  label="Editor"
-                  :items="tableFilter.editor"
-                  v-model="selectedFilter.editor"
-                />
-                <VAutocomplete
-                  label="Status"
-                  :items="tableFilter.status"
-                  v-model="selectedFilter.status"
+                <BooksTableFilter
+                  v-if="booksTableStore.getFilters"
+                  :filters="booksTableStore.getFilters"
+                  @change="(key, value) => handleChangeFilter(key, value)"
                 />
               </VCol>
               <VCol>
-                <VDataTable
-                  :headers="tableHeaders"
-                  :items="
+                <BooksTable
+                  :books="
                     filteredBooks(
                       selectedFilter.type,
                       selectedFilter.editor,
                       selectedFilter.status
                     )
                   "
-                  :search="selectedFilter.search"
-                  fixed-header
-                  fixed-footer
-                  height="70vh"
-                >
-                  <template v-slot:top>
-                    <VToolbar>
-                      <VToolbarTitle>Books</VToolbarTitle>
-                      <VTextField
-                        v-model="selectedFilter.search"
-                        label="Search title"
-                        single-line
-                        hide-details
-                        class="search-bar-spacing"
-                      />
-                      <VBtn color="secondary" variant="tonal">New Book</VBtn>
-                    </VToolbar>
-                  </template>
-                  <template v-slot:item.price="{ item }">
-                    {{ (item as any).raw.price }} €
-                  </template>
-                  <template v-slot:item.rating="{ item }">
-                    <VRating
-                      v-model="(item as any).raw.rating"
-                      :max="5"
-                      color="amber"
-                      half-increments
-                      readonly
-                    />
-                  </template>
-                  <template v-slot:item.comment="{ item }">
-                    <VBtn
-                      icon="mdi-comment-outline"
-                      color="primary"
-                      variant="tonal"
-                    />
-                  </template>
-                  <template v-slot:item.action="{ item }">
-                    <VBtnGroup>
-                      <VBtn
-                        icon="mdi-pencil"
-                        color="secondary"
-                        variant="tonal"
-                      />
-                      <VBtn icon="mdi-delete" color="error" variant="tonal" />
-                    </VBtnGroup>
-                  </template>
-                </VDataTable>
+                  :headers="booksTableStore.getHeaders"
+                />
               </VCol>
             </VRow>
           </VContainer>
@@ -159,8 +102,5 @@ if (error.value === "Unauthorized") {
 }
 .full-height {
   height: 100%;
-}
-.search-bar-spacing {
-  margin-right: 25vw;
 }
 </style>

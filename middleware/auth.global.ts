@@ -2,7 +2,6 @@ import { useUserStore } from "~~/store/user.store";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   if (process.client) {
-    console.log(to.path);
     const userStore = useUserStore();
     if (!userStore.isLogged) {
       try {

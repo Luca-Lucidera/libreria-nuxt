@@ -5,15 +5,15 @@ import ITableHeaders from "~~/interface/table/tableHeaders";
 export const useBooksTableStore = defineStore("books-table", () => {
   const headers = ref<ITableHeaders[]>([]);
   const getHeaders = computed(() => headers.value);
-  const fetchBooksHeaders = async () => {
+  const fetchBooksTableHeaders = async () => {
     if (getHeaders.value.length === 0) {
-      headers.value = await fetchBooksTableHeaders();
+      headers.value = await retriveBooksTableHeaders();
     }
   };
 
   const filters = ref<IBookTableFilter | null>(null);
   const getFilters = computed(() => filters.value);
-  const fetchBooksFilters = async () => {
+  const fetchBooksTableFilters = async () => {
     if (!getFilters.value) {
       const type = await getType()!;
       const status = await getStatus()!;
@@ -26,9 +26,11 @@ export const useBooksTableStore = defineStore("books-table", () => {
     }
   };
   return {
+    filters,
+    headers,
     getHeaders,
-    fetchBooksHeaders,
+    fetchBooksTableHeaders,
     getFilters,
-    fetchBooksFilters,
+    fetchBooksTableFilters,
   };
 });
