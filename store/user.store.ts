@@ -31,6 +31,16 @@ export const useUserStore = defineStore("user", () => {
       throw err;
     }
   };
+  const endSession = async () => {
+    try {
+      if(!computedUser.value) throw new Error('User is not defined');
+      await logout(computedUser.value);
+      reset();
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const isLogged = computed(
     () => user.value !== null && user.value !== undefined
   );
@@ -42,5 +52,6 @@ export const useUserStore = defineStore("user", () => {
     reset,
     isLogged,
     createUser,
+    endSession,
   };
 });

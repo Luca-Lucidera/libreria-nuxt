@@ -34,3 +34,14 @@ export const register = async (user: IRegister) => {
     return handleErrorApi(error);
   }
 };
+
+export const logout = async (user: IUser) => {
+  try {
+    return await $fetch("/api/auth/logout", {
+      method: "POST",
+      body: JSON.stringify(user),
+    });
+  } catch (error) {
+    return handleErrorApi(error);
+  }
+}

@@ -88,7 +88,13 @@ const updateBook = async (book: IBook) => {
   } catch (error) {
   }
 };
-
+const handleLogout = async () => {
+  try {
+    await userStore.endSession();
+    router.push("/login");
+  } catch (error) {
+  }
+}
 </script>
 
 <template>
@@ -106,7 +112,7 @@ const updateBook = async (book: IBook) => {
           <VAppBarTitle
             >Your library {{ userStore.computedUser?.name }}</VAppBarTitle
           >
-          <VBtn icon="mdi-logout" />
+          <VBtn icon="mdi-logout" @click="handleLogout"/>
         </VAppBar>
         <VMain>
           <VContainer class="full-height">
