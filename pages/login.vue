@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ILogin from "~~/interface/login";
+import ILogin from "~~/interface/auth/login";
 import { useUserStore } from "~~/store/user.store";
 
 const userLogin = useState<ILogin>("userLogin", () => {

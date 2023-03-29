@@ -8,5 +8,5 @@ export default interface IBook {
   editor: string;
   price: number;
   rating: number;
-  comments: string;
+  comment: string;
 }

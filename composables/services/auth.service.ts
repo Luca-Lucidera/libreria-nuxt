@@ -1,5 +1,5 @@
-import ILogin from "@/interface/login";
-import IRegister from "~~/interface/register";
+import ILogin from "~~/interface/auth/login";
+import IRegister from "~~/interface/auth/register";
 import IUser from "~~/interface/user";
 
 export const login = async (userLogin: ILogin) => {

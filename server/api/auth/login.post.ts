@@ -1,4 +1,4 @@
-import ILogin from "@/interface/login";
+import ILogin from "~~/interface/auth/login";
 import bcrypt from "bcrypt";
 import IUser from "~~/interface/user";
 

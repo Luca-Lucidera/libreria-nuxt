@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import IRegister from "~~/interface/register";
+import IRegister from "~~/interface/auth/register";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event) as IRegister;

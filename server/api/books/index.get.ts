@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
       editor: book.editor.name,
       price: book.price,
       rating: book.rating,
-      comments: book.comments,
+      comment: book.comment,
     };
   });
   return books;

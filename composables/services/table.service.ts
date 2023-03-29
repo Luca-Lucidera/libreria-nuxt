@@ -1,6 +1,6 @@
-import ITableHeaders from "~~/interface/tableHeaders";
+import ITableHeaders from "~~/interface/table/tableHeaders";
 
-export const fetchTableHeaders = async () => {
+export const fetchBooksTableHeaders = async () => {
   try {
     return await $fetch<ITableHeaders[]>("/api/table/headers", { credentials: "include" });
   } catch (error) {
