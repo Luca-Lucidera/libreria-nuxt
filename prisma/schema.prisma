@@ -57,6 +57,6 @@ model Users {
   lastName String
   email    String  @unique
   password String
-  jwt      String?  @unique
+  jwt      String?
   books    Books[]
 }
