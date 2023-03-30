@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import IRegister from "~~/interface/auth/register";
-import { useUserStore } from "~~/store/user.store";
 
 const registerForm = useState<IRegister>("register-form", () => {
   return {

@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import IBook from "~~/interface/book/book";
-import { useBooksStore } from "~~/store/books.store";
-import { useBooksTableStore } from "~~/store/table.store";
-import { useUserStore } from "~~/store/user.store";
 
 //page state
 const router = useRouter();

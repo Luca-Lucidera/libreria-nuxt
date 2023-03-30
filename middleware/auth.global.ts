@@ -1,5 +1,3 @@
-import { useUserStore } from "~~/store/user.store";
-
 export default defineNuxtRouteMiddleware(async (to, from) => {
   if (process.client) {
     const userStore = useUserStore();
