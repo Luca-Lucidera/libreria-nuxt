@@ -1,5 +1,13 @@
 export const rules = Object.freeze({
   auth: {
+    name: [
+      (v: string) => !!v || "Name is required",
+      (v: string) => v.length <= 30 || "Name must be less than 30 characters",
+    ],
+    lastName: [
+      (v: string) => !!v || "Last name is required",
+      (v: string) => v.length <= 30 || "Last name must be less than 30 characters",
+    ],
     email: [
       (v: string) => !!v || "E-mail is required",
       (v: string) => /.+@.+\..+/.test(v) || "E-mail must be valid",

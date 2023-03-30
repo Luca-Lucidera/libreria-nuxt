@@ -3,7 +3,7 @@ import { VForm } from "vuetify/components/VForm";
 import ILogin from "~~/interface/auth/login";
 
 //page state
-const userLogin = useState<ILogin>("userLogin", () => {
+const loginForm = useState<ILogin>("userLogin", () => {
   return {
     email: "",
     password: "",
@@ -19,10 +19,11 @@ const userStore = useUserStore();
 //function
 const handleSubmit = async () => {
   try {
+    error.value = "";
     globalStore.startLoading();
     const { valid } = await form!.value!.validate();
     if (!valid) return;
-    await userStore.authenticate(userLogin.value);
+    await userStore.authenticate(loginForm.value);
     await useRouter().push("/");
   } catch (err) {
     if (err instanceof Error) {
@@ -46,7 +47,7 @@ const handleSubmit = async () => {
             label="Email"
             variant="underlined"
             color="primary"
-            v-model="userLogin.email"
+            v-model="loginForm.email"
             :rules="rules.auth.email"
           />
         </VCardItem>
@@ -56,7 +57,7 @@ const handleSubmit = async () => {
             variant="underlined"
             prependIcon="mdi-lock"
             color="primary"
-            v-model="userLogin.password"
+            v-model="loginForm.password"
             :type="showPassword ? 'text' : 'password'"
             :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :rules="rules.auth.password"
@@ -74,11 +75,23 @@ const handleSubmit = async () => {
             size="large"
             rounded="lg"
             elevation="18"
+            width="auto"
             :loading="globalStore.getIsLoading"
             :disabled="globalStore.getIsLoading"
           >
             Login
           </VBtn>
+          <VBtn
+            color="secondary"
+            variant="text"
+            size="large"
+            rounded="lg"
+            elevation="18"
+            to="/register"
+            width="auto"
+            :disabled="globalStore.getIsLoading"
+            >REGISTER</VBtn
+          >
         </VCardActions>
       </VForm>
     </VCard>
