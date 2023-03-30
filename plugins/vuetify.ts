@@ -18,7 +18,16 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
     theme: {
       defaultTheme: "dark",
+      themes: {
+        dark: {
+          colors: {
+            primary: "#76FF03",
+            secondary: "#FFFF00",
+          },
+        },
+      }
     },
+
   });
 
   nuxtApp.vueApp.use(vuetify);

@@ -12,6 +12,7 @@ const loginForm = useState<ILogin>("userLogin", () => {
 const form = ref<InstanceType<typeof VForm> | null>(null as any);
 const showPassword = useState("showPassword", () => false);
 const error = useState("error", () => "");
+
 //store
 const globalStore = useGlobalStore();
 const userStore = useUserStore();
@@ -36,7 +37,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <VContainer class="h-screen d-flex align-center justify-center">
+  <VContainer class="h-100 d-flex justify-center align-center">
     <VCard class="w-50 rounded-xl">
       <VCardTitle class="text-center my-4">LOGIN</VCardTitle>
       <VForm @submit.prevent="handleSubmit" ref="form">
@@ -59,9 +60,9 @@ const handleSubmit = async () => {
             color="primary"
             v-model="loginForm.password"
             :type="showPassword ? 'text' : 'password'"
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :rules="rules.auth.password"
-            @click:append="showPassword = !showPassword"
+            @click:append-inner="showPassword = !showPassword"
           />
         </VCardItem>
         <VCardText class="text-center text-error text-body-1">
@@ -71,13 +72,11 @@ const handleSubmit = async () => {
           <VBtn
             type="submit"
             color="primary"
-            variant="tonal"
+            variant="text"
             size="large"
             rounded="lg"
             elevation="18"
             width="auto"
-            :loading="globalStore.getIsLoading"
-            :disabled="globalStore.getIsLoading"
           >
             Login
           </VBtn>
@@ -89,7 +88,6 @@ const handleSubmit = async () => {
             elevation="18"
             to="/register"
             width="auto"
-            :disabled="globalStore.getIsLoading"
             >REGISTER</VBtn
           >
         </VCardActions>

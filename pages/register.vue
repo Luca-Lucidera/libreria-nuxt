@@ -32,7 +32,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <VContainer class="h-screen d-flex align-center justify-center">
+  <VContainer class="h-100 d-flex align-center justify-center">
     <VCard class="w-50 rounded-xl">
       <VCardTitle class="text-center my-4">REGISTER</VCardTitle>
       <VForm @submit.prevent="handleSubmit" ref="form">
@@ -92,8 +92,6 @@ const handleSubmit = async () => {
             rounded="lg"
             elevation="18"
             width="auto"
-            :loading="globalStore.getIsLoading"
-            :disabled="globalStore.getIsLoading"
           >
             REGISTER
           </VBtn>
@@ -105,7 +103,6 @@ const handleSubmit = async () => {
             elevation="18"
             to="/login"
             width="auto"
-            :disabled="globalStore.getIsLoading"
             >LOGIN</VBtn
           >
         </VCardActions>

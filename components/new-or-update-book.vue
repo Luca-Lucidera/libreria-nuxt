@@ -26,31 +26,6 @@ const type = computed(() => {
 const editor = computed(() => {
   return props.editor.filter((s) => s.name !== "All").map((s) => s.name);
 });
-const rules = {
-  title: [
-    (value: string) => !!value || "Title is required",
-    (value: string) =>
-      value.length <= 50 || "Title must be less than 50 characters",
-  ],
-  buy: [
-    (value: number) => !!value || "Buy is required",
-    (value: number) => value <= 9999 || "Buy must be less than 9999",
-    (value: number) => value >= 0 || "Buy must be greater than 0",
-  ],
-  read: [
-    (value: number) => value >= 0 || "Read is required",
-    (value: number) => value <= book.value.buy || "Read must be less than Buy",
-  ],
-  price: [
-    (value: number) => !!value || "Price is required",
-    (value: number) => value <= 9999 || "Price must be less than 9999",
-    (value: number) => value >= 0 || "Price must be greater than 0",
-  ],
-  comment: [
-    (value: string) =>
-      value.length <= 500 || "Comment must be less than 500 characters",
-  ],
-};
 
 const form = ref(null as any);
 async function handleSave() {
@@ -79,7 +54,7 @@ async function handleSave() {
               <VTextField
                 label="Title"
                 v-model="book.title"
-                :rules="rules.title"
+                :rules="rules.book.title"
               />
             </VRow>
             <VRow>
@@ -88,7 +63,7 @@ async function handleSave() {
                   type="number"
                   label="Buy"
                   v-model.number="book.buy"
-                  :rules="rules.buy"
+                  :rules="rules.book.buy"
                 />
               </VCol>
               <VCol>
@@ -96,7 +71,7 @@ async function handleSave() {
                   type="number"
                   label="Read"
                   v-model.number="book.read"
-                  :rules="rules.read"
+                  :rules="rules.book.read"
                 />
               </VCol>
               <VCol>
@@ -117,7 +92,7 @@ async function handleSave() {
                   type="number"
                   label="Price"
                   v-model.number="book.price"
-                  :rules="rules.price"
+                  :rules="rules.book.price"
                 />
               </VCol>
               <VCol class="d-flex justify-center">
@@ -135,7 +110,7 @@ async function handleSave() {
               <VTextarea
                 label="Comment"
                 v-model="book.comment"
-                :rules="rules.comment"
+                :rules="rules.book.comment"
               />
             </VRow>
           </VContainer>
@@ -153,7 +128,7 @@ async function handleSave() {
             <VBtn
               @click="handleSave"
               prepend-icon="mdi-floppy"
-              color="secondary"
+              color="success"
               variant="tonal"
               size="x-large"
               >SAVE</VBtn

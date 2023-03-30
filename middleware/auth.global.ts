@@ -1,6 +1,7 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
   if (process.client) {
     const userStore = useUserStore();
+    if(to.path === "/test") return;
     if (!userStore.isLogged) {
       try {
         await userStore.authenticateViaSession();

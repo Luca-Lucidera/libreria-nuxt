@@ -38,7 +38,7 @@ const globalStore = useGlobalStore()
           class="search-bar-spacing"
         />
         <VBtn
-          color="secondary"
+          color="primary"
           variant="tonal"
           @click="emit('updateBookModal', { ...useEmptyBook().value })"
           >New Book</VBtn
