@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import IBookTableFilter from "~~/interface/table/bookTableFilter";
 import ITableHeaders from "~~/interface/table/tableHeaders";
 
-export const useBooksTableStore = defineStore("books-table", () => {
+export const useTableStore = defineStore("table", () => {
   const headers = ref<ITableHeaders[]>([]);
   const getHeaders = computed(() => headers.value);
   const fetchBooksTableHeaders = async () => {

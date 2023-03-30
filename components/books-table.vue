@@ -13,23 +13,13 @@ const emit = defineEmits<{
   (e: "deleteBook", book: IBook): void;
 }>();
 
-const emptyBook: IBook = {
-  id: "",
-  title: "",
-  buy: 0,
-  read: 0,
-  type: "Manga",
-  status: "To Read",
-  editor: "J-POP",
-  price: 0,
-  rating: 0,
-  comment: "",
-};
 const search = useState(() => "");
+const globalStore = useGlobalStore()
 </script>
 
 <template>
   <VDataTable
+    :loading="globalStore.getIsLoading"
     :headers="(props.headers as any)"
     :items="props.books"
     :search="search"
@@ -50,7 +40,7 @@ const search = useState(() => "");
         <VBtn
           color="secondary"
           variant="tonal"
-          @click="emit('updateBookModal', { ...emptyBook })"
+          @click="emit('updateBookModal', { ...useEmptyBook().value })"
           >New Book</VBtn
         >
       </VToolbar>
