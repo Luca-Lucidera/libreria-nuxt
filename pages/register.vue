@@ -1,36 +1,3 @@
-<script setup lang="ts">
-import IRegister from "~~/interface/auth/register";
-
-const registerForm = useState<IRegister>("register-form", () => {
-  return {
-    name: "",
-    lastName: "",
-    email: "",
-    password: "",
-  };
-});
-const error = useState(() => "");
-const showPassword = useState(() => false);
-
-const userStore = useUserStore();
-const globalStore = useGlobalStore();
-
-const handleSubmit = async () => {
-  try {
-    error.value = "";
-    globalStore.startLoading();
-    await userStore.createUser(registerForm.value);
-    await useRouter().push("/");
-  } catch (err) {
-    if (err instanceof Error) {
-      error.value = err.message;
-    }
-  } finally {
-    globalStore.endLoading();
-  }
-};
-</script>
-
 <template>
   <VContainer class="h-100 d-flex align-center justify-center">
     <VCard class="w-50 rounded-xl">
@@ -75,9 +42,9 @@ const handleSubmit = async () => {
             color="primary"
             v-model="registerForm.password"
             :type="showPassword ? 'text' : 'password'"
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :rules="rules.auth.password"
-            @click:append="showPassword = !showPassword"
+            @click:append-inner="showPassword = !showPassword"
           />
         </VCardItem>
         <VCardText class="text-center text-error text-body-1">
@@ -110,3 +77,41 @@ const handleSubmit = async () => {
     </VCard>
   </VContainer>
 </template>
+
+<script setup lang="ts">
+import IRegister from "~~/interface/auth/register";
+const registerForm = useState<IRegister>("register-form", () => {
+  return {
+    name: "",
+    lastName: "",
+    email: "",
+    password: "",
+  };
+});
+const error = useState(() => "");
+const showPassword = useState(() => false);
+
+const userStore = useUserStore();
+const globalStore = useGlobalStore();
+
+const handleSubmit = async () => {
+  try {
+    error.value = "";
+    globalStore.startLoading();
+    await userStore.createUser(registerForm.value);
+    await useRouter().push("/");
+    registerForm.value = {
+      name: "",
+      lastName: "",
+      email: "",
+      password: "",
+    };
+  } catch (err) {
+    if (err instanceof Error) {
+      error.value = err.message;
+    }
+  } finally {
+    globalStore.stopLoading();
+  }
+};
+</script>

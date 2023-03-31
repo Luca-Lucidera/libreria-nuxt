@@ -1,41 +1,3 @@
-<script setup lang="ts">
-import { VForm } from "vuetify/components/VForm";
-import ILogin from "~~/interface/auth/login";
-
-//page state
-const loginForm = useState<ILogin>("userLogin", () => {
-  return {
-    email: "",
-    password: "",
-  };
-});
-const form = ref<InstanceType<typeof VForm> | null>(null as any);
-const showPassword = useState("showPassword", () => false);
-const error = useState("error", () => "");
-
-//store
-const globalStore = useGlobalStore();
-const userStore = useUserStore();
-
-//function
-const handleSubmit = async () => {
-  try {
-    error.value = "";
-    globalStore.startLoading();
-    const { valid } = await form!.value!.validate();
-    if (!valid) return;
-    await userStore.authenticate(loginForm.value);
-    await useRouter().push("/");
-  } catch (err) {
-    if (err instanceof Error) {
-      error.value = err.message;
-    }
-  } finally {
-    globalStore.endLoading();
-  }
-};
-</script>
-
 <template>
   <VContainer class="h-100 d-flex justify-center align-center">
     <VCard class="w-50 rounded-xl">
@@ -95,3 +57,45 @@ const handleSubmit = async () => {
     </VCard>
   </VContainer>
 </template>
+
+<script setup lang="ts">
+import { VForm } from "vuetify/components/VForm";
+import ILogin from "~~/interface/auth/login";
+
+//page state
+const loginForm = useState<ILogin>("userLogin", () => {
+  return {
+    email: "",
+    password: "",
+  };
+});
+const form = ref<InstanceType<typeof VForm> | null>(null as any);
+const showPassword = useState("showPassword", () => false);
+const error = useState("error", () => "");
+
+//store
+const globalStore = useGlobalStore();
+const userStore = useUserStore();
+
+//function
+const handleSubmit = async () => {
+  try {
+    error.value = "";
+    globalStore.startLoading();
+    const { valid } = await form!.value!.validate();
+    if (!valid) return;
+    await userStore.authenticate(loginForm.value);
+    await useRouter().push("/");
+    loginForm.value = {
+      email: "",
+      password: "",
+    };
+  } catch (err) {
+    if (err instanceof Error) {
+      error.value = err.message;
+    }
+  } finally {
+    globalStore.stopLoading();
+  }
+};
+</script>

@@ -29,7 +29,6 @@
         <VDialog
           v-model="globalStore.getIsLoading"
           persistent
-          class="bg-transparent"
         >
           <VContainer class="h-screen d-flex justify-center align-center">
             <VCard class="w-25">
@@ -61,7 +60,9 @@ const globalStore = useGlobalStore();
 const showSnackbar = useState(() => true);
 
 const handleLogout = async () => {
+  globalStore.startLoading();
   await userStore.endSession();
-  useRouter().push("/login");
+  await useRouter().push("/login");
+  globalStore.stopLoading();
 };
 </script>

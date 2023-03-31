@@ -10,7 +10,7 @@ export const useGlobalStore = defineStore('global', () => {
   const startLoading = () => {
     isLoading.value = true;
   };
-  const endLoading = () => {
+  const stopLoading = () => {
     isLoading.value = false;
   };
   const changeTheme = () => {
@@ -25,7 +25,7 @@ export const useGlobalStore = defineStore('global', () => {
     getIsLoading,
     getTheme,
     startLoading,
-    endLoading,
+    stopLoading,
     changeTheme,
   };
 });
