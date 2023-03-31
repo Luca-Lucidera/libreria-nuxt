@@ -34,7 +34,7 @@ const handleSubmit = async () => {
 <template>
   <VContainer class="h-100 d-flex align-center justify-center">
     <VCard class="w-50 rounded-xl">
-      <VCardTitle class="text-center my-4">REGISTER</VCardTitle>
+      <VCardTitle class="text-center my-4 text-primary">REGISTER</VCardTitle>
       <VForm @submit.prevent="handleSubmit" ref="form">
         <VCardItem>
           <VTextField
