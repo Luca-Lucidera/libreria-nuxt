@@ -3,8 +3,9 @@
     <NuxtPage />
   </NuxtLayout>
 </template>
+
 <style>
 html {
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 </style>

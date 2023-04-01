@@ -4,6 +4,7 @@
     :headers="(props.headers as any)"
     :items="props.books"
     :search="search"
+    no-data-text="No books found, please add one"
     height="70vh"
     fixed-header
     fixed-footer

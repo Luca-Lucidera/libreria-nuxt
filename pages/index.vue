@@ -1,3 +1,30 @@
+<template>
+  <div v-if="error">Error while loading the books: {{ error }}</div>
+  <VContainer v-else class="h-100">
+    <VRow align="center" class="h-100">
+      <VCol cols="2">
+        <BooksTableFilter
+          v-if="tableStore.getFilters"
+          :filters="tableStore.getFilters"
+          @change="(key, value) => handleChangeFilter(key, value)"
+        />
+      </VCol>
+      <VCol>
+        <BooksTable
+          :books="
+            booksStore.filteredBooks(
+              selectedFilter.type,
+              selectedFilter.editor,
+              selectedFilter.status
+            )
+          "
+          :headers="tableStore.getHeaders"
+        />
+      </VCol>
+    </VRow>
+  </VContainer>
+</template>
+
 <script setup lang="ts">
 
 onMounted(async () => {
@@ -43,30 +70,3 @@ const handleChangeFilter = (key: string, value: string) => {
   }
 };
 </script>
-
-<template>
-  <div v-if="error">Error while loading the books: {{ error }}</div>
-  <VContainer v-else class="h-100">
-    <VRow align="center" class="h-100">
-      <VCol cols="2">
-        <BooksTableFilter
-          v-if="tableStore.getFilters"
-          :filters="tableStore.getFilters"
-          @change="(key, value) => handleChangeFilter(key, value)"
-        />
-      </VCol>
-      <VCol>
-        <BooksTable
-          :books="
-            booksStore.filteredBooks(
-              selectedFilter.type,
-              selectedFilter.editor,
-              selectedFilter.status
-            )
-          "
-          :headers="tableStore.getHeaders"
-        />
-      </VCol>
-    </VRow>
-  </VContainer>
-</template>
