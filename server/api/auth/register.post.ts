@@ -2,18 +2,18 @@ import bcrypt from "bcrypt";
 import IRegister from "~~/interface/auth/register";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) as IRegister;
-  if(!body) {
-    throw createError({ statusCode: 400, message: "Bad request" });
+  const body = (await readBody(event)) as IRegister | null;
+  if (!body || !body.name || !body.lastName || !body.email || !body.password) {
+    throw createError({ statusCode: 400, message: "Invalid credentials" });
   }
   const { name, lastName, email, password } = body;
   const checkUserAlreadyExist = await prisma.users.findUnique({
     where: {
       email,
-    }
+    },
   });
 
-  if(checkUserAlreadyExist) {
+  if (checkUserAlreadyExist) {
     throw createError({ statusCode: 400, message: "User already exist" });
   }
 
@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
       lastName,
       email,
       password: encryptedPassword,
-    }
-  })
+    },
+  });
   const jwt = createJwt(user.id);
   await prisma.users.update({
     where: {
@@ -33,8 +33,8 @@ export default defineEventHandler(async (event) => {
     },
     data: {
       jwt,
-    }
-  })
+    },
+  });
   setCookie(event, "session", jwt, {
     httpOnly: true,
     secure: true,

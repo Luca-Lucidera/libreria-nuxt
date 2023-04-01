@@ -5,9 +5,9 @@ export default defineEventHandler(async (event) => {
     where: {
       id: userId,
       jwt: sessionJwt,
-    }
-  })
-  if(!user) {
+    },
+  });
+  if (!user) {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
   return user;
