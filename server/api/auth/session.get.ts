@@ -1,9 +1,10 @@
 export default defineEventHandler(async (event) => {
-  const sessionJwt = getSessionValue(event);
+  const sessionJwt = getSessionJwtFromCookie(event);
   const userId = verifyJwt(sessionJwt);
-  const user = await prisma.users.findUnique({
+  const user = await prisma.users.findFirst({
     where: {
-      id: userId
+      id: userId,
+      jwt: sessionJwt,
     }
   })
   if(!user) {
