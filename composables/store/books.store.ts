@@ -45,9 +45,9 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
-  const removeBook = async (book: IBook) => {
+  const removeBook = async (bookId: string) => {
     try {
-      await deleteBook(book);
+      await deleteBook(bookId);
       await fetchBooks();
     } catch (error) {
       throw error;

@@ -1,15 +1,10 @@
 import bcrypt from "bcrypt";
+import IRegister from "~~/interface/auth/register";
 
 export default defineEventHandler(async (event) => {
-<<<<<<< HEAD
-  const body = await readBody(event);
+  const body = await readBody(event) as IRegister;
   if(!body || !body.name || !body.lastName || !body.email || !body.password) {
     throw createError({ statusCode: 400, message: "Bad request" });
-=======
-  const body = (await readBody(event)) as IRegister | null;
-  if (!body || !body.name || !body.lastName || !body.email || !body.password) {
-    throw createError({ statusCode: 400, message: "Invalid credentials" });
->>>>>>> master
   }
   const { name, lastName, email, password } = body;
 
@@ -18,12 +13,7 @@ export default defineEventHandler(async (event) => {
       email,
     },
   });
-<<<<<<< HEAD
   if(checkUserAlreadyExist) {
-=======
-
-  if (checkUserAlreadyExist) {
->>>>>>> master
     throw createError({ statusCode: 400, message: "User already exist" });
   }
 
@@ -35,14 +25,9 @@ export default defineEventHandler(async (event) => {
       lastName,
       email,
       password: encryptedPassword,
-<<<<<<< HEAD
     }
   })
 
-=======
-    },
-  });
->>>>>>> master
   const jwt = createJwt(user.id);
 
   await prisma.user.update({
@@ -51,14 +36,9 @@ export default defineEventHandler(async (event) => {
     },
     data: {
       jwt,
-<<<<<<< HEAD
     }
   })
 
-=======
-    },
-  });
->>>>>>> master
   setCookie(event, "session", jwt, {
     httpOnly: true,
     secure: true,

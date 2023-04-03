@@ -1,59 +1,36 @@
 import bcrypt from "bcrypt";
-<<<<<<< HEAD
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-=======
-import ILogin from "~~/interface/auth/login";
-
-export default defineEventHandler(async (event) => {
-  const body = (await readBody(event)) as ILogin | null;
->>>>>>> master
   if (!body || !body.email || !body.password) {
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid credential",
     });
   }
-<<<<<<< HEAD
   
-  const userFound = await prisma.user.findUnique({
-=======
-  const user = await prisma.users.findUnique({
->>>>>>> master
+  const user = await prisma.user.findUnique({
     where: {
       email: body.email,
     },
   });
-<<<<<<< HEAD
-  if (!userFound) {
+  if (!user) {
     throw createError({ statusCode: 404, statusMessage: "User not found" });
   }
   
   const isPasswordCorrect = await bcrypt.compare(
     body.password,
-    userFound.password
+    user.password
   );
-=======
-  if (!user) {
-    throw createError({ statusCode: 404, statusMessage: "Invalid credentials" });
-  }
-  const isPasswordCorrect = await bcrypt.compare(body.password, user.password);
->>>>>>> master
   if (!isPasswordCorrect) {
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid credentials",
     });
   }
-<<<<<<< HEAD
   
-  const jwtSessionToken = createJwt(userFound.id);
-  const updateUserLoginJwt = await prisma.user.update({
-=======
   const jwtSessionToken = createJwt(user.id);
-  const updateUserLoginJwt = await prisma.users.update({
->>>>>>> master
+  const updateUserLoginJwt = await prisma.user.update({
     where: {
       id: user.id,
     },
@@ -61,10 +38,6 @@ export default defineEventHandler(async (event) => {
       jwt: jwtSessionToken,
     },
   });
-<<<<<<< HEAD
-
-=======
->>>>>>> master
   setCookie(event, "session", jwtSessionToken, {
     httpOnly: true,
     secure: true,

@@ -88,7 +88,7 @@
           <VBtn
             color="error"
             variant="outlined"
-            @click="handleDeleteBook(bookToDelete)"
+            @click="handleDeleteBook(bookToDelete.id)"
             >Delete</VBtn
           >
         </VCardActions>
@@ -159,11 +159,11 @@ const handleUpdateBook = async (book: IBook) => {
   }
 };
 
-const handleDeleteBook = async (book: IBook) => {
+const handleDeleteBook = async (bookId: string) => {
   deleteBookDialog.value = false;
   try {
     globalStore.startLoading();
-    await booksStore.removeBook(book);
+    await booksStore.removeBook(bookId);
   } catch (error) {
     console.log(error);
   } finally {
