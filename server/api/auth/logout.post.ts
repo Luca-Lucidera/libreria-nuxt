@@ -1,17 +1,15 @@
-import IUser from "~~/interface/user";
-
 export default defineEventHandler(async (event) => {
-  const user = await readBody(event) as IUser;
-  if (!user) {
+  const body = await readBody(event);
+  if (!body) {
     throw createError({
       statusCode: 400,
-      statusMessage: "User is required",
+      statusMessage: "user not found",
     });
   }
 
   await prisma.user.update({
     where: {
-      id: user.id,
+      id: body.id,
     },
     data: {
       jwt: "",
@@ -21,5 +19,5 @@ export default defineEventHandler(async (event) => {
   setCookie(event, "session", "", {
     expires: new Date(0),
   });
-  return "logged out";
-})
+  return true;
+});

@@ -28,7 +28,7 @@
           />
         </VCardItem>
         <VCardText class="text-center text-error text-body-1">
-          {{ error }}
+          <span>{{ error }}</span>
         </VCardText>
         <VCardActions class="justify-center my-4">
           <VBtn
@@ -79,23 +79,20 @@ const userStore = useUserStore();
 
 //function
 const handleSubmit = async () => {
-  try {
-    error.value = "";
-    globalStore.startLoading();
-    const { valid } = await form!.value!.validate();
-    if (!valid) return;
-    await userStore.authenticate(loginForm.value);
-    await useRouter().push("/");
-    loginForm.value = {
-      email: "",
-      password: "",
-    };
-  } catch (err) {
-    if (err instanceof Error) {
-      error.value = err.message;
-    }
-  } finally {
+  error.value = "";
+  globalStore.startLoading();
+  const { valid } = await form!.value!.validate();
+  if (!valid) return;
+  const err = await userStore.authenticate(loginForm.value);
+  if(err) {
+    error.value = err;
     globalStore.stopLoading();
+    return;
   }
+  await useRouter().push("/");
+  loginForm.value = {
+    email: "",
+    password: "",
+  };
 };
 </script>
