@@ -6,7 +6,8 @@ export const rules = Object.freeze({
     ],
     lastName: [
       (v: string) => !!v || "Last name is required",
-      (v: string) => v.length <= 30 || "Last name must be less than 30 characters",
+      (v: string) =>
+        v.length <= 30 || "Last name must be less than 30 characters",
     ],
     email: [
       (v: string) => !!v || "E-mail is required",
@@ -45,8 +46,8 @@ export const rules = Object.freeze({
       (value: number) => value >= 0 || "Price must be greater than 0",
     ],
     comment: [
-      (value: string) =>
-        value.length <= 500 || "Comment must be less than 500 characters",
+      (value: string) => !!value || "Comment can't be null",
+      (value: string) => value.length <= 500 || "Comment must be less than 500 characters",
     ],
   },
 });
