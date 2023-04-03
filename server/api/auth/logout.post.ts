@@ -8,7 +8,8 @@ export default defineEventHandler(async (event) => {
       statusMessage: "User is required",
     });
   }
-  await prisma.users.update({
+
+  await prisma.user.update({
     where: {
       id: user.id,
     },
@@ -16,6 +17,7 @@ export default defineEventHandler(async (event) => {
       jwt: "",
     },
   });
+  
   setCookie(event, "session", "", {
     expires: new Date(0),
   });
