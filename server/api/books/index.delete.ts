@@ -1,14 +1,12 @@
-import IBook from "~~/interface/book/book";
-
 export default defineEventHandler(async (event) => {
-  const book = (await readBody(event)) as IBook;
-  if (!book) {
-    return createError({ statusCode: 400, statusMessage: "Bad Request" });
+  const id = event.context.params?.id;
+  if (!id) {
+    return createError({ statusCode: 400, statusMessage: "the id of the book is required" });
   }
-  await prisma.books.delete({
+  await prisma.book.delete({
     where: {
-      id: book.id,
+      id,
     },
-  })
+  });
   return "OK";
 });

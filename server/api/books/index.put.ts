@@ -1,58 +1,46 @@
-import IBook from "~~/interface/book/book";
+import { Book, Publisher, Status, Type, User } from "@prisma/client";
 
 export default defineEventHandler(async (event) => {
-  const bookBody = (await readBody(event)) as IBook;
-  if (!bookBody) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Book id is required",
-    });
-  }
-  const editorId = await prisma.editor.findUnique({
-    where: {
-      name: bookBody.editor,
-    },
-    select: {
-      id: true,
-    },
-  });
-  const statusId = await prisma.statusBook.findUnique({
-    where: {
-      name: bookBody.status,
-    },
-    select: {
-      id: true,
-    },
-  });
-  const typeId = await prisma.bookType.findUnique({
-    where: {
-      name: bookBody.type,
-    },
-    select: {
-      id: true,
-    },
-  });
+  const { id: userId }: User = event.context.user;
 
-  if (!editorId || !statusId || !typeId) {
+  const bookToUpdate = (await readBody(event)) as Book;
+  if (
+    !bookToUpdate ||
+    !bookToUpdate.title ||
+    !bookToUpdate.type ||
+    !bookToUpdate.status ||
+    !bookToUpdate.publisher
+  ) {
+    throw createError({ statusCode: 404, statusMessage: "Libro mancante" });
+  }
+
+  const parsedBook = {
+    ...bookToUpdate,
+    type: composePrismaEnum(bookToUpdate.type),
+    status: composePrismaEnum(bookToUpdate.status),
+    publisher: composePrismaEnum(bookToUpdate.publisher),
+  };
+
+  const status: Status = bookToUpdate.status as Status;
+  const type: Type = bookToUpdate.type as Type;
+  const publisher: Publisher = bookToUpdate.publisher as Publisher;
+  if (!(status in Status) || !(type in Type) || !(publisher in Publisher)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Bad request",
+      statusMessage: "One field selected does not exist",
     });
   }
-  const bookChanged = await prisma.books.update({
+
+  const bookChanged = await prisma.book.update({
     where: {
-      id: bookBody.id,
+      id: bookToUpdate.id,
     },
     data: {
-      title: bookBody.title,
-      buy: bookBody.buy,
-      read: bookBody.read,
-      price: bookBody.price,
-      rating: bookBody.rating,
-      comment: bookBody.comment,
-      editorId: editorId.id,
-      statusBookId: statusId.id,
-      bookTypeId: typeId.id,
+      ...parsedBook,
+      status,
+      type,
+      publisher,
+      userId,
     },
   });
   return bookChanged;

@@ -1,61 +1,42 @@
-import ICreateBook from "~~/interface/book/create-book";
-import IUser from "~~/interface/user";
+import { Book, Publisher, Status, Type, User } from "@prisma/client";
 
 export default defineEventHandler(async (event) => {
-  const { id: userId }: IUser = event.context.user;
-  const bookToCreate = await readBody(event) as ICreateBook;
-  if(!bookToCreate) {
+  const { id: userId }: User = event.context.user;
+
+  const bookToCreate = (await readBody(event)) as Book;
+  if (
+    !bookToCreate ||
+    !bookToCreate.title ||
+    !bookToCreate.type ||
+    !bookToCreate.status ||
+    !bookToCreate.publisher
+  ) {
     throw createError({ statusCode: 404, statusMessage: "Libro mancante" });
   }
-  const editorId = await prisma.editor.findUnique({
-    where: {
-      name: bookToCreate.editor
-    },
-    select: {
-      id: true
-    }
-  })
-  const statusId = await prisma.statusBook.findUnique({
-    where: {
-      name: bookToCreate.status
-    },
-    select: {
-      id: true
-    }
-  }) 
-  const typeId = await prisma.bookType.findUnique({
-    where: {
-      name: bookToCreate.type
-    },
-    select: {
-      id: true
-    }
-  })
+  const parsedBook = {
+    ...bookToCreate,
+    type: composePrismaEnum(bookToCreate.type),
+    status: composePrismaEnum(bookToCreate.status),
+    publisher: composePrismaEnum(bookToCreate.publisher),
+  };
 
-  //check null 
-  if(!editorId || !statusId || !typeId) {
+  const status: Status = bookToCreate.status as Status;
+  const type: Type = bookToCreate.type as Type;
+  const publisher: Publisher = bookToCreate.publisher as Publisher;
+  if (!(status in Status) || !(type in Type) || !(publisher in Publisher)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "statusId | editorId | typeId non trovati",
+      statusMessage: "One field selected does not exist",
     });
   }
-
-  const book = await prisma.books.create({
+  const book = await prisma.book.create({
     data: {
-      title: bookToCreate.title,
-      buy: bookToCreate.buy,
-      read: bookToCreate.read,
-      price: bookToCreate.price,
-      rating: bookToCreate.rating,
-      comment: bookToCreate.comment,
-      userId: userId, 
-      editorId: editorId.id,
-      statusBookId: statusId.id,
-      bookTypeId: typeId.id
-    }
+      ...parsedBook,
+      status,
+      type,
+      publisher,
+      userId,
+    },
   });
-  if(!book) {
-    throw createError({ statusCode: 404, statusMessage: "Libro creato non trovato" });
-  }
   return book;
 });

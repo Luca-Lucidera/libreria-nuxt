@@ -1,7 +1,10 @@
-import IFilter from "~~/interface/filter";
+import { Status } from "@prisma/client";
 
 export default defineEventHandler(async (event) => {
-  let status = await prisma.statusBook.findMany() as IFilter[];
-  status.unshift({ id: "", name: "All" });
-  return status;
+  let values: string[] = Object.values(Status);
+  values.unshift("All");
+  values = values.map((value) => {
+    return parsePrismaEnum(value);
+  });
+  return values;
 });

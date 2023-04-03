@@ -1,37 +1,38 @@
 import IUser from "~/interface/user";
-import IBook from "~~/interface/book/book";
 
 export default defineEventHandler(async (event) => {
   const { id: userId }: IUser = event.context.user;
-  const booksDB = await prisma.books.findMany({
+  
+  const userBooks = await prisma.book.findMany({
     where: {
-      userId: userId,
+      userId,
     },
-    orderBy: {
-      title: "asc",
-    },
-    include: {
-      bookType: true,
-      editor: true,
-      statusBook: true,
+    select: {
+      id: true,
+      title: true,
+      purchased: true,
+      read: true,
+      type: true,
+      status: true,
+      publisher: true,
+      price: true,
+      rating: true,
+      comment: true,
     },
   });
-  if (booksDB.length === 0) {
-    return booksDB;
+
+  if(userBooks.length === 0) {
+    return userBooks;
   }
-  const books: IBook[] = booksDB.map((book) => {
+  
+  const books = userBooks.map((book) => {
     return {
-      id: book.id,
-      title: book.title,
-      buy: book.buy,
-      read: book.read,
-      type: book.bookType.name,
-      status: book.statusBook.name,
-      editor: book.editor.name,
-      price: book.price,
-      rating: book.rating,
-      comment: book.comment,
-    };
-  });
+      ...book,
+      type: parsePrismaEnum(book.type),
+      status: parsePrismaEnum(book.status),
+      publisher: parsePrismaEnum(book.publisher),
+    }
+  })
+  
   return books;
 });
