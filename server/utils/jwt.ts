@@ -1,11 +1,6 @@
 import jwt from "jsonwebtoken";
 
-/**
- * 
- * @param userId  - The user id
- * @returns string jwt token
- */
-export function createJwt(userId: string) {
+export function createJwt(userId: string): string {
   const jwtSessionToken = jwt.sign({userId: userId}, useRuntimeConfig().jwt.secret, {
     issuer: useRuntimeConfig().jwt.iss,
     audience: useRuntimeConfig().jwt.aud,
@@ -15,11 +10,6 @@ export function createJwt(userId: string) {
   return jwtSessionToken;
 }
 
-/**
- * 
- * @param token - The jwt token
- * @returns string - The user uuid
- */
 export function verifyJwt(token: string): string {
   const decoded = jwt.verify(token, useRuntimeConfig().jwt.secret, {
     issuer: useRuntimeConfig().jwt.iss,
