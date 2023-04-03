@@ -3,60 +3,60 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model BookType {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name  String  @unique
-  books Books[]
-}
-
-model Editor {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name  String  @unique
-  books Books[]
-}
-
-model Books {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  title        String
-  buy          Int
-  read         Int
-  bookTypeId   String     @db.ObjectId
-  statusBookId String     @db.ObjectId
-  editorId     String     @db.ObjectId
-  price        Float
-  rating       Float
-  comment     String
-  userId       String     @db.ObjectId
-  user         Users      @relation(fields: [userId], references: [id])
-  bookType     BookType   @relation(fields: [bookTypeId], references: [id])
-  statusBook   StatusBook @relation(fields: [statusBookId], references: [id])
-  editor       Editor     @relation(fields: [editorId], references: [id])
-}
-
-model StatusBook {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String  @unique
-  statusBooks Books[]
-}
-
 model TableHeaders {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  id       String  @id @default(uuid())
   title    String  @unique
   key      String  @unique
   sortable Boolean
   align    String? @default("center")
 }
 
-model Users {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+model User {
+  id       String  @id @default(uuid())
   name     String
   lastName String
   email    String  @unique
   password String
-  jwt      String? @default("")
-  books    Books[]
+  jwt      String?
+}
+
+model Book {
+  id        String    @id @default(uuid())
+  title     String
+  purchased Int       @default(1)
+  read      Int       @default(0)
+  type      Type
+  status    Status
+  publisher Publisher
+  price     Float     @default(1)
+  rating    Float     @default(0)
+  comment   String?
+}
+
+enum Type {
+  Manga
+  Manhwa
+  Light_Novel
+  Novel
+  Book
+}
+
+enum Status {
+  Plan_To_Read
+  Reading
+  Completed
+  Dropped
+}
+
+enum Publisher {
+  JPOP
+  Planet_Manga
+  Star_Comics
+  Goen
+  Dokusho
+  Other
 }
