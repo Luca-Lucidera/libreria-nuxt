@@ -11,17 +11,31 @@ export const useUserStore = defineStore("user", () => {
   };
 
   const authenticate = async (loginCredential: ILogin) => {
-    try {
-      user.value = await login(loginCredential);
-    } catch (error) {}
+    // try {
+    //   user.value = await login(loginCredential);
+
+    // } catch (error) {}
+    const { data, error } = await useLazyFetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify(loginCredential),
+    });
+    if (error.value) {
+      return error.value?.statusMessage;
+    }
+    if (data.value) {
+      user.value = data.value;
+    }
   };
 
   const authenticateViaSession = async () => {
-    try {
-      user.value = await retriveUserViaSession();
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   user.value = await retriveUserViaSession();
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    const { data, error } = await useLazyFetch("/api/auth/session", {
+      credentials: "include",
+    });
   };
   const createUser = async (registerCredential: IRegister) => {
     try {
@@ -35,7 +49,7 @@ export const useUserStore = defineStore("user", () => {
       await logout(computedUser.value);
       reset();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
     reset();
   };
