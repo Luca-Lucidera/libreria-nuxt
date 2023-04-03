@@ -21,9 +21,9 @@ export default defineEventHandler(async (event) => {
     publisher: composePrismaEnum(bookToUpdate.publisher),
   };
 
-  const status: Status = parsedBook.status as Status;
-  const type: Type = parsedBook.type as Type;
-  const publisher: Publisher = parsedBook.publisher as Publisher;
+  const status: Status = bookToUpdate.status as Status;
+  const type: Type = bookToUpdate.type as Type;
+  const publisher: Publisher = bookToUpdate.publisher as Publisher;
   if (!(status in Status) || !(type in Type) || !(publisher in Publisher)) {
     throw createError({
       statusCode: 400,
