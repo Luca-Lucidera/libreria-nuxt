@@ -1,6 +1,7 @@
-import IFilter from '~~/interface/filter';
+import { Publisher, Status, Type } from "@prisma/client";
+
 export default interface IBookTableFilter {
-  type: IFilter[];
-  status: IFilter[];
-  editor: IFilter[];
+  type: Type[];
+  status: Status[];
+  publisher: Publisher[];
 }

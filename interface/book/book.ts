@@ -1,11 +1,11 @@
 export default interface IBook {
   id: string;
   title: string;
-  buy: number;
+  purchased: number;
   read: number;
   type: string;
   status: string;
-  editor: string;
+  publisher: string;
   price: number;
   rating: number;
   comment: string;

@@ -19,7 +19,7 @@
                 <VTextField
                   type="number"
                   label="Buy"
-                  v-model.number="bookToChange.buy"
+                  v-model.number="bookToChange.purchased"
                   :rules="rules.book.buy"
                 />
               </VCol>
@@ -28,7 +28,7 @@
                   type="number"
                   label="Read"
                   v-model.number="bookToChange.read"
-                  :rules="rules.book.read(bookToChange.buy)"
+                  :rules="rules.book.read(bookToChange.purchased)"
                 />
               </VCol>
               <VCol>
@@ -50,8 +50,8 @@
               <VCol>
                 <VSelect
                   label="Editor"
-                  v-model="bookToChange.editor"
-                  :items="editor"
+                  v-model="bookToChange.publisher"
+                  :items="publisher"
                 />
               </VCol>
             </VRow>
@@ -111,14 +111,13 @@
 
 <script setup lang="ts">
 import IBook from "~~/interface/book/book";
-import IFilter from "~~/interface/filter";
+import IBookTableFilter from "~~/interface/table/bookTableFilter";
 interface Props {
   openModal: boolean;
   book: IBook;
-  status: IFilter[];
-  type: IFilter[];
-  editor: IFilter[];
+  tableFilter: IBookTableFilter;
 }
+
 const props = defineProps<Props>();
 const emit = defineEmits<{
   (e: "createNewBook", book: IBook): void;
@@ -128,14 +127,21 @@ const emit = defineEmits<{
 
 const open = computed(() => props.openModal);
 const bookToChange = computed(() => props.book);
+
 const status = computed(() => {
-  return props.status.filter((s) => s.name !== "All").map((s) => s.name);
+  return props.tableFilter.status
+    .filter((s: string) => s !== "All")
+    .map((s) => s);
 });
 const type = computed(() => {
-  return props.type.filter((s) => s.name !== "All").map((s) => s.name);
+  return props.tableFilter.type
+    .filter((s: string) => s !== "All")
+    .map((s) => s);
 });
-const editor = computed(() => {
-  return props.editor.filter((s) => s.name !== "All").map((s) => s.name);
+const publisher = computed(() => {
+  return props.tableFilter.publisher
+    .filter((p: string) => p != "All")
+    .map((p) => p);
 });
 
 const form = ref(null as any);

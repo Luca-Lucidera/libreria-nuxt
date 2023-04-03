@@ -1,8 +1,7 @@
-import IFilter from "~~/interface/filter";
 
 export const getEditor = async () => {
   try {
-    return await $fetch<IFilter[]>("/api/filter/editor");
+    return await $fetch("/api/filter/publisher");
   } catch (error) {
     handleErrorApi(error)
   }
@@ -10,7 +9,7 @@ export const getEditor = async () => {
 
 export const getStatus = async () => {
   try {
-    return await $fetch<IFilter[]>("/api/filter/status");
+    return await $fetch("/api/filter/status");
   } catch (error) {
     handleErrorApi(error);
   }
@@ -19,7 +18,7 @@ export const getStatus = async () => {
 
 export const getType = async () => {
   try {
-    return await $fetch<IFilter[]>("/api/filter/type");
+    return await $fetch("/api/filter/type");
   } catch (error) {
     handleErrorApi(error);
   }

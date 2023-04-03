@@ -1,10 +1,9 @@
 import ILogin from "~~/interface/auth/login";
 import IRegister from "~~/interface/auth/register";
-import IUser from "~~/interface/user";
 
 export const login = async (userLogin: ILogin) => {
   try {
-    const user = await $fetch<IUser>("/api/auth/login", {
+    const user = await $fetch("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(userLogin),
     });
@@ -16,7 +15,7 @@ export const login = async (userLogin: ILogin) => {
 
 export const retriveUserViaSession = async () => {
   try {
-    return await $fetch<IUser>("/api/auth/session", {
+    return await $fetch("/api/auth/session", {
       credentials: "include",
     });
   } catch (error) {
@@ -26,7 +25,7 @@ export const retriveUserViaSession = async () => {
 
 export const register = async (user: IRegister) => {
   try {
-    return await $fetch<IUser>("/api/auth/register", {
+    return await $fetch("/api/auth/register", {
       method: "POST",
       body: JSON.stringify(user),
     });
@@ -35,7 +34,7 @@ export const register = async (user: IRegister) => {
   }
 };
 
-export const logout = async (user: IUser) => {
+export const logout = async (user: any) => {
   try {
     return await $fetch("/api/auth/logout", {
       method: "POST",

@@ -54,7 +54,7 @@
         </VCard>
       </VMenu>
     </template>
-    <template v-slot:item.action="{ item }">
+    <template v-slot:item.actions="{ item }">
       <VBtnGroup>
         <VBtn
           icon="mdi-pencil"
@@ -99,9 +99,7 @@
     v-if="tableStore.getFilters"
     :open-modal="openBookModal"
     :book="bookToCreateOrUpdate"
-    :status="tableStore.getFilters?.status!"
-    :type="tableStore.getFilters?.type!"
-    :editor="tableStore.getFilters?.editor!"
+    :table-filter="tableStore.getFilters"
     @create-new-book="(book) => handleCreateBook(book)"
     @update-book="(bookId) => handleUpdateBook(bookId)"
     @only-close="() => (openBookModal = false)"
@@ -109,12 +107,12 @@
 </template>
 
 <script setup lang="ts">
+import { TableHeaders } from "@prisma/client";
 import { VDataTable } from "vuetify/labs/VDataTable";
 import IBook from "~~/interface/book/book";
-import ITableHeaders from "~~/interface/table/tableHeaders";
 interface Props {
   books: IBook[];
-  headers: ITableHeaders[];
+  headers: TableHeaders[];
 }
 
 const props = defineProps<Props>();

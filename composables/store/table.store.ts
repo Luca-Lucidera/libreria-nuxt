@@ -1,9 +1,9 @@
+import { TableHeaders } from ".prisma/client";
 import { defineStore } from "pinia";
 import IBookTableFilter from "~~/interface/table/bookTableFilter";
-import ITableHeaders from "~~/interface/table/tableHeaders";
 
 export const useTableStore = defineStore("table", () => {
-  const headers = ref<ITableHeaders[]>([]);
+  const headers = ref<TableHeaders[]>([]);
   const getHeaders = computed(() => headers.value);
   const fetchBooksTableHeaders = async () => {
     if (getHeaders.value.length === 0) {
@@ -21,7 +21,7 @@ export const useTableStore = defineStore("table", () => {
       filters.value = {
         type: type!,
         status: status!,
-        editor: editor!,
+        publisher: editor!,
       }
     }
   };
