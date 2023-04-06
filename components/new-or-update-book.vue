@@ -87,20 +87,20 @@
         <VCardActions class="justify-center mb-10">
           <VBtnGroup>
             <VBtn
-              @click="emit('onlyClose')"
-              prepend-icon="mdi-close"
-              color="error"
-              variant="tonal"
-              size="x-large"
-              >CLOSE</VBtn
-            >
-            <VBtn
               @click="handleSave"
               prepend-icon="mdi-floppy"
               color="success"
               variant="tonal"
               size="x-large"
               >SAVE</VBtn
+            >
+            <VBtn
+              @click="emit('onlyClose')"
+              prepend-icon="mdi-close"
+              color="error"
+              variant="tonal"
+              size="x-large"
+              >CLOSE</VBtn
             >
           </VBtnGroup>
         </VCardActions>
