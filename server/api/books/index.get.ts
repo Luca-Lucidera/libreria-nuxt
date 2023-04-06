@@ -1,7 +1,7 @@
-import IUser from "~/interface/user";
+import { User } from "@prisma/client";
 
 export default defineEventHandler(async (event) => {
-  const { id: userId }: IUser = event.context.user;
+  const { id: userId }: User = event.context.user;
   
   const userBooks = await prisma.book.findMany({
     where: {
