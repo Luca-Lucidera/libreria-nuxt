@@ -14,7 +14,7 @@
           :books="
             booksStore.filteredBooks(
               selectedFilter.type,
-              selectedFilter.editor,
+              selectedFilter.publisher,
               selectedFilter.status
             )
           "
@@ -26,32 +26,14 @@
 </template>
 
 <script setup lang="ts">
-
-onMounted(async () => {
-  try {
-    globalStore.startLoading();
-    await booksStore.fetchBooks();
-    await tableStore.fetchBooksTableHeaders();
-    await tableStore.fetchBooksTableFilters();
-  } catch (err) {
-    if (err instanceof Error) {
-      error.value = err.message;
-      if (error.value === "Unauthorized") {
-        await useRouter().push("/login");
-      }
-    }
-  } finally {
-    globalStore.stopLoading();
-  }
-});
-
+import { FetchError } from "ofetch";
 
 //state
 const error = useState(() => "");
 const selectedFilter = useState("selected-filter", () => {
   return {
     type: "All",
-    editor: "All",
+    publisher: "All",
     status: "All",
   };
 });
@@ -60,6 +42,27 @@ const selectedFilter = useState("selected-filter", () => {
 const booksStore = useBooksStore();
 const tableStore = useTableStore();
 const globalStore = useGlobalStore();
+
+try {
+  globalStore.startLoading();
+  await booksStore.fetchBooks();
+  await tableStore.fetchBooksTableFilters();
+  await tableStore.fetchBooksTableHeaders();
+} catch (e: any) {
+  const err: FetchError = e;
+  if (err.statusCode != 500) {
+    if (err.statusMessage) {
+      error.value = err.statusMessage;
+    } else {
+      error.value =
+        "Not a fatal error, but we can't find the problem, please contact luca-lucidera on github";
+    }
+  } else {
+    error.value = "Something went wrong";
+  }
+} finally {
+  globalStore.stopLoading();
+}
 
 //function
 const handleChangeFilter = (key: string, value: string) => {

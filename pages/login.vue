@@ -59,6 +59,7 @@
 </template>
 
 <script setup lang="ts">
+import { FetchError } from "ofetch";
 import { VForm } from "vuetify/components/VForm";
 import ILogin from "~~/interface/auth/login";
 
@@ -79,20 +80,30 @@ const userStore = useUserStore();
 
 //function
 const handleSubmit = async () => {
-  error.value = "";
-  globalStore.startLoading();
-  const { valid } = await form!.value!.validate();
-  if (!valid) return;
-  const err = await userStore.authenticate(loginForm.value);
-  if(err) {
-    error.value = err;
+  try {
+    error.value = "";
+    globalStore.startLoading();
+    const { valid } = await form!.value!.validate();
+    if (!valid) return;
+    await userStore.authenticate(loginForm.value);
+    await useRouter().push("/");
+    loginForm.value = {
+      email: "",
+      password: "",
+    };
+  } catch (e: any) {
+    const err: FetchError = e;
+    if (err.statusCode != 500) {
+      if (err.statusMessage) {
+        error.value = err.statusMessage;
+      } else {
+        error.value = "Not a fatal error, but we can't find the problem, please contact luca-lucidera on github";
+      }
+    } else {
+      error.value = "Something went wrong";
+    }
+  } finally {
     globalStore.stopLoading();
-    return;
   }
-  await useRouter().push("/");
-  loginForm.value = {
-    email: "",
-    password: "",
-  };
 };
 </script>

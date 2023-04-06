@@ -20,38 +20,51 @@ export const useBooksStore = defineStore("books", () => {
     }).value;
 
   const fetchBooks = async () => {
-    try {
-      books.value = await getBooks();
-    } catch (error) {
-      throw error;
+    const { data, error } = await useLazyFetch("/api/books", {
+      method: "GET",
+      credentials: "include",
+    });
+    if (error.value) {
+      throw error.value;
+    }
+    if (data.value) {
+      books.value = data.value;
     }
   };
 
   const createBook = async (book: IBook) => {
-    try {
-      await postBook(book);
-      await fetchBooks();
-    } catch (error) {
-      throw error;
+    const { error } = await useLazyFetch("/api/books", {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify(book),
+    });
+    if (error.value) {
+      throw error.value;
     }
+    await fetchBooks();
   };
-  
+
   const updateBook = async (book: IBook) => {
-    try {
-      await putBook(book);
-      await fetchBooks();
-    } catch (error) {
-      throw error;
+    const { error } = await useLazyFetch("/api/books", {
+      method: "PUT",
+      credentials: "include",
+      body: JSON.stringify(book),
+    });
+    if (error.value) {
+      throw error.value;
     }
+    await fetchBooks();
   };
 
   const removeBook = async (bookId: string) => {
-    try {
-      await deleteBook(bookId);
-      await fetchBooks();
-    } catch (error) {
-      throw error;
+    const { error } = await useLazyFetch(`/api/books/${bookId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (error.value) {
+      throw error.value;
     }
+    await fetchBooks();
   };
 
   return {

@@ -79,6 +79,7 @@
 </template>
 
 <script setup lang="ts">
+import { FetchError } from "ofetch";
 import IRegister from "~~/interface/auth/register";
 const registerForm = useState<IRegister>("register-form", () => {
   return {
@@ -106,9 +107,16 @@ const handleSubmit = async () => {
       email: "",
       password: "",
     };
-  } catch (err) {
-    if (err instanceof Error) {
-      error.value = err.message;
+  } catch (e: any) {
+    const err: FetchError = e;
+    if (err.statusCode != 500) {
+      if (err.statusMessage) {
+        error.value = err.statusMessage;
+      } else {
+        error.value = "Not a fatal error, but we can't find the problem, please contact luca-lucidera on github";
+      }
+    } else {
+      error.value = "Something went wrong";
     }
   } finally {
     globalStore.stopLoading();

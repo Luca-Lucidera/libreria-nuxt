@@ -8,5 +8,5 @@ export default interface IBook {
   publisher: string;
   price: number;
   rating: number;
-  comment: string;
+  comment: string | null;
 }

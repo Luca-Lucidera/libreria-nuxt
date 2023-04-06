@@ -3,7 +3,7 @@ import { Book, Publisher, Status, Type, User } from "@prisma/client";
 export default defineEventHandler(async (event) => {
   const { id: userId }: User = event.context.user;
 
-  const bookToCreate = (await readBody(event)) as Book;
+  const { id, ...bookToCreate } = (await readBody(event)) as Book;
   if (
     !bookToCreate ||
     !bookToCreate.title ||

@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   if (!body || !body.email || !body.password) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Invalid credential",
+      statusMessage: "Invalid credentials",
     });
   }
   
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     },
   });
   if (!user) {
-    throw createError({ statusCode: 404, statusMessage: "User not found" });
+    throw createError({ statusCode: 404, statusMessage: "Invalid credentials" });
   }
   
   const isPasswordCorrect = await bcrypt.compare(
