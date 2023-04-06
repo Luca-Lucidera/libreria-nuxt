@@ -26,10 +26,7 @@
       </VAppBar>
       <VMain class="h-100">
         <slot />
-        <VDialog
-          v-model="globalStore.getIsLoading"
-          persistent
-        >
+        <VDialog v-model="globalStore.getIsLoading" persistent>
           <VContainer class="h-screen d-flex justify-center align-center">
             <VCard class="w-25">
               <VCardTitle class="text-center">Loading...</VCardTitle>
@@ -54,15 +51,31 @@
 </template>
 
 <script setup lang="ts">
+import { FetchError } from "ofetch";
+
 const userStore = useUserStore();
 const globalStore = useGlobalStore();
 
 const showSnackbar = useState(() => true);
 
 const handleLogout = async () => {
-  globalStore.startLoading();
-  await userStore.endSession();
-  await useRouter().push("/login");
-  globalStore.stopLoading();
+  try {
+    globalStore.startLoading();
+    await userStore.endSession();
+  } catch (err: any) {
+    const error: FetchError = err;
+    if (error.statusCode !== 500) {
+      if (!error.statusMessage) {
+        console.log("something went wrong");
+      } else {
+        console.log(error.statusMessage);
+      }
+    } else {
+      console.log("something went wrong");
+    }
+  } finally {
+    await useRouter().push("/login");
+    globalStore.stopLoading();
+  }
 };
 </script>

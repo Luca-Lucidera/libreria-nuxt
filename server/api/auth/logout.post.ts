@@ -1,21 +1,17 @@
+import { User } from "@prisma/client";
+
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  if (!body) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "user not found",
-    });
-  }
+  const { id }: User = event.context.user;
 
   await prisma.user.update({
     where: {
-      id: body.id,
+      id,
     },
     data: {
       jwt: "",
     },
   });
-  
+
   setCookie(event, "session", "", {
     expires: new Date(0),
   });

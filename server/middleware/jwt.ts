@@ -1,9 +1,8 @@
 export default defineEventHandler(async (event) => {
   if (
-    event.node.req.url?.startsWith("/api") &&
-    !event.node.req.url?.startsWith("/api/auth") &&
-    !event.node.req.url?.startsWith("/api/table") &&
-    !event.node.req.url?.startsWith("/api/filter")
+    event.node.req.url?.startsWith("/api/books") ||
+    event.node.req.url?.startsWith("/api/auth/session") ||
+    event.node.req.url?.startsWith("/api/auth/logout")
   ) {
     const sessionJwt = getSessionJwtFromCookie(event);
     const userId = verifyJwt(sessionJwt);
