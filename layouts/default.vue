@@ -35,17 +35,6 @@
           </VContainer>
         </VDialog>
       </VMain>
-      <VSnackbar v-model="showSnackbar" color="info" elevation="24">
-        <p>
-          If the layout of the page look weird, please press CTRL + F5 or CTRL +
-          SHIFT + R
-        </p>
-        <template v-slot:actions>
-          <VBtn color="white" @click="showSnackbar = false" variant="elevated"
-            >I understand</VBtn
-          >
-        </template>
-      </VSnackbar>
     </VContainer>
   </VLayout>
 </template>
@@ -56,12 +45,11 @@ import { FetchError } from "ofetch";
 const userStore = useUserStore();
 const globalStore = useGlobalStore();
 
-const showSnackbar = useState(() => true);
-
 const handleLogout = async () => {
   try {
     globalStore.startLoading();
     await userStore.endSession();
+    globalStore.clearJwt();
   } catch (err: any) {
     const error: FetchError = err;
     if (error.statusCode !== 500) {

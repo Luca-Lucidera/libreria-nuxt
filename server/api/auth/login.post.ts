@@ -8,41 +8,35 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid credentials",
     });
   }
-  
+
   const user = await prisma.user.findUnique({
     where: {
       email: body.email,
     },
   });
   if (!user) {
-    throw createError({ statusCode: 404, statusMessage: "Invalid credentials" });
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Invalid credentials",
+    });
   }
-  
-  const isPasswordCorrect = await bcrypt.compare(
-    body.password,
-    user.password
-  );
+
+  const isPasswordCorrect = await bcrypt.compare(body.password, user.password);
   if (!isPasswordCorrect) {
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid credentials",
     });
   }
-  
-  const jwtSessionToken = createJwt(user.id);
-  const updateUserLoginJwt = await prisma.user.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      jwt: jwtSessionToken,
-    },
-  });
-  setCookie(event, "session", jwtSessionToken, {
+
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+
+  setCookie(event, "refresh_token", refreshToken, {
     httpOnly: true,
     secure: true,
-    sameSite: "lax",
-    expires: new Date(Date.now() + 86400000),
+    sameSite: "strict",
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
   });
-  return updateUserLoginJwt;
+  return { user: user, accessToken: accessToken }
 });

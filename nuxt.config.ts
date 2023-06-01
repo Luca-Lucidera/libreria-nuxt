@@ -12,11 +12,9 @@ export default defineNuxtConfig({
   },
   modules: ["@pinia/nuxt", "@nuxt/devtools"],
   runtimeConfig: {
-    jwt: {
-      secret: "9575a2c6-7951-4085-9658-a7f6f1eb2e0c",
-      iss: "la-tua-libreria-api",
-      aud: "la-tua-libreria",
-    },
+    jwtSecret: "",
+    jwtAud: "",
+    jwtIss: "",
     public: {
       api: "/api",
       env: "development",

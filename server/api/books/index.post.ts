@@ -1,7 +1,13 @@
 import { Book, Publisher, Status, Type, User } from "@prisma/client";
 
 export default defineEventHandler(async (event) => {
-  const { id: userId }: User = event.context.user;
+  const result = await handleSecurity(event);
+  if (!result.success) {
+    throw createError({ statusCode: 401, message: result.errorData });
+  }
+  if (!result.successData?.user?.id) {
+    throw createError({ statusCode: 401, message: "Token invalid" });
+  }
 
   const { id, ...bookToCreate } = (await readBody(event)) as Book;
   if (
@@ -35,7 +41,7 @@ export default defineEventHandler(async (event) => {
       status,
       type,
       publisher,
-      userId,
+      userId: result.successData.user.id,
     },
   });
   return book;

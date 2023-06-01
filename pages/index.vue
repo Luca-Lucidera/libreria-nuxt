@@ -39,31 +39,32 @@ const selectedFilter = useState("selected-filter", () => {
 });
 
 //store
-const booksStore = useBooksStore();
 const tableStore = useTableStore();
 const globalStore = useGlobalStore();
+const booksStore = useBooksStore();
 
-try {
-  globalStore.startLoading();
-  await booksStore.fetchBooks();
-  await tableStore.fetchBooksTableFilters();
-  await tableStore.fetchBooksTableHeaders();
-} catch (e: any) {
-  const err: FetchError = e;
-  if (err.statusCode != 500) {
-    if (err.statusMessage) {
-      error.value = err.statusMessage;
+onMounted(async () => {
+  try {
+    globalStore.startLoading();
+    await tableStore.fetchBooksTableFilters();
+    await tableStore.fetchBooksTableHeaders();
+    await booksStore.fetchBooks();
+  } catch (e: any) {
+    const err: FetchError = e;
+    if (err.statusCode != 500) {
+      if (err.statusMessage) {
+        error.value = err.statusMessage;
+      } else {
+        error.value =
+          "Not a fatal error, but we can't find the problem, please contact luca-lucidera on github";
+      }
     } else {
-      error.value =
-        "Not a fatal error, but we can't find the problem, please contact luca-lucidera on github";
+      error.value = "Something went wrong";
     }
-  } else {
-    error.value = "Something went wrong";
+  } finally {
+    globalStore.stopLoading();
   }
-} finally {
-  globalStore.stopLoading();
-}
-
+});
 //function
 const handleChangeFilter = (key: string, value: string) => {
   type filterKey = keyof typeof selectedFilter.value;

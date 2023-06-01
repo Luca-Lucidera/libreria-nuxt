@@ -1,26 +1,100 @@
-import jwt from "jsonwebtoken";
+import Result from "~~/interface/result";
+import { User } from "@prisma/client";
+import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
 
-export function createJwt(userId: string): string {
-  const jwtSessionToken = jwt.sign({userId: userId}, useRuntimeConfig().jwt.secret, {
-    issuer: useRuntimeConfig().jwt.iss,
-    audience: useRuntimeConfig().jwt.aud,
-    expiresIn: "24h",
-    algorithm: "HS256",
-  });
-  return jwtSessionToken;
+type JwtErrorResponse = {
+  name: "ExpiredToken" | "InvalidToken";
+  message: string;
+};
+
+export function generateAccessToken(user: User) {
+  return jwt.sign(
+    {
+      userId: user.id,
+      name: user.name,
+      lastName: user.lastName,
+    },
+    useRuntimeConfig().jwtSecret,
+    {
+      issuer: useRuntimeConfig().jwtIss,
+      audience: useRuntimeConfig().jwtAud,
+      expiresIn: "5m",
+      algorithm: "HS256",
+    }
+  );
 }
 
-export function verifyJwt(token: string): string {
-  const decoded = jwt.verify(token, useRuntimeConfig().jwt.secret, {
-    issuer: useRuntimeConfig().jwt.iss,
-    audience: useRuntimeConfig().jwt.aud,
-    algorithms: ["HS256"],
-  });
-  if(!decoded) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
+export function generateRefreshToken(user: User) {
+  return jwt.sign(
+    {
+      userId: user.id,
+      name: user.name,
+      lastName: user.lastName,
+    },
+    useRuntimeConfig().jwtSecret,
+    {
+      issuer: useRuntimeConfig().jwtIss,
+      audience: useRuntimeConfig().jwtAud,
+      expiresIn: "7d",
+      algorithm: "HS256",
+    }
+  );
+}
+
+//valida un jwt e ritorna lo userId
+export function verifyJwtAndDecode(
+  token: string
+): Result<string, JwtErrorResponse> {
+  try {
+    const payload = jwt.verify(token, useRuntimeConfig().jwtSecret, {
+      algorithms: ["HS256"],
+      issuer: useRuntimeConfig().jwtIss,
+      audience: useRuntimeConfig().jwtAud,
+      ignoreExpiration: false,
+    });
+
+    if (typeof payload === "string") {
+      return {
+        success: false,
+        errorData: {
+          name: "InvalidToken",
+          message: "payload token must be an object",
+        },
+      };
+    }
+
+    return {
+      success: true,
+      successData: payload.userId,
+    };
+  } catch (err: any) {
+    const error: JsonWebTokenError = err;
+
+    if (error.name === "TokenExpiredError") {
+      return {
+        success: false,
+        errorData: {
+          name: "ExpiredToken",
+          message: "The token is expired",
+        },
+      };
+    }
+
+    console.error("JWT ERROR verifyJwtAndDecode()", { error }, "jwt", token);
+    
+    return {
+      success: false,
+      errorData: {
+        name: "InvalidToken",
+        message: "The token is invalid",
+      },
+    };
   }
-  if(typeof decoded === "string") {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
-  return decoded.userId;
+}
+
+export function decodeJwt(token: string) {
+  const data = jwt.decode(token);
+  if (!data) return null;
+  if (typeof data === "string") return null;
+  return data;
 }
