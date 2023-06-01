@@ -4,6 +4,8 @@ import ILogin from "~~/interface/auth/login";
 import IRegister from "~~/interface/auth/register";
 
 export const useUserStore = defineStore("user", () => {
+  const globalStore = useGlobalStore();
+
   const user = ref<User | null>(null);
   const computedUser = computed(() => user.value);
   const reset = () => {
@@ -11,58 +13,81 @@ export const useUserStore = defineStore("user", () => {
   };
 
   const authenticate = async (loginCredential: ILogin) => {
-    const { data, error } = await useLazyFetch("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify(loginCredential),
-    });
-    if (error.value) {
-      throw error.value;
-    }
-    if (data.value) {
-      user.value = data.value;
+    try {
+      const data = await $fetch<{ user: User; accessToken: string }>(
+        "/api/auth/login",
+        {
+          method: "POST",
+          body: JSON.stringify(loginCredential),
+        }
+      );
+
+      if (data.accessToken && data.user) {
+        const { user: utente, accessToken } = data;
+        user.value = utente;
+        if (accessToken) {
+          globalStore.setJwt(accessToken);
+        }
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
   const authenticateViaSession = async () => {
-    const { data, error } = await useLazyFetch("/api/auth/session", {
-      credentials: "include",
-    });
-
-    if (error.value) {
-      throw error.value;
-    }
-
-    if (data.value) {
-      user.value = data.value;
+    try {
+      const data = await $fetch<{ user: User; accessToken: string }>(
+        "/api/auth/session",
+        {
+          credentials: "include",
+          headers: {
+            Authorization: globalStore.computedJwt
+              ? `Bearer ${globalStore.computedJwt}`
+              : "",
+          },
+        }
+      );
+      if ((data.user, data.accessToken)) {
+        const { user: utente, accessToken } = data;
+        user.value = utente;
+        if (accessToken) {
+          globalStore.setJwt(accessToken);
+        }
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
   const createUser = async (registerCredential: IRegister) => {
-    const { data, error } = await useLazyFetch("/api/auth/register", {
-      method: "POST",
-      body: JSON.stringify(registerCredential),
-    });
-
-    if (error.value) {
-      throw error.value;
-    }
-
-    if (data.value) {
-      user.value = data.value;
+    const data = await $fetch<{ user: User; accessToken: string }>(
+      "/api/auth/register",
+      {
+        method: "POST",
+        body: JSON.stringify(registerCredential),
+      }
+    );
+    if (data.accessToken && data.user) {
+      const { user: utente, accessToken } = data;
+      user.value = utente;
+      if (accessToken) {
+        globalStore.setJwt(accessToken);
+      }
     }
   };
 
   const endSession = async () => {
-    const { error } = await useLazyFetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    if (error.value) {
-      throw error.value;
+    try {
+      await $fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      reset();
+    } catch (error) {
+      throw error;
     }
-
-    reset();
   };
+
   const isLogged = computed(
     () => user.value !== null && user.value !== undefined
   );

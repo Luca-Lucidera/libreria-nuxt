@@ -2,9 +2,9 @@ import bcrypt from "bcrypt";
 import IRegister from "~~/interface/auth/register";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) as IRegister;
-  if(!body || !body.name || !body.lastName || !body.email || !body.password) {
-    throw createError({ statusCode: 400, message: "Bad request" });
+  const body = (await readBody(event)) as IRegister;
+  if (!body || !body.name || !body.lastName || !body.email || !body.password) {
+    throw createError({ statusCode: 400, statusMessage: "Bad request" });
   }
   const { name, lastName, email, password } = body;
 
@@ -13,8 +13,8 @@ export default defineEventHandler(async (event) => {
       email,
     },
   });
-  if(checkUserAlreadyExist) {
-    throw createError({ statusCode: 400, message: "User already exist" });
+  if (checkUserAlreadyExist) {
+    throw createError({ statusCode: 400, statusMessage: "User already exist" });
   }
 
   const encryptedPassword = await bcrypt.hash(password, 10);
@@ -25,26 +25,17 @@ export default defineEventHandler(async (event) => {
       lastName,
       email,
       password: encryptedPassword,
-    }
-  })
-
-  const jwt = createJwt(user.id);
-
-  await prisma.user.update({
-    where: {
-      id: user.id,
     },
-    data: {
-      jwt,
-    }
-  })
+  });
 
-  setCookie(event, "session", jwt, {
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+
+  setCookie(event, "refresh_token", refreshToken, {
     httpOnly: true,
     secure: true,
-    sameSite: "lax",
-    expires: new Date(Date.now() + 86400000),
+    sameSite: "strict",
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
   });
-  
-  return user;
+  return { user: user, accessToken: accessToken };
 });

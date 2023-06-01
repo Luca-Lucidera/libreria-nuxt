@@ -80,7 +80,7 @@ export function verifyJwtAndDecode(
       };
     }
 
-    console.error("JWT ERROR verifyJwtAndDecode()", { error });
+    console.error("JWT ERROR verifyJwtAndDecode()", { error }, "jwt", token);
     
     return {
       success: false,

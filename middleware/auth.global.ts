@@ -3,7 +3,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (!userStore.isLogged) {
     try {
       await userStore.authenticateViaSession();
-      return;
+      if(to.path == "/login" || to.path == "/register") {
+        return navigateTo("/");
+      } else {
+        return;
+      }
     } catch {
       if (to.path != "/login" && to.path != "/register") {
         return navigateTo("/login");

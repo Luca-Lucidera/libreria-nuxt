@@ -1,11 +1,17 @@
 import { User } from "@prisma/client";
+import IBook from "~/interface/book/book";
 
 export default defineEventHandler(async (event) => {
-  const { id: userId }: User = event.context.user;
-  
+  const result = await handleSecurity(event);
+  if (!result.success) {
+    throw createError({ statusCode: 401, statusMessage: result.errorData });
+  }
+  if(!result.successData?.user?.id){
+    throw createError({ statusCode: 401, statusMessage: "Token invalid" });
+  }
   const userBooks = await prisma.book.findMany({
     where: {
-      userId,
+      userId: result.successData.user.id,
     },
     select: {
       id: true,
@@ -21,18 +27,23 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  if(userBooks.length === 0) {
+  if (userBooks.length === 0) {
     return userBooks;
   }
-  
-  const books = userBooks.map((book) => {
+
+  const books: IBook[] = userBooks.map((book) => {
     return {
-      ...book,
+      id: book.id,
+      title: book.title,
+      purchased: book.purchased,
+      read: book.read,
       type: parsePrismaEnum(book.type),
       status: parsePrismaEnum(book.status),
       publisher: parsePrismaEnum(book.publisher),
-    }
-  })
-  
+      price: book.price,
+      rating: book.rating,
+      comment: book.comment,
+    };
+  });
   return books;
 });

@@ -1,9 +1,11 @@
+import { NuxtError } from "nuxt/app";
 import { defineStore } from "pinia";
 import IBook from "~~/interface/book/book";
 
 export const useBooksStore = defineStore("books", () => {
-  const books = ref<IBook[]>([]);
+  const globalStore = useGlobalStore();
 
+  const books = ref<IBook[]>([]);
   const computedBooks = computed(() => books.value);
 
   const filteredBooks = (type: string, publisher: string, status: string) =>
@@ -20,51 +22,77 @@ export const useBooksStore = defineStore("books", () => {
     }).value;
 
   const fetchBooks = async () => {
-    const { data, error } = await useLazyFetch("/api/books", {
-      method: "GET",
-      credentials: "include",
-    });
-    if (error.value) {
-      throw error.value;
-    }
-    if (data.value) {
-      books.value = data.value;
+    try {
+      const data = await $fetch<IBook[]>("/api/books", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: globalStore.computedJwt
+            ? `Bearer ${globalStore.computedJwt}`
+            : "",
+        },
+      });
+
+      if (data) {
+        books.value = data;
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
   const createBook = async (book: IBook) => {
-    const { error } = await useLazyFetch("/api/books", {
-      method: "POST",
-      credentials: "include",
-      body: JSON.stringify(book),
-    });
-    if (error.value) {
-      throw error.value;
+    try {
+      await $fetch("/api/books", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(book),
+        headers: {
+          Authorization: globalStore.computedJwt
+            ? `Bearer ${globalStore.computedJwt}`
+            : "",
+        },
+      });
+      await fetchBooks();
+    } catch (ex: any) {
+      //ex è di tipo NuxtError
+      throw ex;
     }
-    await fetchBooks();
   };
 
   const updateBook = async (book: IBook) => {
-    const { error } = await useLazyFetch("/api/books", {
-      method: "PUT",
-      credentials: "include",
-      body: JSON.stringify(book),
-    });
-    if (error.value) {
-      throw error.value;
+    try {
+      await $fetch("/api/books", {
+        method: "PUT",
+        credentials: "include",
+        body: JSON.stringify(book),
+        headers: {
+          Authorization: globalStore.computedJwt
+            ? `Bearer ${globalStore.computedJwt}`
+            : "",
+        },
+      });
+      await fetchBooks();
+    } catch (error) {
+      throw error;
     }
-    await fetchBooks();
   };
 
   const removeBook = async (bookId: string) => {
-    const { error } = await useLazyFetch(`/api/books/${bookId}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-    if (error.value) {
-      throw error.value;
+    try {
+      await $fetch(`/api/books/${bookId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          Authorization: globalStore.computedJwt
+            ? `Bearer ${globalStore.computedJwt}`
+            : "",
+        },
+      });
+      await fetchBooks();
+    } catch (error) {
+      throw error;
     }
-    await fetchBooks();
   };
 
   return {

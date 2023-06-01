@@ -4,6 +4,15 @@ export const useGlobalStore = defineStore('global', () => {
   const isLoading = ref(false);
   const theme = ref('dark');
   
+  const jwt = ref<string | null>(null);
+  const computedJwt = computed(() => jwt.value);
+  const setJwt = (token: string) => {
+    jwt.value = token;
+  };
+  const clearJwt = () => {
+    jwt.value = null;
+  };
+
   const getIsLoading = computed(() => isLoading.value);
   const getTheme = computed(() => theme.value);
 
@@ -27,5 +36,8 @@ export const useGlobalStore = defineStore('global', () => {
     startLoading,
     stopLoading,
     changeTheme,
+    computedJwt,
+    clearJwt,
+    setJwt
   };
 });
