@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npx prisma generate && nuxt build",
+  "cleanUrls": true,
+  "framework": "nuxtjs",
+  "functions": {
+    "server/api/**/*.ts": {}
+  },
+  "installCommand": "npm install"
+}
