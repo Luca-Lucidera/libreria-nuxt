@@ -3,7 +3,9 @@
   "cleanUrls": true,
   "framework": "nuxtjs",
   "functions": {
-    "server/api/**/*.ts": {}
+    "server/api/**/*.ts": {
+      "memory": 3008
+    }
   },
   "installCommand": "npm install"
 }
