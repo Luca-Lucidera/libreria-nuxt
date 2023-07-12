@@ -1,11 +1,10 @@
-import { NuxtError } from "nuxt/app";
 import { defineStore } from "pinia";
-import IBook from "~~/interface/book/book";
+import {Book} from "~/types/book";
 
-export const useBooksStore = defineStore("books", () => {
+export const useBooksStore= defineStore("books", () => {
   const globalStore = useGlobalStore();
 
-  const books = ref<IBook[]>([]);
+  const books = ref<Book[]>([]);
   const computedBooks = computed(() => books.value);
 
   const filteredBooks = (type: string, publisher: string, status: string) =>
@@ -23,7 +22,7 @@ export const useBooksStore = defineStore("books", () => {
 
   const fetchBooks = async () => {
     try {
-      const data = await $fetch<IBook[]>("/api/books", {
+      const data = await $fetch<Book[]>("/api/books", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -41,7 +40,7 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
-  const createBook = async (book: IBook) => {
+  const createBook = async (book: Book) => {
     try {
       await $fetch("/api/books", {
         method: "POST",
@@ -60,7 +59,7 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
-  const updateBook = async (book: IBook) => {
+  const updateBook = async (book: Book) => {
     try {
       await $fetch("/api/books", {
         method: "PUT",

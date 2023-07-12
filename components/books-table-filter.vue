@@ -9,8 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import IBookTableFilter from '~~/interface/table/bookTableFilter';
-
 interface Props {
   filters: IBookTableFilter;
 }

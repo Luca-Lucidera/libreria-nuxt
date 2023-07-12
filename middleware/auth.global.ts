@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       }
     } catch {
       if (to.path != "/login" && to.path != "/register") {
-        return await navigateTo("/login");
+        return navigateTo("/login");
       } else {
         return;
       }

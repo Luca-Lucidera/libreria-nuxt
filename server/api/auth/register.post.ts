@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
-import IRegister from "~~/interface/auth/register";
+import { UserRegisterDTO } from "~/types/user/userRegisterDTO";
 
 export default defineEventHandler(async (event) => {
-  const body = (await readBody(event)) as IRegister;
+  const body = (await readBody(event)) as UserRegisterDTO;
   if (!body || !body.name || !body.lastName || !body.email || !body.password) {
     throw createError({ statusCode: 400, statusMessage: "Bad request" });
   }

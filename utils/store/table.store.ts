@@ -1,9 +1,10 @@
 import { TableHeaders } from "@prisma/client";
 import { defineStore } from "pinia";
-import IBookTableFilter from "~~/interface/table/bookTableFilter";
+import {BookTableFilter} from "~/types/bookTableFilter";
 
 export const useTableStore = defineStore("table", () => {
   const headers = ref<TableHeaders[]>([]);
+
   const getHeaders = computed(() => headers.value);
   const fetchBooksTableHeaders = async () => {
     try {
@@ -16,8 +17,10 @@ export const useTableStore = defineStore("table", () => {
     }
   };
 
-  const filters = ref<IBookTableFilter | null>(null);
+  const filters = ref<BookTableFilter | null>(null);
+
   const getFilters = computed(() => filters.value);
+
   const fetchBooksTableFilters = async () => {
     const [status, types, publisher] = await Promise.all([
       $fetch<string[]>("/api/filter/status", { method: "GET" }),
@@ -33,6 +36,7 @@ export const useTableStore = defineStore("table", () => {
       publisher: publisher,
     };
   };
+
   return {
     filters,
     headers,

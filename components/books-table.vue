@@ -109,9 +109,8 @@
 <script setup lang="ts">
 import { TableHeaders } from "@prisma/client";
 import { VDataTable } from "vuetify/labs/VDataTable";
-import IBook from "~~/interface/book/book";
 interface Props {
-  books: IBook[];
+  books: Book[];
   headers: TableHeaders[];
 }
 

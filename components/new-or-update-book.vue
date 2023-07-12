@@ -110,18 +110,16 @@
 </template>
 
 <script setup lang="ts">
-import IBook from "~~/interface/book/book";
-import IBookTableFilter from "~~/interface/table/bookTableFilter";
 interface Props {
   openModal: boolean;
-  book: IBook;
-  tableFilter: IBookTableFilter;
+  book: Book;
+  tableFilter: BookTableFilter;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  (e: "createNewBook", book: IBook): void;
-  (e: "updateBook", book: IBook): void;
+  (e: "createNewBook", book: Book): void;
+  (e: "updateBook", book: Book): void;
   (e: "onlyClose"): void;
 }>();
 

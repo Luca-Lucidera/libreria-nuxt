@@ -21,7 +21,6 @@ model User {
   lastName String
   email    String   @unique
   password String
-  jwt      String?
   books    Book[]
 }
 
@@ -37,7 +36,7 @@ model Book {
   publisher Publisher
   price     Float     @default(1)
   rating    Float     @default(0)
-  comment   String?
+  comment   String
   userId    String
   user      User      @relation(fields: [userId], references: [id])
 }

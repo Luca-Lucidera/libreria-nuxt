@@ -1,70 +1,9 @@
-<template>
-  <VContainer class="h-100 d-flex justify-center align-center">
-    <VCard class="w-50 rounded-xl">
-      <VCardTitle class="text-center my-4 text-primary">LOGIN</VCardTitle>
-      <VForm @submit.prevent="handleSubmit" ref="form">
-        <VCardItem>
-          <VTextField
-            prependIcon="mdi-email"
-            type="email"
-            label="Email"
-            variant="underlined"
-            color="primary"
-            v-model="loginForm.email"
-            :rules="rules.auth.email"
-          />
-        </VCardItem>
-        <VCardItem>
-          <VTextField
-            label="Password"
-            variant="underlined"
-            prependIcon="mdi-lock"
-            color="primary"
-            v-model="loginForm.password"
-            :type="showPassword ? 'text' : 'password'"
-            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="rules.auth.password"
-            @click:append-inner="showPassword = !showPassword"
-          />
-        </VCardItem>
-        <VCardText class="text-center text-error text-body-1">
-          <span>{{ error }}</span>
-        </VCardText>
-        <VCardActions class="justify-center my-4">
-          <VBtn
-            type="submit"
-            color="primary"
-            variant="text"
-            size="large"
-            rounded="lg"
-            elevation="18"
-            width="auto"
-          >
-            Login
-          </VBtn>
-          <VBtn
-            color="secondary"
-            variant="text"
-            size="large"
-            rounded="lg"
-            elevation="18"
-            to="/register"
-            width="auto"
-            >REGISTER</VBtn
-          >
-        </VCardActions>
-      </VForm>
-    </VCard>
-  </VContainer>
-</template>
-
-<script setup lang="ts">
-import { FetchError } from "ofetch";
-import { VForm } from "vuetify/components/VForm";
-import ILogin from "~~/interface/auth/login";
+<script lang="ts" setup>
+import {VForm} from "vuetify/components/VForm";
+import {UserLoginDTO} from "~/types/user/userLoginDTO";
 
 //page state
-const loginForm = useState<ILogin>("userLogin", () => {
+const loginForm = useState<UserLoginDTO>(() => {
   return {
     email: "",
     password: "",
@@ -83,27 +22,87 @@ const handleSubmit = async () => {
   try {
     error.value = "";
     globalStore.startLoading();
-    const { valid } = await form!.value!.validate();
+    const {valid} = await form!.value!.validate();
     if (!valid) return;
-    await userStore.authenticate(loginForm.value);
-    await useRouter().push("/");
-    loginForm.value = {
-      email: "",
-      password: "",
-    };
-  } catch (e: any) {
-    const err: FetchError = e;
-    if (err.statusCode != 500) {
-      if (err.statusMessage) {
-        error.value = err.statusMessage;
-      } else {
-        error.value = "Not a fatal error, but we can't find the problem, please contact luca-lucidera on github";
-      }
+    const result = await userStore.authenticate(loginForm.value);
+    if (result.success) {
+      await useRouter().push("/");
+      loginForm.value = {
+        email: "",
+        password: "",
+      };
     } else {
-      error.value = "Something went wrong";
+      if (result.errorData) {
+        error.value = result.errorData
+      } else {
+        error.value = "Errore non previsto, riprovare più tardi"
+      }
     }
-  } finally {
+  }  finally {
     globalStore.stopLoading();
   }
 };
 </script>
+
+<template>
+  <VContainer class="h-100 d-flex justify-center align-center">
+    <VCard class="w-50 rounded-xl">
+      <VCardTitle class="text-center my-4 text-primary">LOGIN</VCardTitle>
+      <VForm @submit.prevent="handleSubmit" ref="form">
+        <VCardItem>
+          <VTextField
+              v-model="loginForm.email"
+              :rules="rules.auth.email"
+              color="primary"
+              label="Email"
+              prependIcon="mdi-email"
+              type="email"
+              variant="underlined"
+          />
+        </VCardItem>
+        <VCardItem>
+          <VTextField
+              v-model="loginForm.password"
+              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              :rules="rules.auth.password"
+              :type="showPassword ? 'text' : 'password'"
+              color="primary"
+              label="Password"
+              prependIcon="mdi-lock"
+              variant="underlined"
+              @click:append-inner="showPassword = !showPassword"
+          />
+        </VCardItem>
+        <VCardText class="text-center text-error text-body-1">
+          <span>{{ error }}</span>
+        </VCardText>
+        <VCardActions class="justify-center my-4">
+          <VBtn
+              color="primary"
+              elevation="18"
+              rounded="lg"
+              size="large"
+              type="submit"
+              variant="text"
+              width="auto"
+          >
+            Login
+          </VBtn>
+          <VBtn
+              color="secondary"
+              elevation="18"
+              rounded="lg"
+              size="large"
+              to="/register"
+              variant="text"
+              width="auto"
+          >REGISTER
+          </VBtn
+          >
+        </VCardActions>
+      </VForm>
+    </VCard>
+  </VContainer>
+</template>
+
+

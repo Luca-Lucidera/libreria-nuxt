@@ -1,4 +1,4 @@
-import Result from "~~/interface/result";
+import Result from "~/types/result";
 import { User } from "@prisma/client";
 import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
 
