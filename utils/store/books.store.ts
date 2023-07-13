@@ -1,5 +1,7 @@
-import { defineStore } from "pinia";
+import {defineStore} from "pinia";
 import {Book} from "~/types/book";
+import {FetchError} from "ofetch";
+import {Result} from "~/types/result";
 
 export const useBooksStore= defineStore("books", () => {
   const globalStore = useGlobalStore();
@@ -20,23 +22,31 @@ export const useBooksStore= defineStore("books", () => {
       });
     }).value;
 
-  const fetchBooks = async () => {
+  const fetchBooks = async (): Promise<Result<void, string>> => {
     try {
-      const data = await $fetch<Book[]>("/api/books", {
+      books.value = await $fetch<Book[]>("/api/books", {
         method: "GET",
         credentials: "include",
         headers: {
-          Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
-            : "",
-        },
+          "Authorization": globalStore.computedJwt ? `Bearer ${globalStore.computedJwt}` : ""
+        }
       });
-
-      if (data) {
-        books.value = data;
+      return {
+        success: true
       }
     } catch (error) {
-      throw error;
+      if (error instanceof FetchError) {
+        console.error(`Errore in books.store.ts fetchBooks(), DATA: ${error.data}, statusCode: ${error.statusCode}, statusMessage: ${error.statusMessage}`)
+        return {
+          success: false,
+          errorData: error.statusMessage
+        }
+      }
+      console.error(`Errore non gestito books.store.ts fetchBooks() ${JSON.stringify(error, null, 4)}`)
+      return {
+        success: false,
+        errorData: "Errore non gestito nel prendere i libri, riprovare più darti"
+      }
     }
   };
 

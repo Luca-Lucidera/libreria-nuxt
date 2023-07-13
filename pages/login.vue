@@ -78,24 +78,24 @@ const handleSubmit = async () => {
         </VCardText>
         <VCardActions class="justify-center my-4">
           <VBtn
-              color="primary"
-              elevation="18"
-              rounded="lg"
-              size="large"
               type="submit"
-              variant="text"
+              color="primary"
+              variant="tonal"
+              size="large"
+              rounded="lg"
+              elevation="18"
               width="auto"
           >
             Login
           </VBtn>
           <VBtn
               color="secondary"
+              variant="text"
+              size="large"
               elevation="18"
               rounded="lg"
-              size="large"
-              to="/register"
-              variant="text"
               width="auto"
+              to="/register"
           >REGISTER
           </VBtn
           >

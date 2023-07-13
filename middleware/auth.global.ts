@@ -1,21 +1,21 @@
+import {navigateTo} from "#imports";
+
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const userStore = useUserStore();
-  if (!userStore.isLogged) {
-    try {
-      await userStore.authenticateViaSession();
-      if(to.path == "/login" || to.path == "/register") {
-        return await navigateTo("/");
+  if (process.client) {
+    const userStore = useUserStore();
+    if (!userStore.isLogged) {
+      const result = await userStore.authenticateViaSession();
+      if (result.success) {
+        if (to.path === "/login" || to.path === "/register") {
+          return navigateTo("/");
+        } else return;
       } else {
-        return;
+        if (to.path != "/login" && to.path != "/register") {
+          return navigateTo("/login");
+        } else {
+          return;
+        }
       }
-    } catch {
-      if (to.path != "/login" && to.path != "/register") {
-        return navigateTo("/login");
-      } else {
-        return;
-      }
-    }
-  } else {
-    return;
+    } else return;
   }
 });

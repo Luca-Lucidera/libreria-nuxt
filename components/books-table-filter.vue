@@ -9,8 +9,10 @@
 </template>
 
 <script setup lang="ts">
+import {BookTableFilter} from "~/types/bookTableFilter";
+
 interface Props {
-  filters: IBookTableFilter;
+  filters: BookTableFilter;
 }
 
 const props = defineProps<Props>();
