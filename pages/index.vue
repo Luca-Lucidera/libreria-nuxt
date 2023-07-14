@@ -1,13 +1,11 @@
 <script setup lang="ts">
+import CustomFilter from "~/components/custom-filter.vue";
+
 //state
 const errors = useState<string[]>(() => []);
-const selectedFilter = useState("selected-filter", () => {
-  return {
-    type: "All",
-    publisher: "All",
-    status: "All",
-  };
-});
+
+//type, status, publisher
+const filters = useState(() => ["All", "All", "All"])
 
 //store
 const tableStore = useTableStore();
@@ -40,15 +38,6 @@ onMounted(async () => {
 
   globalStore.stopLoading();
 });
-
-//function
-const handleChangeFilter = (key: string, value: string) => {
-  type filterKey = keyof typeof selectedFilter.value;
-  const k: filterKey = key as filterKey;
-  if (k in selectedFilter.value) {
-    selectedFilter.value[k] = value;
-  }
-};
 </script>
 
 <template>
@@ -57,22 +46,23 @@ const handleChangeFilter = (key: string, value: string) => {
   </template>
   <VContainer v-else class="h-100">
     <VRow align="center" class="h-100">
-      <VCol cols="2" style="border:solid 2px red">
-        <BooksTableFilter
+      <VCol cols="2">
+        <CustomFilter
             v-if="tableStore.getFilters"
-            :filters="tableStore.getFilters"
-            @change="(key, value) => handleChangeFilter(key, value)"
-        />
+            v-for="(filterEntries, i) in Object.entries(tableStore.getFilters)"
+            :filters="filterEntries[1]"
+            :label="filterEntries[0]"
+            v-model="filters[i]"/>
       </VCol>
-      <VCol style="border: solid 2px red">
+
+      <VCol>
         <BooksTable
             :books="
             booksStore.filteredBooks(
-              selectedFilter.type,
-              selectedFilter.publisher,
-              selectedFilter.status
-            )
-          "
+              filters[0],
+              filters[1],
+              filters[2]
+            )"
             :headers="tableStore.getHeaders"
         />
       </VCol>
