@@ -52,7 +52,11 @@ onMounted(async () => {
             v-for="(filterEntries, i) in Object.entries(tableStore.getFilters)"
             :filters="filterEntries[1]"
             :label="filterEntries[0]"
-            v-model="filters[i]"/>
+            v-model="filters[i]"
+        />
+        <div v-else>
+          caricamento.... (da eliminare)
+        </div>
       </VCol>
 
       <VCol>
