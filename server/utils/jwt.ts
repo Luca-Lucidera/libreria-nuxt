@@ -1,6 +1,6 @@
-import Result from "~/types/result";
+import {Result} from "~/types/result";
 import { User } from "@prisma/client";
-import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
+import jwt, { JsonWebTokenError } from "jsonwebtoken";
 
 type JwtErrorResponse = {
   name: "ExpiredToken" | "InvalidToken";

@@ -49,8 +49,7 @@ export const useBooksStore= defineStore("books", () => {
       }
     }
   };
-
-  const createBook = async (book: Book) => {
+  const createBook = async (book: Book): Promise<Result<void, string>> => {
     try {
       await $fetch("/api/books", {
         method: "POST",
@@ -58,18 +57,30 @@ export const useBooksStore= defineStore("books", () => {
         body: JSON.stringify(book),
         headers: {
           Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
-            : "",
+              ? `Bearer ${globalStore.computedJwt}`
+              : "",
         },
       });
       await fetchBooks();
-    } catch (ex: any) {
-      //ex è di tipo NuxtError
-      throw ex;
+      return {
+        success: true
+      }
+    } catch (error) {
+      if (error instanceof FetchError) {
+        console.error(`Errore in books.store.ts createBook(), DATA: ${error.data}, statusCode: ${error.statusCode}, statusMessage: ${error.statusMessage}`)
+        return {
+          success: false,
+          errorData: error.statusMessage
+        }
+      }
+      console.error(`Errore non gestito books.store.ts createBook() ${JSON.stringify(error, null, 4)}`)
+      return {
+        success: false,
+        errorData: "Errore non gestito nel creare i; libro, riprovare più darti"
+      }
     }
   };
-
-  const updateBook = async (book: Book) => {
+  const updateBook = async (book: Book): Promise<Result<void, string>> => {
     try {
       await $fetch("/api/books", {
         method: "PUT",
@@ -77,30 +88,57 @@ export const useBooksStore= defineStore("books", () => {
         body: JSON.stringify(book),
         headers: {
           Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
-            : "",
+              ? `Bearer ${globalStore.computedJwt}`
+              : "",
         },
       });
       await fetchBooks();
+      return {
+        success: true
+      }
     } catch (error) {
-      throw error;
+      if (error instanceof FetchError) {
+        console.error(`Errore in books.store.ts updateBook(), DATA: ${error.data}, statusCode: ${error.statusCode}, statusMessage: ${error.statusMessage}`)
+        return {
+          success: false,
+          errorData: error.statusMessage
+        }
+      }
+      console.error(`Errore non gestito books.store.ts updateBook() ${JSON.stringify(error, null, 4)}`)
+      return {
+        success: false,
+        errorData: "Errore non gestito nel modificare il libro, riprovare più darti"
+      }
     }
   };
-
-  const removeBook = async (bookId: string) => {
+  const removeBook = async (bookId: string): Promise<Result<void, string>> => {
     try {
       await $fetch(`/api/books/${bookId}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
           Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
-            : "",
+              ? `Bearer ${globalStore.computedJwt}`
+              : "",
         },
       });
       await fetchBooks();
+      return {
+        success: true
+      }
     } catch (error) {
-      throw error;
+      if (error instanceof FetchError) {
+        console.error(`Errore in books.store.ts removeBook(), DATA: ${error.data}, statusCode: ${error.statusCode}, statusMessage: ${error.statusMessage}`)
+        return {
+          success: false,
+          errorData: error.statusMessage
+        }
+      }
+      console.error(`Errore non gestito books.store.ts removeBook() ${JSON.stringify(error, null, 4)}`)
+      return {
+        success: false,
+        errorData: "Errore non gestito nell'eliminare il libro, riprovare più darti"
+      }
     }
   };
 

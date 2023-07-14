@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { H3Event } from "h3";
-import Result from "~/types/result";
+import {Result} from "~/types/result";
 
 type SuccessData = {
   isNewToken: boolean;
