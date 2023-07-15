@@ -43,11 +43,11 @@ onMounted(async () => {
     <p v-for="error in errors" class="text-red">{{ error }}</p>
   </template>
   <VContainer v-else class="h-100">
-    {{ tableStore.getFilters }}
+    {{ tableStore.areFiltersReady() }}
     <VRow align="center" class="h-100">
       <VCol cols="2">
         <VProgressCircular
-          v-if="tableStore.getFilters == null"
+          v-if="!tableStore.areFiltersReady()"
           :indeterminate="true"
           size="100"
         />
