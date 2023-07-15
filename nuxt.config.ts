@@ -18,4 +18,5 @@ export default defineNuxtConfig({
             env: "development",
         },
     },
+    ssr: false
 });
