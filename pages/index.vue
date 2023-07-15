@@ -48,8 +48,8 @@ onMounted(async () => {
     <VRow align="center" class="h-100">
       <VCol cols="2">
         <CustomFilter
-            v-if="tableStore.getFilters"
-            v-for="(filterEntries, i) in Object.entries(tableStore.getFilters)"
+            v-if="tableStore.filters"
+            v-for="(filterEntries, i) in Object.entries(tableStore.filters)"
             :filters="filterEntries[1]"
             :label="filterEntries[0]"
             v-model="filters[i]"

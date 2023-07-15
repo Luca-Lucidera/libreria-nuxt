@@ -6,6 +6,5 @@ export default defineEventHandler(async (event) => {
   values = values.map((value) => {
     return parsePrismaEnum(value);
   });
-  console.log("values: ", values);
   return values;
 });
