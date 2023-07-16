@@ -2,19 +2,17 @@
 type FilterProps = {
   filters: string[];
   label: string;
+  modelValue: string;
 };
-
-const props = defineProps<FilterProps>();
-const filterModel = defineModel<string>({ required: true, default: "" });
-
-console.log(`filters -> ${props.filters}, -> label ${props.label}`)
+defineProps<FilterProps>();
+defineEmits(["update:modelValue"]);
 </script>
 
 <template>
-  <p>filtersProps: {{ filters }} | labelProps: {{ label }}</p>
   <VSelect
-    :items="props.filters"
-    :label="props.label.toUpperCase()"
-    v-model="filterModel"
+    :items="filters"
+    :label="label.toUpperCase()"
+    :model-value="modelValue"
+    @update:modelValue="(val: string) => $emit('update:modelValue', val)"
   />
 </template>

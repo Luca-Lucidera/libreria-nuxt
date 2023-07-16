@@ -43,7 +43,7 @@ onMounted(async () => {
     <p v-for="error in errors" class="text-red">{{ error }}</p>
   </template>
   <VContainer v-else class="h-100">
-    {{ tableStore.areFiltersReady() }}
+    {{ filters[0] }}
     <VRow align="center" class="h-100">
       <VCol cols="2">
         <VProgressCircular
@@ -54,6 +54,7 @@ onMounted(async () => {
         <CustomFilter
           v-else
           v-for="(filterEntries, i) in Object.entries(tableStore.getFilters)"
+          :key="i"
           :label="filterEntries[0]"
           :filters="filterEntries[1]"
           v-model="filters[i]"

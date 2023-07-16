@@ -40,15 +40,15 @@ export const useTableStore = defineStore("table", () => {
 
   const filters = ref<BookTableFilter>({ type: [], status: [], publisher: [] });
   const getFilters = computed(() => {
-    console.log(`VALORE DI FILTERS IN TABLE.STORE.TS -> ${filters.value}}`);
+    console.log(`VALORE DI FILTERS IN TABLE.STORE.TS -> ${JSON.stringify(filters.value)}`);
     return filters.value;
   });
   const fetchBooksTableFilters = async (): Promise<Result<void, string>> => {
     try {
       const [status, types, publisher] = await Promise.all([
-        $fetch<string[]>("/api/filter/status", { method: "GET" }),
-        $fetch<string[]>("/api/filter/type", { method: "GET" }),
-        $fetch<string[]>("/api/filter/publisher", { method: "GET" }),
+        $fetch<string[]>("/api/filter/status"),
+        $fetch<string[]>("/api/filter/type"),
+        $fetch<string[]>("/api/filter/publisher"),
       ]);
 
       filters.value = {
