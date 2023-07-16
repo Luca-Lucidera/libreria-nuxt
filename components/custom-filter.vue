@@ -4,15 +4,17 @@ type FilterProps = {
   label: string;
 };
 
-const { filters, label } = defineProps<FilterProps>();
+const props = defineProps<FilterProps>();
 const filterModel = defineModel<string>({ required: true, default: "" });
+
+console.log(`filters -> ${props.filters}, -> label ${props.label}`)
 </script>
 
 <template>
   <p>filtersProps: {{ filters }} | labelProps: {{ label }}</p>
   <VSelect
-    :items="filters"
-    :label="label.toUpperCase()"
+    :items="props.filters"
+    :label="props.label.toUpperCase()"
     v-model="filterModel"
   />
 </template>

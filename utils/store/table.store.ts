@@ -39,7 +39,10 @@ export const useTableStore = defineStore("table", () => {
   };
 
   const filters = ref<BookTableFilter>({ type: [], status: [], publisher: [] });
-  const getFilters = computed(() => filters.value);
+  const getFilters = computed(() => {
+    console.log(`VALORE DI FILTERS IN TABLE.STORE.TS -> ${filters.value}}`);
+    return filters.value;
+  });
   const fetchBooksTableFilters = async (): Promise<Result<void, string>> => {
     try {
       const [status, types, publisher] = await Promise.all([
