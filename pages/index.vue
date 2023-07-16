@@ -43,7 +43,6 @@ onMounted(async () => {
     <p v-for="error in errors" class="text-red">{{ error }}</p>
   </template>
   <VContainer v-else class="h-100">
-    {{ filters[0] }}
     <VRow align="center" class="h-100">
       <VCol cols="2">
         <VProgressCircular
