@@ -1,4 +1,4 @@
-export default interface Result<TSuccess, TError> {
+export type Result<TSuccess, TError> = {
   success: boolean;
   successData?: TSuccess;
   errorData?: TError;

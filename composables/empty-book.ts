@@ -1,15 +1,15 @@
-import IBook from "~~/interface/book/book";
+import { Book } from "~/types/book";
 
 export const useEmptyBook = () =>
-  useState<IBook>("empty-book", () => ({
+  useState<Book>("empty-book", () => ({
     id: "",
     title: "",
-    purchased: 0,
+    purchased: 1,
     read: 0,
     type: "Manga",
     status: "Plan To Read",
     publisher: "JPOP",
-    price: 0,
+    price: 1,
     rating: 0,
     comment: "",
   }));

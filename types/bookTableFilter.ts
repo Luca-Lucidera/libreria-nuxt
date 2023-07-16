@@ -1,4 +1,4 @@
-export default interface IBookTableFilter {
+export type BookTableFilter = {
   type: string[];
   status: string[];
   publisher: string[];

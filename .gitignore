@@ -7,3 +7,9 @@ node_modules
 .env
 dist
 .DS_Store
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+.idea
