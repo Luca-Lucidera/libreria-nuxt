@@ -22,9 +22,8 @@ model User {
   email    String   @unique
   password String
   books    Book[]
+  booksToBuy BookToBuy[]
 }
-
-
 
 model Book {
   id        String    @id @default(uuid())

@@ -48,5 +48,10 @@ export const rules = Object.freeze({
       (value: string) =>
         value.length <= 500 || "Comment must be less than 500 characters",
     ],
+    number: [
+      (value: number) => !!value || "Number is required",
+      (value: number) => value <= 9999 || "Number must be less than 9999",
+      (value: number) => value > 0 || "Number must be greater than 0",
+    ]
   },
 });

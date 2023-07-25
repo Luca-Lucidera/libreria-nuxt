@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import { VForm } from "vuetify/lib/components/index.mjs";
+import { useDisplay } from "vuetify";
+
 //state
 const errors = useState<string[]>(() => []);
-
-//type, status, publisher
-const filters = useState(() => ["All", "All", "All"]);
 
 //store
 const tableStore = useTableStore();
 const globalStore = useGlobalStore();
 const booksStore = useBooksStore();
+
+const tab = ref(null);
 
 onMounted(async () => {
   globalStore.startLoading();
@@ -36,6 +38,55 @@ onMounted(async () => {
 
   globalStore.stopLoading();
 });
+
+//NUOVA SEZIONE DA SPOSTARE IN UN NUOVO COMPONENT
+type BookToBuy = { title: string; number: number; price: number };
+const useBookInShelf = useState(() => false);
+const libroSelezionato = useState(() => ({
+  title: "",
+  number: 1,
+  price: 1,
+}));
+const listaLibriDaComprare = useState<BookToBuy[]>(() => []);
+const form = ref<InstanceType<typeof VForm> | null>(null as any);
+const validateForm = () => {
+  return form.value?.validate();
+};
+
+const addToList = () => {
+  if (!validateForm()) return;
+  const libro = listaLibriDaComprare.value.find(
+    (l) => l.title === libroSelezionato.value.title
+  );
+  if (!libro) {
+    listaLibriDaComprare.value.push(libroSelezionato.value);
+    libroSelezionato.value = {
+      title: "",
+      number: 1,
+      price: 1,
+    };
+    return;
+  }
+  listaLibriDaComprare.value.map((l) => {
+    if (l.title === libroSelezionato.value.title) {
+      l.number++;
+    }
+  });
+};
+
+const updateOtherFields = () => {
+  const libro = booksStore.books.find(
+    (b) => b.title === libroSelezionato.value.title
+  );
+  if (!libro) return;
+  libroSelezionato.value.price = libro.price;
+};
+
+const removeFromList = (title: string) => {
+  const i = listaLibriDaComprare.value.findIndex((l) => l.title === title);
+  if (i === -1) return;
+  listaLibriDaComprare.value.splice(i, 1);
+};
 </script>
 
 <template>
@@ -43,29 +94,137 @@ onMounted(async () => {
     <p v-for="error in errors" class="text-red">{{ error }}</p>
   </template>
   <VContainer v-else class="h-100">
-    <VRow align="center" class="h-100">
-      <VCol cols="2">
-        <VProgressCircular
-          v-if="!tableStore.areFiltersReady()"
-          :indeterminate="true"
-          size="100"
-        />
-        <CustomFilter
-          v-else
-          v-for="(filterEntries, i) in Object.entries(tableStore.getFilters)"
-          :key="i"
-          :label="filterEntries[0]"
-          :filters="filterEntries[1]"
-          v-model="filters[i]"
-        />
-      </VCol>
+    <VTabs v-model="tab" align-tabs="center" class="mb-8">
+      <VTab value="home">
+        <VIcon>mdi-home</VIcon>
+        Home
+      </VTab>
+      <VTab value="next-to-buy">
+        <VIcon>mdi-book</VIcon>
+        Next to buy
+      </VTab>
+    </VTabs>
+    <VWindow v-model="tab">
+      <VWindowItem value="home">
+        <HomePageTable v-if="!useDisplay().mobile.value" />
+        <VRow v-else>
+          <VCol v-for="(book, i) in booksStore.computedBooks" cols="6">
+            <VCard>
+              <VCardTitle class="text-center">{{ book.title }}</VCardTitle>
+              <VCardText>
+                purchased: {{ book.purchased }} <br />
+                publisher: {{ book.publisher }} <br />
+                price: {{ book.price }} <VIcon size="small">mdi-currency-eur</VIcon>
+              </VCardText>
+              <VCardActions class="d-flex justify-space-around">
+                <VBtn color="primary" variant="tonal">
+                  <VIcon>mdi-book-open</VIcon>
+                </VBtn>
+                <VBtn color="error" variant="tonal">
+                  <VIcon>mdi-delete</VIcon>
+                </VBtn>
+              </VCardActions>
+            </VCard>
+          </VCol>
+        </VRow>
+      </VWindowItem>
+      <VWindowItem value="next-to-buy">
+        <VCol>
+          <VRow justify="center">
+            <VCard class="px-5 rounded-xl w-">
+              <VForm ref="form" @submit.prevent="addToList">
+                <VCardTitle class="text-center">Next to buy</VCardTitle>
+                <VSwitch
+                  v-model="useBookInShelf"
+                  :label="`${
+                    useBookInShelf ? 'use' : 'not use'
+                  } books in the library`"
+                  :color="useBookInShelf ? 'primary' : 'secondary'"
+                />
 
-      <VCol>
-        <BooksTable
-          :books="booksStore.filteredBooks(filters[0], filters[1], filters[2])"
-          :headers="tableStore.getHeaders"
-        />
-      </VCol>
-    </VRow>
+                <VCol>
+                  <VRow>
+                    <VAutocomplete
+                      v-if="useBookInShelf"
+                      :items="booksStore.books.map((b) => b.title)"
+                      variant="outlined"
+                      label="Choose a title"
+                      v-model="libroSelezionato.title"
+                      :rules="rules.book.title"
+                      @update:model-value="updateOtherFields"
+                    />
+                    <VTextField
+                      v-else
+                      v-model="libroSelezionato.title"
+                      variant="outlined"
+                      label="Title"
+                      :rules="rules.book.title"
+                    />
+                  </VRow>
+                  <VRow>
+                    <VCol>
+                      <VTextField
+                        type="number"
+                        label="Number of the volume"
+                        variant="outlined"
+                        v-model.number="libroSelezionato.number"
+                        :rules="rules.book.number"
+                      />
+                    </VCol>
+                    <VCol>
+                      <VTextField
+                        type="number"
+                        label="Price of the volume"
+                        variant="outlined"
+                        v-model.number="libroSelezionato.price"
+                        append-inner-icon="mdi-currency-eur"
+                        :rules="rules.book.price"
+                      />
+                    </VCol>
+                  </VRow>
+                </VCol>
+                <VCardActions class="justify-center">
+                  <VBtn
+                    color="primary"
+                    variant="tonal"
+                    class="mb-5"
+                    type="submit"
+                  >
+                    <VIcon>mdi-plus</VIcon>
+                    Add
+                  </VBtn>
+                </VCardActions>
+              </VForm>
+            </VCard>
+          </VRow>
+          <VRow justify="center" class="my-5 py-5">
+            <VCol
+              v-for="(libro, i) in listaLibriDaComprare"
+              :key="i"
+              cols="12"
+              lg="4"
+            >
+              <VCard class="rounded-shaped">
+                <VCardTitle class="text-center">{{ libro.title }}</VCardTitle>
+                <VCardText class="text-center">
+                  <p>Number: {{ libro.number }}</p>
+                  <p>Price: {{ libro.price }}</p>
+                </VCardText>
+                <VCardActions class="justify-center">
+                  <VBtn
+                    color="error"
+                    variant="tonal"
+                    @click="removeFromList(libro.title)"
+                  >
+                    <VIcon>mdi-delete</VIcon>
+                    Delete
+                  </VBtn>
+                </VCardActions>
+              </VCard>
+            </VCol>
+          </VRow>
+        </VCol>
+      </VWindowItem>
+    </VWindow>
   </VContainer>
 </template>
