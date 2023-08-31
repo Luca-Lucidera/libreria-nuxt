@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { VForm } from "vuetify/lib/components/index.mjs";
 import { useDisplay } from "vuetify";
+import { BookToBuy } from "types/bookToBuy";
 
 //state
 const errors = useState<string[]>(() => []);
@@ -40,12 +41,13 @@ onMounted(async () => {
 });
 
 //NUOVA SEZIONE DA SPOSTARE IN UN NUOVO COMPONENT
-type BookToBuy = { title: string; number: number; price: number };
+
 const useBookInShelf = useState(() => false);
 const libroSelezionato = useState(() => ({
   title: "",
   number: 1,
   price: 1,
+  isNew: true,
 }));
 const listaLibriDaComprare = useState<BookToBuy[]>(() => []);
 const form = ref<InstanceType<typeof VForm> | null>(null as any);
@@ -64,6 +66,7 @@ const addToList = () => {
       title: "",
       number: 1,
       price: 1,
+      isNew: true,
     };
     return;
   }
@@ -87,9 +90,21 @@ const removeFromList = (title: string) => {
   if (i === -1) return;
   listaLibriDaComprare.value.splice(i, 1);
 };
+
+const saveList = async () => {
+  //check is new
+  globalStore.startLoading();
+  const aggiunti = listaLibriDaComprare.value.filter((l) => l.isNew === true);
+  const data = await useFetch("/api/books/to-buy");
+};
+
+const cantSave = computed(() =>
+  listaLibriDaComprare.value.every((l) => l.isNew === false)
+);
 </script>
 
 <template>
+  <!-- ERRORI -->
   <template v-if="errors.length != 0">
     <p v-for="error in errors" class="text-red">{{ error }}</p>
   </template>
@@ -107,26 +122,7 @@ const removeFromList = (title: string) => {
     <VWindow v-model="tab">
       <VWindowItem value="home">
         <HomePageTable v-if="!useDisplay().mobile.value" />
-        <VRow v-else>
-          <VCol v-for="(book, i) in booksStore.computedBooks" cols="6">
-            <VCard>
-              <VCardTitle class="text-center">{{ book.title }}</VCardTitle>
-              <VCardText>
-                purchased: {{ book.purchased }} <br />
-                publisher: {{ book.publisher }} <br />
-                price: {{ book.price }} <VIcon size="small">mdi-currency-eur</VIcon>
-              </VCardText>
-              <VCardActions class="d-flex justify-space-around">
-                <VBtn color="primary" variant="tonal">
-                  <VIcon>mdi-book-open</VIcon>
-                </VBtn>
-                <VBtn color="error" variant="tonal">
-                  <VIcon>mdi-delete</VIcon>
-                </VBtn>
-              </VCardActions>
-            </VCard>
-          </VCol>
-        </VRow>
+        <MobileBookList v-else />
       </VWindowItem>
       <VWindowItem value="next-to-buy">
         <VCol>
@@ -183,7 +179,7 @@ const removeFromList = (title: string) => {
                     </VCol>
                   </VRow>
                 </VCol>
-                <VCardActions class="justify-center">
+                <VCardActions class="justify-space-around">
                   <VBtn
                     color="primary"
                     variant="tonal"
@@ -192,6 +188,10 @@ const removeFromList = (title: string) => {
                   >
                     <VIcon>mdi-plus</VIcon>
                     Add
+                  </VBtn>
+                  <VBtn color="success" variant="tonal" @click="saveList">
+                    <VIcon>mdi-floppy</VIcon>
+                    Save
                   </VBtn>
                 </VCardActions>
               </VForm>
@@ -212,6 +212,7 @@ const removeFromList = (title: string) => {
                 </VCardText>
                 <VCardActions class="justify-center">
                   <VBtn
+                    :disabled="cantSave"
                     color="error"
                     variant="tonal"
                     @click="removeFromList(libro.title)"

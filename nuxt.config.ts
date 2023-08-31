@@ -18,5 +18,11 @@ export default defineNuxtConfig({
             env: "development",
         },
     },
-    ssr: false
+    $development: {
+        sourcemap: {
+            client: true,
+            server: true,
+        },
+    },
+    ssr: false,
 });

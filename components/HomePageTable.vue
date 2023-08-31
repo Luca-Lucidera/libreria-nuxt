@@ -25,8 +25,6 @@
   </VRow>
 </template>
 <script setup lang="ts">
-const userStore = useUserStore();
-const globalStore = useGlobalStore();
 const tableStore = useTableStore();
 const booksStore = useBooksStore();
 
