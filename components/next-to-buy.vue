@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const booksStore = useBooksStore();
+const globalStore = useGlobalStore();
 
 type FormData = {
   title: string;
@@ -66,6 +67,31 @@ const validate = () => {
   }
   listAdded.value.push({ ...formData.value });
 };
+
+const fakeSave = async () => {
+  await new Promise<void>((resolve) => {
+    globalStore.startLoading();
+    setTimeout(() => {
+      globalStore.stopLoading();
+      listFromServer.value = [...listAdded.value, ...listFromServer.value];
+      listAdded.value = [];
+      resolve();
+    }, 3000);
+  });
+};
+
+const fakeDelete = async (title: string) => {
+  await new Promise<void>((resolve) => {
+    globalStore.startLoading();
+    setTimeout(() => {
+      globalStore.stopLoading();
+      listFromServer.value = listFromServer.value.filter(
+        (book) => book.title !== title
+      );
+      resolve();
+    }, 3000);
+  });
+};
 </script>
 
 <template>
@@ -125,6 +151,7 @@ const validate = () => {
               <VBtn
                 :disabled="listAdded.length === 0"
                 :color="listAdded.length !== 0 ? 'success' : 'default'"
+                @click="fakeSave"
                 >Save the list
                 <VIcon class="ml-1">mdi-floppy</VIcon>
               </VBtn>
@@ -151,7 +178,23 @@ const validate = () => {
           </VCardActions>
         </VCard>
       </VCol>
-      <VCol cols="6" v-for="books in listFromServer"> </VCol>
+      <VCol cols="6" v-for="books in listFromServer">
+        <VCard>
+          <VCardTitle class="text-center">{{ books.title }}</VCardTitle>
+          <VCardText>
+            <p>Volume: {{ books.volume }}</p>
+            <p>Price: {{ books.price }} €</p>
+          </VCardText>
+          <VCardActions class="justify-center">
+            <VBtn
+              color="error"
+              @click="fakeDelete(books.title)"
+              >Ma da server
+              <VIcon>mdi-delete</VIcon>
+            </VBtn>
+          </VCardActions>
+        </VCard>
+      </VCol>
     </VRow>
   </VContainer>
 </template>
