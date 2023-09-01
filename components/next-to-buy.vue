@@ -67,31 +67,6 @@ const validate = () => {
   }
   listAdded.value.push({ ...formData.value });
 };
-
-const fakeSave = async () => {
-  await new Promise<void>((resolve) => {
-    globalStore.startLoading();
-    setTimeout(() => {
-      globalStore.stopLoading();
-      listFromServer.value = [...listAdded.value, ...listFromServer.value];
-      listAdded.value = [];
-      resolve();
-    }, 3000);
-  });
-};
-
-const fakeDelete = async (title: string) => {
-  await new Promise<void>((resolve) => {
-    globalStore.startLoading();
-    setTimeout(() => {
-      globalStore.stopLoading();
-      listFromServer.value = listFromServer.value.filter(
-        (book) => book.title !== title
-      );
-      resolve();
-    }, 3000);
-  });
-};
 </script>
 
 <template>
