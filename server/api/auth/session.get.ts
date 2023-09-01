@@ -18,6 +18,6 @@ export default defineEventHandler(async (event) => {
   if (result.successData?.isNewToken) {
     renewJwt = result.successData?.jwt;
   }
-  
-  return { user: user, accessToken: renewJwt };
+  const { password, ...userWithoutPassword } = user;
+  return { user: userWithoutPassword, accessToken: renewJwt };
 });

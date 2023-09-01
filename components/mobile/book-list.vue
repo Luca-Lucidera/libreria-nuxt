@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Book } from "~/types/book";
 import { useDisplay } from "vuetify/lib/framework.mjs";
 
 const booksStore = useBooksStore();
@@ -9,8 +10,22 @@ const container = ref(null as any);
 const search = useState(() => "");
 watchEffect(() => {
   containerHeight.value =
-    screenHeight.value - container.value?.$el.getBoundingClientRect().y - 50;
+    screenHeight.value - container.value?.$el.getBoundingClientRect().y - 30;
 });
+
+const modal = useState(() => false);
+
+const bookToShow = useState<Book | null>(() => null);
+
+const openModal = (book: Book) => {
+  modal.value = true;
+  bookToShow.value = { ...book };
+};
+
+const closeModal = () => {
+  modal.value = false;
+  bookToShow.value = null;
+};
 </script>
 
 <template>
@@ -29,30 +44,25 @@ watchEffect(() => {
     <VContainer
       class="mt-4 overflow-y-auto"
       ref="container"
-      :style="{
-        height: containerHeight + 'px',
-      }"
+      :style="{ height: containerHeight + 'px' }"
     >
       <VRow>
         <VCol v-for="book in booksStore.computedBooks" cols="6">
-          <VCard>
-            <VCardTitle class="text-center">{{ book.title }}</VCardTitle>
-            <VCardText>
-              <p>purchased: {{ book.purchased }}</p>
-              <p>publisher: {{ book.publisher }}</p>
-              <p>price: {{ book.price }} €</p>
-            </VCardText>
-            <VCardActions class="justify-space-around">
-              <VBtn color="primary" variant="tonal">
-                <VIcon>mdi-book-open</VIcon>
-              </VBtn>
-              <VBtn color="error" variant="tonal">
-                <VIcon>mdi-delete</VIcon>
-              </VBtn>
-            </VCardActions>
-          </VCard>
+          <MobileBookCard
+            :book="book"
+            @open-modal="(book) => openModal(book)"
+          />
         </VCol>
       </VRow>
     </VContainer>
+
+    <MobileBookModal
+      v-if="bookToShow"
+      :book="bookToShow"
+      :open-modal="modal"
+      @close-modal="(value) => (modal = value)"
+      @create-book="(book) => {}"
+      @update-book="(book) => {}"
+    />
   </template>
 </template>
