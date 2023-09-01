@@ -6,6 +6,7 @@
 
 <style>
 html {
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 </style>
