@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDisplay } from "vuetify";
 const booksStore = useBooksStore();
 const globalStore = useGlobalStore();
 
@@ -33,7 +34,7 @@ const updateOtherValue = (title: string) => {
   }
 };
 
-const validate = () => {
+const validateLocal = () => {
   if (
     formData.value.title === "" ||
     formData.value.price === 0 ||
@@ -65,7 +66,22 @@ const validate = () => {
     alert("Errore, il libro è già stato aggiunto");
     return;
   }
-  listAdded.value.push({ ...formData.value });
+  saveLocal(formData.value);
+};
+
+const saveLocal = (formData: FormData) => {
+  listAdded.value.push({ ...formData });
+  localStorage.setItem("next-to-buy-local", JSON.stringify(listAdded.value));
+};
+
+const removeLocal = (formData: FormData) => {
+  listAdded.value = listAdded.value.filter(
+    (book) =>
+      book.title !== formData.title ||
+      book.volume !== formData.volume ||
+      book.price !== formData.price
+  );
+  localStorage.setItem("next-to-buy-local", JSON.stringify(listAdded.value));
 };
 
 const fakeSave = async () => {
@@ -92,13 +108,29 @@ const fakeDelete = async (title: string) => {
     }, 1500);
   });
 };
+
+onMounted(() => {
+  const local = localStorage.getItem("next-to-buy-local");
+  if (local) {
+    listAdded.value = JSON.parse(local);
+  }
+});
 </script>
 
 <template>
   <VContainer>
-    <VRow justify="center">
-      <VCol>
-        <VCard>
+    
+    <VRow>
+      <VCol
+        :class="{
+          'd-flex': useDisplay().lgAndUp.value,
+          'justify-center': useDisplay().lgAndUp.value,
+        }"
+      >
+        <VCard
+          :style="{ width: useDisplay().lgAndUp.value ? '50%' : '' }"
+          rounded="lg"
+        >
           <VCardTitle class="text-center">Next to buy</VCardTitle>
           <VCardText>
             <VRow>
@@ -124,7 +156,8 @@ const fakeDelete = async (title: string) => {
                 />
               </VCol>
               <VCol cols="4">
-                <VSwitch v-model="useBookInShelf" label="Use shelf" />
+                <label>Use shelf</label>
+                <VSwitch v-model="useBookInShelf" />
               </VCol>
               <VCol cols="12">
                 <VTextField
@@ -145,7 +178,7 @@ const fakeDelete = async (title: string) => {
               </VCol>
             </VRow>
             <VCardActions class="justify-center">
-              <VBtn color="primary" size="x-large" @click="validate">
+              <VBtn color="primary" size="x-large" @click="validateLocal">
                 <VIcon>mdi-plus</VIcon>
               </VBtn>
               <VBtn
@@ -160,8 +193,8 @@ const fakeDelete = async (title: string) => {
         </VCard>
       </VCol>
     </VRow>
-    <VRow >
-      <VCol cols="6" v-for="books in listAdded">
+    <VRow>
+      <VCol xs="12" sm="6" md="4" lg="3" xl="2" v-for="books in listAdded">
         <VCard class="d-flex flex-column pulsing-container" rounded="lg">
           <VCardTitle class="text-center">{{ books.title }}</VCardTitle>
           <VCardText class="d-flex flex-column justify-center py-1 text-center">
@@ -169,10 +202,7 @@ const fakeDelete = async (title: string) => {
             <p>Price: {{ books.price }} €</p>
           </VCardText>
           <VCardActions class="justify-center">
-            <VBtn
-              color="error"
-              @click="listAdded.splice(listAdded.indexOf(books), 1)"
-            >
+            <VBtn color="error" @click="removeLocal(books)">
               <VIcon>mdi-delete</VIcon>
             </VBtn>
           </VCardActions>
@@ -186,8 +216,7 @@ const fakeDelete = async (title: string) => {
             <p>Price: {{ books.price }} €</p>
           </VCardText>
           <VCardActions class="justify-center">
-            <VBtn color="error" @click="fakeDelete(books.title)"
-              >Ma da server
+            <VBtn color="error" @click="fakeDelete(books.title)">
               <VIcon>mdi-delete</VIcon>
             </VBtn>
           </VCardActions>
@@ -208,7 +237,7 @@ html {
     transform: scale(1);
   }
   50% {
-    border-color: #00ADB5;
+    border-color: rgb(var(--v-theme-primary));
     transform: scale(1.02);
   }
   100% {

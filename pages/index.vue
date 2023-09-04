@@ -58,7 +58,7 @@ onMounted(async () => {
     </VTabs>
     <VWindow v-model="tab">
       <VWindowItem value="home">
-        <HomePageTable v-if="!useDisplay().mobile.value" />
+        <HomePageTable v-if="!useDisplay().lgAndDown.value" />
         <MobileBookList v-else />
       </VWindowItem>
       <VWindowItem value="next-to-buy">
