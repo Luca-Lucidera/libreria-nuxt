@@ -42,7 +42,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- ERRORI -->
   <template v-if="errors.length != 0">
     <p v-for="error in errors" class="text-red">{{ error }}</p>
   </template>

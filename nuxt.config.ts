@@ -1,4 +1,3 @@
-// @ts-ignore
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     typescript: {
@@ -19,10 +18,7 @@ export default defineNuxtConfig({
         },
     },
     $development: {
-        sourcemap: {
-            client: true,
-            server: true,
-        },
+        sourcemap: true,
     },
     ssr: false,
 });

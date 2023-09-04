@@ -76,7 +76,7 @@ const fakeSave = async () => {
       listFromServer.value = [...listAdded.value, ...listFromServer.value];
       listAdded.value = [];
       resolve();
-    }, 3000);
+    }, 1500);
   });
 };
 
@@ -89,7 +89,7 @@ const fakeDelete = async (title: string) => {
         (book) => book.title !== title
       );
       resolve();
-    }, 3000);
+    }, 1500);
   });
 };
 </script>
@@ -160,11 +160,11 @@ const fakeDelete = async (title: string) => {
         </VCard>
       </VCol>
     </VRow>
-    <VRow>
+    <VRow >
       <VCol cols="6" v-for="books in listAdded">
-        <VCard>
+        <VCard class="d-flex flex-column pulsing-container" rounded="lg">
           <VCardTitle class="text-center">{{ books.title }}</VCardTitle>
-          <VCardText>
+          <VCardText class="d-flex flex-column justify-center py-1 text-center">
             <p>Volume: {{ books.volume }}</p>
             <p>Price: {{ books.price }} €</p>
           </VCardText>
@@ -186,9 +186,7 @@ const fakeDelete = async (title: string) => {
             <p>Price: {{ books.price }} €</p>
           </VCardText>
           <VCardActions class="justify-center">
-            <VBtn
-              color="error"
-              @click="fakeDelete(books.title)"
+            <VBtn color="error" @click="fakeDelete(books.title)"
               >Ma da server
               <VIcon>mdi-delete</VIcon>
             </VBtn>
@@ -202,5 +200,25 @@ const fakeDelete = async (title: string) => {
 <style>
 html {
   overflow-y: scroll;
+}
+
+@keyframes pulse {
+  0% {
+    border-color: transparent;
+    transform: scale(1);
+  }
+  50% {
+    border-color: #00ADB5;
+    transform: scale(1.02);
+  }
+  100% {
+    border-color: transparent;
+    transform: scale(1);
+  }
+}
+
+.pulsing-container {
+  border: 2px solid transparent;
+  animation: pulse 2s infinite;
 }
 </style>
