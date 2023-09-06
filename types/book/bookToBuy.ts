@@ -1,6 +1,5 @@
 export type BookToBuy = {
   title: string;
-  number: number;
+  volume: number;
   price: number;
-  isNew: boolean;
 };

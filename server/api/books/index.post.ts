@@ -3,10 +3,10 @@ import { Book, Publisher, Status, Type, User } from "@prisma/client";
 export default defineEventHandler(async (event) => {
   const result = await handleSecurity(event);
   if (!result.success) {
-    throw createError({ statusCode: 401, message: result.errorData });
+    throw createError({ statusCode: 401, statusMessage: result.errorData });
   }
   if (!result.successData?.user?.id) {
-    throw createError({ statusCode: 401, message: "Token invalid" });
+    throw createError({ statusCode: 401, statusMessage: "Token invalid" });
   }
 
   const { id, ...bookToCreate } = (await readBody(event)) as Book;

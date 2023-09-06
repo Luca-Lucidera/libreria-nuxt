@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { VForm } from "vuetify/lib/components/index.mjs";
 import { useDisplay } from "vuetify";
-import { BookToBuy } from "types/bookToBuy";
 
 //state
 const errors = useState<string[]>(() => []);

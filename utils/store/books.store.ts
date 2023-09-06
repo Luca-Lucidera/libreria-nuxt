@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { Book } from "~/types/book";
 import { FetchError } from "ofetch";
 import { Result } from "~/types/result";
+import { BookToBuy } from "types/book/bookToBuy";
 
 export const useBooksStore = defineStore("books", () => {
   const globalStore = useGlobalStore();
@@ -59,6 +60,7 @@ export const useBooksStore = defineStore("books", () => {
       };
     }
   };
+
   const createBook = async (book: Book): Promise<Result<void, string>> => {
     try {
       await $fetch("/api/books", {
@@ -99,6 +101,7 @@ export const useBooksStore = defineStore("books", () => {
       };
     }
   };
+
   const updateBook = async (book: Book): Promise<Result<void, string>> => {
     try {
       await $fetch("/api/books", {
@@ -139,6 +142,7 @@ export const useBooksStore = defineStore("books", () => {
       };
     }
   };
+
   const removeBook = async (bookId: string): Promise<Result<void, string>> => {
     try {
       await $fetch(`/api/books/${bookId}`, {
@@ -179,6 +183,71 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
+  const fetchBooksToBuy = async (): Promise<Result<BookToBuy[], string>> => {
+    try {
+      const data = await $fetch<BookToBuy[]>("/api/books/to-buy", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: globalStore.computedJwt
+            ? `Bearer ${globalStore.computedJwt}`
+            : "",
+        },
+      });
+      return {
+        success: true,
+        successData: data,
+      };
+    } catch (error) {
+      if (error instanceof FetchError) {
+        console.error(
+          `Errore in books.store.ts fetchBooksToBuy(), DATA: ${error.data}, statusCode: ${error.statusCode}, statusMessage: ${error.statusMessage}`
+        );
+        return {
+          success: false,
+          errorData: error.statusMessage,
+        };
+      }
+      console.error(
+        `Errore non gestito books.store.ts fetchBooksToBuy() ${JSON.stringify(
+          error,
+          null,
+          4
+        )}`
+      );
+      return {
+        success: false,
+        errorData:
+          "Errore non gestito nel prendere i libri da comprare, riprovare più darti",
+      };
+    }
+  };
+
+  const addBooksToBuy = async (
+    books: BookToBuy[]
+  ): Promise<Result<void, string>> => {
+    try {
+      await $fetch("/api/books/to-buy", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(books),
+        headers: {
+          Authorization: globalStore.computedJwt
+            ? `Bearer ${globalStore.computedJwt}`
+            : "",
+        },
+      });
+      return {
+        success: true,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        errorData:
+          "Errore non gestito nell'aggiungere i libri da comprare, riprovare più darti",
+      };
+    }
+  };
   return {
     books,
     computedBooks,
@@ -187,5 +256,7 @@ export const useBooksStore = defineStore("books", () => {
     createBook,
     updateBook,
     removeBook,
+    fetchBooksToBuy,
+    addBooksToBuy,
   };
 });

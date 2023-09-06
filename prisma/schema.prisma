@@ -16,12 +16,13 @@ model TableHeaders {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  name       String
-  lastName   String
-  email      String      @unique
-  password   String
-  books      Book[]
+  id        String      @id @default(uuid())
+  name      String
+  lastName  String
+  email     String      @unique
+  password  String
+  books     Book[]
+  BookToBuy BookToBuy[]
 }
 
 model Book {
@@ -34,9 +35,18 @@ model Book {
   publisher Publisher
   price     Float     @default(1)
   rating    Float     @default(0)
-  comment   String
+  comment   String    @default("")
   userId    String
   user      User      @relation(fields: [userId], references: [id])
+}
+
+model BookToBuy {
+  id     String @id @default(uuid())
+  title  String
+  volume Int
+  price  Float  @default(1)
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 enum Type {

@@ -1,23 +1,19 @@
 <script setup lang="ts">
+import { BookToBuy } from "types/book/bookToBuy";
 import { useDisplay } from "vuetify";
 const booksStore = useBooksStore();
 const globalStore = useGlobalStore();
-
-type FormData = {
-  title: string;
-  volume: number;
-  price: number;
-};
+const error = useState<null | string>(() => null);
 
 const useBookInShelf = useState(() => false);
 
 // lista di libri aggiunti al momento
-const listAdded = useState<FormData[]>(() => []);
+const listAdded = useState<BookToBuy[]>(() => []);
 
 // lista di libri presi dal db
-const listFromServer = useState<FormData[]>(() => []);
+const listFromServer = useState<BookToBuy[]>(() => []);
 
-const formData = useState<FormData>(() => ({
+const formData = useState<BookToBuy>(() => ({
   title: "",
   volume: 1,
   price: 1,
@@ -69,12 +65,12 @@ const validateLocal = () => {
   saveLocal(formData.value);
 };
 
-const saveLocal = (formData: FormData) => {
+const saveLocal = (formData: BookToBuy) => {
   listAdded.value.push({ ...formData });
   localStorage.setItem("next-to-buy-local", JSON.stringify(listAdded.value));
 };
 
-const removeLocal = (formData: FormData) => {
+const removeLocal = (formData: BookToBuy) => {
   listAdded.value = listAdded.value.filter(
     (book) =>
       book.title !== formData.title ||
@@ -84,42 +80,53 @@ const removeLocal = (formData: FormData) => {
   localStorage.setItem("next-to-buy-local", JSON.stringify(listAdded.value));
 };
 
-const fakeSave = async () => {
-  await new Promise<void>((resolve) => {
-    globalStore.startLoading();
-    setTimeout(() => {
-      globalStore.stopLoading();
-      listFromServer.value = [...listAdded.value, ...listFromServer.value];
-      listAdded.value = [];
-      resolve();
-    }, 1500);
-  });
+const serverSave = async () => {
+  globalStore.startLoading();
+  const result = await booksStore.addBooksToBuy(listAdded.value);
+  if(!result.success) {
+    if(result.errorData) {
+      error.value = result.errorData;
+    } else {
+      error.value = "Errore non gestito";
+    }
+  } else {
+    listFromServer.value = [...listFromServer.value, ...listAdded.value];    
+    listAdded.value = [];
+    localStorage.removeItem("next-to-buy-local");
+  }
+  globalStore.stopLoading();
+}
+
+const serverRemove = async (formData: BookToBuy) => {
 };
 
-const fakeDelete = async (title: string) => {
-  await new Promise<void>((resolve) => {
-    globalStore.startLoading();
-    setTimeout(() => {
-      globalStore.stopLoading();
-      listFromServer.value = listFromServer.value.filter(
-        (book) => book.title !== title
-      );
-      resolve();
-    }, 1500);
-  });
-};
 
-onMounted(() => {
+onMounted(async () => {
+  globalStore.startLoading();
   const local = localStorage.getItem("next-to-buy-local");
   if (local) {
     listAdded.value = JSON.parse(local);
   }
+
+  const result = await booksStore.fetchBooksToBuy();
+  if(!result.success) {
+    if(result.errorData) {
+      error.value = result.errorData;
+    } else {
+      error.value = "Errore non gestito";
+    }
+  } else {
+    if(result.successData) {
+      listFromServer.value = result.successData;
+    }
+  }
+
+  globalStore.stopLoading();
 });
 </script>
 
 <template>
   <VContainer>
-    
     <VRow>
       <VCol
         :class="{
@@ -184,7 +191,7 @@ onMounted(() => {
               <VBtn
                 :disabled="listAdded.length === 0"
                 :color="listAdded.length !== 0 ? 'success' : 'default'"
-                @click="fakeSave"
+                @click="serverSave"
                 >Save the list
                 <VIcon class="ml-1">mdi-floppy</VIcon>
               </VBtn>
@@ -194,29 +201,29 @@ onMounted(() => {
       </VCol>
     </VRow>
     <VRow>
-      <VCol xs="12" sm="6" md="4" lg="3" xl="2" v-for="books in listAdded">
+      <VCol xs="12" sm="6" md="4" lg="3" xl="2" v-for="book in listAdded">
         <VCard class="d-flex flex-column pulsing-container" rounded="lg">
-          <VCardTitle class="text-center">{{ books.title }}</VCardTitle>
+          <VCardTitle class="text-center">{{ book.title }}</VCardTitle>
           <VCardText class="d-flex flex-column justify-center py-1 text-center">
-            <p>Volume: {{ books.volume }}</p>
-            <p>Price: {{ books.price }} €</p>
+            <p>Volume: {{ book.volume }}</p>
+            <p>Price: {{ book.price }} €</p>
           </VCardText>
           <VCardActions class="justify-center">
-            <VBtn color="error" @click="removeLocal(books)">
+            <VBtn color="error" @click="removeLocal(book)">
               <VIcon>mdi-delete</VIcon>
             </VBtn>
           </VCardActions>
         </VCard>
       </VCol>
-      <VCol cols="6" v-for="books in listFromServer">
+      <VCol xs="12" sm="6" md="4" lg="3" xl="2" v-for="book in listFromServer">
         <VCard>
-          <VCardTitle class="text-center">{{ books.title }}</VCardTitle>
+          <VCardTitle class="text-center">{{ book.title }}</VCardTitle>
           <VCardText>
-            <p>Volume: {{ books.volume }}</p>
-            <p>Price: {{ books.price }} €</p>
+            <p>Volume: {{ book.volume }}</p>
+            <p>Price: {{ book.price }} €</p>
           </VCardText>
           <VCardActions class="justify-center">
-            <VBtn color="error" @click="fakeDelete(books.title)">
+            <VBtn color="error" @click="serverRemove(book)">
               <VIcon>mdi-delete</VIcon>
             </VBtn>
           </VCardActions>
