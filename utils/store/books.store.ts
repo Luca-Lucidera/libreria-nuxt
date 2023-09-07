@@ -225,9 +225,9 @@ export const useBooksStore = defineStore("books", () => {
 
   const addBooksToBuy = async (
     books: BookToBuy[]
-  ): Promise<Result<void, string>> => {
+  ): Promise<Result<boolean, string>> => {
     try {
-      await $fetch("/api/books/to-buy", {
+      const { success, duplicate } = await $fetch<{success: boolean, duplicate: boolean}>("/api/books/to-buy", {
         method: "POST",
         credentials: "include",
         body: JSON.stringify(books),
@@ -237,10 +237,28 @@ export const useBooksStore = defineStore("books", () => {
             : "",
         },
       });
+
       return {
-        success: true,
+        success,
+        successData: duplicate,
       };
     } catch (error) {
+      if (error instanceof FetchError) {
+        console.error(
+          `Errore in books.store.ts addBooksToBuy(), DATA: ${error.data}, statusCode: ${error.statusCode}, statusMessage: ${error.statusMessage}`
+        );
+        return {
+          success: false,
+          errorData: error.statusMessage,
+        };
+      }
+      console.error(
+        `Errore non gestito books.store.ts addBooksToBuy() ${JSON.stringify(
+          error,
+          null,
+          4
+        )}`
+      );
       return {
         success: false,
         errorData:

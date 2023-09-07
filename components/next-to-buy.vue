@@ -83,40 +83,54 @@ const removeLocal = (formData: BookToBuy) => {
 const serverSave = async () => {
   globalStore.startLoading();
   const result = await booksStore.addBooksToBuy(listAdded.value);
-  if(!result.success) {
-    if(result.errorData) {
+  if (!result.success) {
+    if (result.errorData) {
       error.value = result.errorData;
     } else {
       error.value = "Errore non gestito";
     }
   } else {
-    listFromServer.value = [...listFromServer.value, ...listAdded.value];    
-    listAdded.value = [];
-    localStorage.removeItem("next-to-buy-local");
+    //SUCCESS DATA: rappresent if the are duplicate
+    if (result.successData) {
+      //find a way to show the user there are some duplicate
+      //and DO NOT RETURN
+    }
+    const { success, successData, errorData } =
+      await booksStore.fetchBooksToBuy();
+    if (success && successData) {
+      listFromServer.value = successData;
+      listAdded.value = [];
+      localStorage.removeItem("next-to-buy-local");
+      globalStore.stopLoading();
+      return;
+    }
+
+    if (errorData) {
+      error.value = errorData;
+    } else {
+      error.value = "Errore non gestito";
+    }
+    globalStore.stopLoading();
   }
-  globalStore.stopLoading();
-}
-
-const serverRemove = async (formData: BookToBuy) => {
 };
-
+const serverRemove = async (formData: BookToBuy) => {};
 
 onMounted(async () => {
   globalStore.startLoading();
   const local = localStorage.getItem("next-to-buy-local");
   if (local) {
-    listAdded.value = JSON.parse(local);
+    listAdded.value = JSON.parse(local) as BookToBuy[];
   }
 
   const result = await booksStore.fetchBooksToBuy();
-  if(!result.success) {
-    if(result.errorData) {
+  if (!result.success) {
+    if (result.errorData) {
       error.value = result.errorData;
     } else {
       error.value = "Errore non gestito";
     }
   } else {
-    if(result.successData) {
+    if (result.successData) {
       listFromServer.value = result.successData;
     }
   }
