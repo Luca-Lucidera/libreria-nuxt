@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BookToBuy } from "types/book/bookToBuy";
+import { BookToBuy } from "~/types/book/bookToBuy";
 import { useDisplay } from "vuetify";
 const booksStore = useBooksStore();
 const globalStore = useGlobalStore();
@@ -103,6 +103,7 @@ const serverSave = async () => {
       listAdded.value = [];
       localStorage.removeItem("next-to-buy-local");
       globalStore.stopLoading();
+      globalStore.showSnackbar("List saved", "success");
       return;
     }
 
@@ -125,12 +126,14 @@ const serverRemove = async (formData: BookToBuy) => {
       error.value = "Errore non gestito";
     }
     globalStore.stopLoading();
+    globalStore.showSnackbar(error.value, "error")
     return;
   }
   
   if(successData) {
     listFromServer.value = successData;
     globalStore.stopLoading();
+    globalStore.showSnackbar("Book removed", "success");
     return;
   }
 };

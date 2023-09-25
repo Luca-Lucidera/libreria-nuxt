@@ -35,6 +35,12 @@
           </VContainer>
         </VDialog>
       </VMain>
+      <VSnackbar
+        v-model="globalStore.snackbar.show"
+        :timeout="globalStore.snackbar.timeout"
+        :color="globalStore.snackbar.color"
+        >{{ globalStore.snackbar.message }}</VSnackbar
+      >
     </VContainer>
   </VLayout>
 </template>

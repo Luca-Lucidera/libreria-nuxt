@@ -1,9 +1,10 @@
 import { defineStore } from "pinia";
+import { Snackbar } from "~/types/snackbar";
 
-export const useGlobalStore = defineStore('global', () => {
+export const useGlobalStore = defineStore("global", () => {
   const isLoading = ref(false);
-  const theme = ref('dark');
-  
+  const theme = ref("dark");
+
   const jwt = ref<string | null>(null);
   const computedJwt = computed(() => jwt.value);
   const setJwt = (token: string) => {
@@ -23,11 +24,27 @@ export const useGlobalStore = defineStore('global', () => {
     isLoading.value = false;
   };
   const changeTheme = () => {
-    if(theme.value === 'dark') {
-      theme.value = 'light';
+    if (theme.value === "dark") {
+      theme.value = "light";
     } else {
-      theme.value = 'dark';
+      theme.value = "dark";
     }
+  };
+
+  
+  const snackbar = useState<Snackbar>(() => ({
+    show: false,
+    message: "",
+    color: "",
+    timeout: 3000,
+  }));
+  const showSnackbar = (message = "", color = "secondary") => {
+    snackbar.value.show = true;
+    snackbar.value.message = message;
+    snackbar.value.color = color;
+    /**
+     * Reminder per il futuro, se è presente un timeout la prop show verrà messa automaticamente a false dopo il periodo di tempo indicato
+     */
   };
 
   return {
@@ -38,6 +55,8 @@ export const useGlobalStore = defineStore('global', () => {
     changeTheme,
     computedJwt,
     clearJwt,
-    setJwt
+    setJwt,
+    snackbar,
+    showSnackbar,
   };
 });
