@@ -72,16 +72,17 @@ const handleCloseDialogDelete = () => {
 <template>
   <VDataTable
       :loading="globalStore.getIsLoading"
-      :headers="props.headers"
+      :headers="(props.headers as any[])"
       :items="props.books"
       :search="search"
       loading-text="Caricamento..."
       no-data-text="No books found, please add one"
-      height="70vh"
+      height="65vh"
       fixed-header
       fixed-footer
-      items-per-page="-1"
+      :items-per-page="props.books.length > 15 ? 15 : props.books.length"
       show-current-page
+      hover
   >
     <template v-slot:top>
       <VToolbar>

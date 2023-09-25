@@ -8,7 +8,7 @@
             userStore.computedUser ? userStore.computedUser.name : null
           }}</VAppBarTitle
         >
-        <VMenu location="bottom" v-if="userStore.computedUser">
+        <VMenu location="bottom" v-if="userStore.isLogged">
           <template v-slot:activator="{ props }">
             <VBtn color="primary" v-bind="props" icon="mdi-account-circle" />
           </template>

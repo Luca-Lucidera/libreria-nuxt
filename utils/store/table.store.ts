@@ -1,6 +1,6 @@
 import { TableHeaders } from "@prisma/client";
 import { defineStore } from "pinia";
-import { BookTableFilter } from "~/types/bookTableFilter";
+import { BookTableFilter } from "~/types/book/bookTableFilter";
 import { FetchError } from "ofetch";
 import { Result } from "~/types/result";
 

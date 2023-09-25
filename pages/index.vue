@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import { useDisplay } from "vuetify";
+
 //state
 const errors = useState<string[]>(() => []);
-
-//type, status, publisher
-const filters = useState(() => ["All", "All", "All"]);
 
 //store
 const tableStore = useTableStore();
 const globalStore = useGlobalStore();
 const booksStore = useBooksStore();
+
+const tab = ref(null);
 
 onMounted(async () => {
   globalStore.startLoading();
@@ -43,29 +44,24 @@ onMounted(async () => {
     <p v-for="error in errors" class="text-red">{{ error }}</p>
   </template>
   <VContainer v-else class="h-100">
-    <VRow align="center" class="h-100">
-      <VCol cols="2">
-        <VProgressCircular
-          v-if="!tableStore.areFiltersReady()"
-          :indeterminate="true"
-          size="100"
-        />
-        <CustomFilter
-          v-else
-          v-for="(filterEntries, i) in Object.entries(tableStore.getFilters)"
-          :key="i"
-          :label="filterEntries[0]"
-          :filters="filterEntries[1]"
-          v-model="filters[i]"
-        />
-      </VCol>
-
-      <VCol>
-        <BooksTable
-          :books="booksStore.filteredBooks(filters[0], filters[1], filters[2])"
-          :headers="tableStore.getHeaders"
-        />
-      </VCol>
-    </VRow>
+    <VTabs v-model="tab" align-tabs="center" class="mb-8">
+      <VTab value="home">
+        <VIcon>mdi-home</VIcon>
+        Home
+      </VTab>
+      <VTab value="next-to-buy">
+        <VIcon>mdi-book</VIcon>
+        Next to buy
+      </VTab>
+    </VTabs>
+    <VWindow v-model="tab">
+      <VWindowItem value="home">
+        <HomePageTable v-if="!useDisplay().lgAndDown.value" />
+        <MobileBookList v-else />
+      </VWindowItem>
+      <VWindowItem value="next-to-buy">
+        <NextToBuy />
+      </VWindowItem>
+    </VWindow>
   </VContainer>
 </template>

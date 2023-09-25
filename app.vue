@@ -7,5 +7,6 @@
 <style>
 html {
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 </style>
