@@ -10,12 +10,16 @@ const simulateFetch = async () => {
   }
 };
 
-addRouteMiddleware(() => {
-  if (process.env.NODE_ENV === "production") {
-    return "/";
-  }
-});
 const env = process.env.NODE_ENV;
+definePageMeta({
+  middleware: [
+    () => {
+      if (process.env.NODE_ENV === "production") {
+        return "/";
+      }
+    },
+  ],
+});
 </script>
 
 <template>
