@@ -89,9 +89,10 @@ const serverSave = async () => {
     } else {
       error.value = "Errore non gestito";
     }
+    globalStore.stopLoading();
   } else {
-    //SUCCESS DATA: rappresent if the are duplicate
     if (result.successData) {
+      //SUCCESS DATA: represent if the are duplicate
       //find a way to show the user there are some duplicate
       //and DO NOT RETURN
     }
@@ -113,7 +114,26 @@ const serverSave = async () => {
     globalStore.stopLoading();
   }
 };
-const serverRemove = async (formData: BookToBuy) => {};
+
+const serverRemove = async (formData: BookToBuy) => {
+  globalStore.startLoading();
+  const { success, successData, errorData } = await booksStore.removeBooksToBuy(formData);
+  if(!success) {
+    if(errorData) {
+      error.value = errorData;
+    } else {
+      error.value = "Errore non gestito";
+    }
+    globalStore.stopLoading();
+    return;
+  }
+  
+  if(successData) {
+    listFromServer.value = successData;
+    globalStore.stopLoading();
+    return;
+  }
+};
 
 onMounted(async () => {
   globalStore.startLoading();

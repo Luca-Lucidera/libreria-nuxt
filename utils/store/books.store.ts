@@ -266,6 +266,31 @@ export const useBooksStore = defineStore("books", () => {
       };
     }
   };
+
+  const removeBooksToBuy = async (btb: BookToBuy): Promise<Result<BookToBuy[], string>> => {
+    try {
+      const data = await $fetch<BookToBuy[]>("/api/books/to-buy", {
+        method: "DELETE",
+        credentials: "include",
+        body: JSON.stringify(btb),
+        headers: {
+          Authorization: globalStore.computedJwt
+            ? `Bearer ${globalStore.computedJwt}`
+            : "",
+        },  
+      });
+      return {
+        success: true,
+        successData: data
+      }
+    } catch (error) {
+      //TODO!: Gestisci l'errore in maniera più approfondita
+      return {
+        success: false,
+        errorData: "Errore nell'eliminazione del libro"
+      }
+    }
+  }
   return {
     books,
     computedBooks,
@@ -276,5 +301,6 @@ export const useBooksStore = defineStore("books", () => {
     removeBook,
     fetchBooksToBuy,
     addBooksToBuy,
+    removeBooksToBuy
   };
 });
