@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Snackbar } from "~/types/snackbar";
+import type { Snackbar } from "~/types/snackbar";
 
 export const useGlobalStore = defineStore("global", () => {
   const isLoading = ref(false);

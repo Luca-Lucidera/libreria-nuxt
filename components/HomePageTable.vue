@@ -1,3 +1,11 @@
+<script setup lang="ts">
+const tableStore = useTableStore();
+const booksStore = useBooksStore();
+
+//type, status, publisher
+const filters = useState(() => ["All", "All", "All"]);
+</script>
+
 <template>
   <VRow align="center" class="h-100">
     <VCol cols="2">
@@ -24,10 +32,3 @@
     </VCol>
   </VRow>
 </template>
-<script setup lang="ts">
-const tableStore = useTableStore();
-const booksStore = useBooksStore();
-
-//type, status, publisher
-const filters = useState(() => ["All", "All", "All"]);
-</script>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {VForm} from "vuetify/components/VForm";
-import {UserLoginDTO} from "~/types/user/userLoginDTO";
+import { VForm } from "vuetify/components/VForm";
+import type { UserLoginDTO } from "~/types/user/userLoginDTO";
 
 //page state
 const loginForm = useState<UserLoginDTO>(() => {
@@ -22,7 +22,7 @@ const handleSubmit = async () => {
   try {
     error.value = "";
     globalStore.startLoading();
-    const {valid} = await form!.value!.validate();
+    const { valid } = await form!.value!.validate();
     if (!valid) return;
     const result = await userStore.authenticate(loginForm.value);
     if (result.success) {
@@ -33,12 +33,12 @@ const handleSubmit = async () => {
       };
     } else {
       if (result.errorData) {
-        error.value = result.errorData
+        error.value = result.errorData;
       } else {
-        error.value = "Errore non previsto, riprovare più tardi"
+        error.value = "Errore non previsto, riprovare più tardi";
       }
     }
-  }  finally {
+  } finally {
     globalStore.stopLoading();
   }
 };
@@ -51,26 +51,26 @@ const handleSubmit = async () => {
       <VForm @submit.prevent="handleSubmit" ref="form">
         <VCardItem>
           <VTextField
-              v-model="loginForm.email"
-              :rules="rules.auth.email"
-              color="primary"
-              label="Email"
-              prependIcon="mdi-email"
-              type="email"
-              variant="underlined"
+            v-model="loginForm.email"
+            :rules="rules.auth.email"
+            color="primary"
+            label="Email"
+            prependIcon="mdi-email"
+            type="email"
+            variant="underlined"
           />
         </VCardItem>
         <VCardItem>
           <VTextField
-              v-model="loginForm.password"
-              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="rules.auth.password"
-              :type="showPassword ? 'text' : 'password'"
-              color="primary"
-              label="Password"
-              prependIcon="mdi-lock"
-              variant="underlined"
-              @click:append-inner="showPassword = !showPassword"
+            v-model="loginForm.password"
+            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :rules="rules.auth.password"
+            :type="showPassword ? 'text' : 'password'"
+            color="primary"
+            label="Password"
+            prependIcon="mdi-lock"
+            variant="underlined"
+            @click:append-inner="showPassword = !showPassword"
           />
         </VCardItem>
         <VCardText class="text-center text-error text-body-1">
@@ -78,31 +78,28 @@ const handleSubmit = async () => {
         </VCardText>
         <VCardActions class="justify-center my-4">
           <VBtn
-              type="submit"
-              color="primary"
-              variant="tonal"
-              size="large"
-              rounded="lg"
-              elevation="18"
-              width="auto"
+            type="submit"
+            color="primary"
+            variant="tonal"
+            size="large"
+            rounded="lg"
+            elevation="18"
+            width="auto"
           >
             Login
           </VBtn>
           <VBtn
-              color="secondary"
-              variant="text"
-              size="large"
-              elevation="18"
-              rounded="lg"
-              width="auto"
-              to="/register"
-          >REGISTER
-          </VBtn
-          >
+            color="secondary"
+            variant="text"
+            size="large"
+            elevation="18"
+            rounded="lg"
+            width="auto"
+            to="/register"
+            >REGISTER
+          </VBtn>
         </VCardActions>
       </VForm>
     </VCard>
   </VContainer>
 </template>
-
-

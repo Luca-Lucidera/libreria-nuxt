@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { UserRegisterDTO } from "~/types/user/userRegisterDTO";
+import type { UserRegisterDTO } from "~/types/user/userRegisterDTO";
 
 export default defineEventHandler(async (event) => {
   const body = (await readBody(event)) as UserRegisterDTO;

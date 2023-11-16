@@ -1,4 +1,4 @@
-import { Book } from "~/types/book";
+import type { Book } from "~/types/book";
 import { parsePrismaEnum } from "~/server/utils/parser";
 
 export default defineEventHandler(async (event) => {

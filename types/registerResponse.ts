@@ -1,3 +1,3 @@
-import {LoginResponse} from "~/types/loginResponse";
+import type { LoginResponse } from "~/types/loginResponse";
 
-export type RegisterResponse = {} & LoginResponse
+export type RegisterResponse = {} & LoginResponse;

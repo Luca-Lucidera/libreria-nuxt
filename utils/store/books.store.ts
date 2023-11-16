@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import { Book } from "~/types/book";
+import type { Book } from "~/types/book";
 import { FetchError } from "ofetch";
-import { Result } from "~/types/result";
-import { BookToBuy } from "types/book/bookToBuy";
+import type { Result } from "~/types/result";
+import type { BookToBuy } from "~/types/book/bookToBuy";
 
 export const useBooksStore = defineStore("books", () => {
   const globalStore = useGlobalStore();
@@ -22,7 +22,7 @@ export const useBooksStore = defineStore("books", () => {
     });
   };
 
-  const fetchBooks = async (): Promise<Result<void, string>> => {
+  const fetchBooks = async (): Promise<Result<null, string>> => {
     try {
       books.value = await $fetch<Book[]>("/api/books", {
         method: "GET",
@@ -35,6 +35,7 @@ export const useBooksStore = defineStore("books", () => {
       });
       return {
         success: true,
+        successData: null,
       };
     } catch (error) {
       if (error instanceof FetchError) {
@@ -43,7 +44,7 @@ export const useBooksStore = defineStore("books", () => {
         );
         return {
           success: false,
-          errorData: error.statusMessage,
+          errorData: error.statusMessage!!,
         };
       }
       console.error(
@@ -61,7 +62,7 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
-  const createBook = async (book: Book): Promise<Result<void, string>> => {
+  const createBook = async (book: Book): Promise<Result<null, string>> => {
     try {
       await $fetch("/api/books", {
         method: "POST",
@@ -76,6 +77,7 @@ export const useBooksStore = defineStore("books", () => {
       await fetchBooks();
       return {
         success: true,
+        successData: null,
       };
     } catch (error) {
       if (error instanceof FetchError) {
@@ -84,7 +86,7 @@ export const useBooksStore = defineStore("books", () => {
         );
         return {
           success: false,
-          errorData: error.statusMessage,
+          errorData: error.statusMessage!!,
         };
       }
       console.error(
@@ -102,7 +104,7 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
-  const updateBook = async (book: Book): Promise<Result<void, string>> => {
+  const updateBook = async (book: Book): Promise<Result<null, string>> => {
     try {
       await $fetch("/api/books", {
         method: "PUT",
@@ -117,6 +119,7 @@ export const useBooksStore = defineStore("books", () => {
       await fetchBooks();
       return {
         success: true,
+        successData: null,
       };
     } catch (error) {
       if (error instanceof FetchError) {
@@ -125,7 +128,7 @@ export const useBooksStore = defineStore("books", () => {
         );
         return {
           success: false,
-          errorData: error.statusMessage,
+          errorData: error.statusMessage!!,
         };
       }
       console.error(
@@ -143,7 +146,7 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
-  const removeBook = async (bookId: string): Promise<Result<void, string>> => {
+  const removeBook = async (bookId: string): Promise<Result<null, string>> => {
     try {
       await $fetch(`/api/books/${bookId}`, {
         method: "DELETE",
@@ -157,6 +160,7 @@ export const useBooksStore = defineStore("books", () => {
       await fetchBooks();
       return {
         success: true,
+        successData: null,
       };
     } catch (error) {
       if (error instanceof FetchError) {
@@ -165,7 +169,7 @@ export const useBooksStore = defineStore("books", () => {
         );
         return {
           success: false,
-          errorData: error.statusMessage,
+          errorData: error.statusMessage!,
         };
       }
       console.error(
@@ -205,7 +209,7 @@ export const useBooksStore = defineStore("books", () => {
         );
         return {
           success: false,
-          errorData: error.statusMessage,
+          errorData: error.statusMessage!,
         };
       }
       console.error(
@@ -227,7 +231,10 @@ export const useBooksStore = defineStore("books", () => {
     books: BookToBuy[]
   ): Promise<Result<boolean, string>> => {
     try {
-      const { success, duplicate } = await $fetch<{success: boolean, duplicate: boolean}>("/api/books/to-buy", {
+      const { success, duplicate } = await $fetch<{
+        success: boolean;
+        duplicate: boolean;
+      }>("/api/books/to-buy", {
         method: "POST",
         credentials: "include",
         body: JSON.stringify(books),
@@ -237,11 +244,11 @@ export const useBooksStore = defineStore("books", () => {
             : "",
         },
       });
-
+      //!TODO: FIXA STA SCHIFEZZA
       return {
-        success,
+        success: true,
         successData: duplicate,
-      };
+      }
     } catch (error) {
       if (error instanceof FetchError) {
         console.error(
@@ -249,7 +256,7 @@ export const useBooksStore = defineStore("books", () => {
         );
         return {
           success: false,
-          errorData: error.statusMessage,
+          errorData: error.statusMessage!,
         };
       }
       console.error(
@@ -267,7 +274,9 @@ export const useBooksStore = defineStore("books", () => {
     }
   };
 
-  const removeBooksToBuy = async (btb: BookToBuy): Promise<Result<BookToBuy[], string>> => {
+  const removeBooksToBuy = async (
+    btb: BookToBuy
+  ): Promise<Result<BookToBuy[], string>> => {
     try {
       const data = await $fetch<BookToBuy[]>("/api/books/to-buy", {
         method: "DELETE",
@@ -277,20 +286,20 @@ export const useBooksStore = defineStore("books", () => {
           Authorization: globalStore.computedJwt
             ? `Bearer ${globalStore.computedJwt}`
             : "",
-        },  
+        },
       });
       return {
         success: true,
-        successData: data
-      }
+        successData: data,
+      };
     } catch (error) {
       //TODO!: Gestisci l'errore in maniera più approfondita
       return {
         success: false,
-        errorData: "Errore nell'eliminazione del libro"
-      }
+        errorData: "Errore nell'eliminazione del libro",
+      };
     }
-  }
+  };
   return {
     books,
     computedBooks,
@@ -301,6 +310,6 @@ export const useBooksStore = defineStore("books", () => {
     removeBook,
     fetchBooksToBuy,
     addBooksToBuy,
-    removeBooksToBuy
+    removeBooksToBuy,
   };
 });

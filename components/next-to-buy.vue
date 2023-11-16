@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BookToBuy } from "~/types/book/bookToBuy";
+import type { BookToBuy } from "~/types/book/bookToBuy";
 import { useDisplay } from "vuetify";
 const booksStore = useBooksStore();
 const globalStore = useGlobalStore();
@@ -96,46 +96,37 @@ const serverSave = async () => {
       //find a way to show the user there are some duplicate
       //and DO NOT RETURN
     }
-    const { success, successData, errorData } =
-      await booksStore.fetchBooksToBuy();
-    if (success && successData) {
-      listFromServer.value = successData;
-      listAdded.value = [];
-      localStorage.removeItem("next-to-buy-local");
-      globalStore.stopLoading();
-      globalStore.showSnackbar("List saved", "success");
+    const fetchResult = await booksStore.fetchBooksToBuy();
+    if (!fetchResult.success) {
+      error.value = fetchResult.errorData;
       return;
     }
 
-    if (errorData) {
-      error.value = errorData;
-    } else {
-      error.value = "Errore non gestito";
-    }
+    listFromServer.value = fetchResult.successData;
+    listAdded.value = [];
+    localStorage.removeItem("next-to-buy-local");
+    globalStore.stopLoading();
+    globalStore.showSnackbar("List saved", "success");
+
     globalStore.stopLoading();
   }
 };
 
 const serverRemove = async (formData: BookToBuy) => {
   globalStore.startLoading();
-  const { success, successData, errorData } = await booksStore.removeBooksToBuy(formData);
-  if(!success) {
-    if(errorData) {
-      error.value = errorData;
-    } else {
-      error.value = "Errore non gestito";
-    }
-    globalStore.stopLoading();
-    globalStore.showSnackbar(error.value, "error")
-    return;
-  }
+  const removeResult = await booksStore.removeBooksToBuy(formData);
   
-  if(successData) {
-    listFromServer.value = successData;
+  if (!removeResult.success) {
+    error.value = removeResult.errorData;
     globalStore.stopLoading();
-    globalStore.showSnackbar("Book removed", "success");
+    globalStore.showSnackbar(error.value, "error");
     return;
   }
+
+  listFromServer.value = removeResult.successData;
+  globalStore.stopLoading();
+  globalStore.showSnackbar("Book removed", "success");
+  return;
 };
 
 onMounted(async () => {

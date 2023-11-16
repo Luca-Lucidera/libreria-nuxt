@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Book } from "~/types/book";
-import { useDisplay } from "vuetify/lib/framework.mjs";
+import type { Book } from "~/types/book";
+import { useDisplay } from "vuetify";
 
 const booksStore = useBooksStore();
 const globalStore = useGlobalStore();

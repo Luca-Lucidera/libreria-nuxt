@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {UserRegisterDTO} from "~/types/user/userRegisterDTO";
+import type { UserRegisterDTO } from "~/types/user/userRegisterDTO";
 
 const registerForm = useState<UserRegisterDTO>(() => {
   return {
@@ -16,7 +16,6 @@ const userStore = useUserStore();
 const globalStore = useGlobalStore();
 
 const handleSubmit = async () => {
-
   error.value = "";
   globalStore.startLoading();
   const result = await userStore.createUser(registerForm.value);
@@ -29,13 +28,13 @@ const handleSubmit = async () => {
       password: "",
     };
   } else {
-    if(result.errorData) {
+    if (result.errorData) {
       error.value = result.errorData;
     } else {
-      error.value = "Errore non previsto, riprovare più tardi"
+      error.value = "Errore non previsto, riprovare più tardi";
     }
   }
-}
+};
 </script>
 
 <template>
@@ -45,46 +44,46 @@ const handleSubmit = async () => {
       <VForm @submit.prevent="handleSubmit" ref="form">
         <VCardItem>
           <VTextField
-              prependIcon="mdi-account-circle"
-              label="First name"
-              variant="underlined"
-              color="primary"
-              v-model="registerForm.name"
-              :rules="rules.auth.name"
+            prependIcon="mdi-account-circle"
+            label="First name"
+            variant="underlined"
+            color="primary"
+            v-model="registerForm.name"
+            :rules="rules.auth.name"
           />
         </VCardItem>
         <VCardItem>
           <VTextField
-              prependIcon="mdi-account-circle"
-              label="Last name"
-              variant="underlined"
-              color="primary"
-              v-model="registerForm.lastName"
-              :rules="rules.auth.lastName"
+            prependIcon="mdi-account-circle"
+            label="Last name"
+            variant="underlined"
+            color="primary"
+            v-model="registerForm.lastName"
+            :rules="rules.auth.lastName"
           />
         </VCardItem>
         <VCardItem>
           <VTextField
-              prependIcon="mdi-email"
-              type="email"
-              label="Email"
-              variant="underlined"
-              color="primary"
-              v-model="registerForm.email"
-              :rules="rules.auth.email"
+            prependIcon="mdi-email"
+            type="email"
+            label="Email"
+            variant="underlined"
+            color="primary"
+            v-model="registerForm.email"
+            :rules="rules.auth.email"
           />
         </VCardItem>
         <VCardItem>
           <VTextField
-              label="Password"
-              variant="underlined"
-              prependIcon="mdi-lock"
-              color="primary"
-              v-model="registerForm.password"
-              :type="showPassword ? 'text' : 'password'"
-              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="rules.auth.password"
-              @click:append-inner="showPassword = !showPassword"
+            label="Password"
+            variant="underlined"
+            prependIcon="mdi-lock"
+            color="primary"
+            v-model="registerForm.password"
+            :type="showPassword ? 'text' : 'password'"
+            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :rules="rules.auth.password"
+            @click:append-inner="showPassword = !showPassword"
           />
         </VCardItem>
         <VCardText class="text-center text-error text-body-1">
@@ -92,30 +91,28 @@ const handleSubmit = async () => {
         </VCardText>
         <VCardActions class="justify-center my-4">
           <VBtn
-              type="submit"
-              color="primary"
-              variant="tonal"
-              size="large"
-              rounded="lg"
-              elevation="18"
-              width="auto"
+            type="submit"
+            color="primary"
+            variant="tonal"
+            size="large"
+            rounded="lg"
+            elevation="18"
+            width="auto"
           >
             REGISTER
           </VBtn>
           <VBtn
-              color="secondary"
-              variant="text"
-              size="large"
-              elevation="18"
-              rounded="lg"
-              width="auto"
-              to="/login"
-          >LOGIN
-          </VBtn
-          >
+            color="secondary"
+            variant="text"
+            size="large"
+            elevation="18"
+            rounded="lg"
+            width="auto"
+            to="/login"
+            >LOGIN
+          </VBtn>
         </VCardActions>
       </VForm>
     </VCard>
   </VContainer>
 </template>
-

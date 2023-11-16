@@ -1,6 +1,6 @@
-import {UserVM} from "~/types/user/userVM";
+import type { UserVM } from "~/types/user/userVM";
 
 export type LoginResponse = {
-    user: UserVM
-    accessToken: string
-}
+  user: UserVM;
+  accessToken: string;
+};

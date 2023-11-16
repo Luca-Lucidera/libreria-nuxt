@@ -1,5 +1,5 @@
-import {Result} from "~/types/result";
-import { User } from "@prisma/client";
+import type {Result} from "~/types/result";
+import type { User } from "@prisma/client";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 
 type JwtErrorResponse = {

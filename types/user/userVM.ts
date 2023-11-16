@@ -1,7 +1,3 @@
-import {User} from "@prisma/client";
+import type { User } from "@prisma/client";
 
-
-
-
-
-export type UserVM = Omit<User, "password" | "jwt">
+export type UserVM = Omit<User, "password" | "jwt">;
