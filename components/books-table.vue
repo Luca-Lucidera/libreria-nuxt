@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import type { TableHeaders } from "@prisma/client";
 import type { Book } from "~/types/book";
 import { useEmptyBook } from "~/composables/empty-book";
 
-// interface Props {
-//   books: Book[];
-//   headers: TableHeaders[];
-// }
 type Props = {
   filters: string[];
 };
@@ -147,19 +142,19 @@ const handleCloseDialogDelete = () => {
         </VCard>
       </VMenu>
     </template>
-    <template v-slot:item.actions="{ value }">
+    <template v-slot:item.actions="{ item }">
       <VBtnGroup>
         <VBtn
           icon="mdi-pencil"
           color="secondary"
           variant="text"
-          @click="handleOpenDialogNewOrUpdateBook(value)"
+          @click="handleOpenDialogNewOrUpdateBook(item)"
         />
         <VBtn
           color="error"
           icon="mdi-delete"
           variant="text"
-          @click="handleOpenDialogDelete(value)"
+          @click="handleOpenDialogDelete(item)"
         ></VBtn>
       </VBtnGroup>
     </template>
