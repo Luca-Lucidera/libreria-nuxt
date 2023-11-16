@@ -2,11 +2,31 @@ import { defineStore } from "pinia";
 import type { Snackbar } from "~/types/snackbar";
 
 export const useGlobalStore = defineStore("global", () => {
+  
+  // STATE
   const isLoading = ref(false);
   const theme = ref("dark");
-
   const jwt = ref<string | null>(null);
-  const computedJwt = computed(() => jwt.value);
+  const snackbar = ref<Snackbar>({
+    show: false,
+    message: "",
+    color: "",
+    timeout: 3000,
+  });
+
+  const $reset = () => {
+    isLoading.value = false;
+    theme.value = "dark";
+    jwt.value = null;
+    snackbar.value = {
+      show: false,
+      message: "",
+      color: "",
+      timeout: 3000,
+    }
+  }
+
+  //JWT
   const setJwt = (token: string) => {
     jwt.value = token;
   };
@@ -14,15 +34,15 @@ export const useGlobalStore = defineStore("global", () => {
     jwt.value = null;
   };
 
-  const getIsLoading = computed(() => isLoading.value);
-  const getTheme = computed(() => theme.value);
-
+  // LOADING
   const startLoading = () => {
     isLoading.value = true;
   };
   const stopLoading = () => {
     isLoading.value = false;
   };
+
+  // THEME
   const changeTheme = () => {
     if (theme.value === "dark") {
       theme.value = "light";
@@ -31,13 +51,7 @@ export const useGlobalStore = defineStore("global", () => {
     }
   };
 
-  
-  const snackbar = useState<Snackbar>(() => ({
-    show: false,
-    message: "",
-    color: "",
-    timeout: 3000,
-  }));
+  // SNACKBAR
   const showSnackbar = (message = "", color = "secondary") => {
     snackbar.value.show = true;
     snackbar.value.message = message;
@@ -48,15 +62,15 @@ export const useGlobalStore = defineStore("global", () => {
   };
 
   return {
-    getIsLoading,
-    getTheme,
+    isLoading,
     startLoading,
     stopLoading,
     changeTheme,
-    computedJwt,
+    jwt,
     clearJwt,
     setJwt,
     snackbar,
     showSnackbar,
+    $reset
   };
 });

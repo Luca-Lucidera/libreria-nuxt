@@ -5,11 +5,16 @@ import type { Result } from "~/types/result";
 import type { BookToBuy } from "~/types/book/bookToBuy";
 
 export const useBooksStore = defineStore("books", () => {
+  // STORE
   const globalStore = useGlobalStore();
 
+  // state
   const books = ref<Book[]>([]);
-  const computedBooks = computed(() => books.value);
-
+  
+  const $reset = () => {
+    books.value = [];
+  };
+  
   const filteredBooks = (type: string, status: string, publisher: string) => {
     if (type === "All" && publisher === "All" && status === "All") {
       return books.value;
@@ -28,8 +33,8 @@ export const useBooksStore = defineStore("books", () => {
         method: "GET",
         credentials: "include",
         headers: {
-          Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
+          Authorization: globalStore.jwt
+            ? `Bearer ${globalStore.jwt}`
             : "",
         },
       });
@@ -69,8 +74,8 @@ export const useBooksStore = defineStore("books", () => {
         credentials: "include",
         body: JSON.stringify(book),
         headers: {
-          Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
+          Authorization: globalStore.jwt
+            ? `Bearer ${globalStore.jwt}`
             : "",
         },
       });
@@ -111,8 +116,8 @@ export const useBooksStore = defineStore("books", () => {
         credentials: "include",
         body: JSON.stringify(book),
         headers: {
-          Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
+          Authorization: globalStore.jwt
+            ? `Bearer ${globalStore.jwt}`
             : "",
         },
       });
@@ -152,8 +157,8 @@ export const useBooksStore = defineStore("books", () => {
         method: "DELETE",
         credentials: "include",
         headers: {
-          Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
+          Authorization: globalStore.jwt
+            ? `Bearer ${globalStore.jwt}`
             : "",
         },
       });
@@ -193,8 +198,8 @@ export const useBooksStore = defineStore("books", () => {
         method: "GET",
         credentials: "include",
         headers: {
-          Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
+          Authorization: globalStore.jwt
+            ? `Bearer ${globalStore.jwt}`
             : "",
         },
       });
@@ -239,8 +244,8 @@ export const useBooksStore = defineStore("books", () => {
         credentials: "include",
         body: JSON.stringify(books),
         headers: {
-          Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
+          Authorization: globalStore.jwt
+            ? `Bearer ${globalStore.jwt}`
             : "",
         },
       });
@@ -283,8 +288,8 @@ export const useBooksStore = defineStore("books", () => {
         credentials: "include",
         body: JSON.stringify(btb),
         headers: {
-          Authorization: globalStore.computedJwt
-            ? `Bearer ${globalStore.computedJwt}`
+          Authorization: globalStore.jwt
+            ? `Bearer ${globalStore.jwt}`
             : "",
         },
       });
@@ -300,14 +305,15 @@ export const useBooksStore = defineStore("books", () => {
       };
     }
   };
+
   return {
     books,
-    computedBooks,
     filteredBooks,
     fetchBooks,
     createBook,
     updateBook,
     removeBook,
+    $reset,
     fetchBooksToBuy,
     addBooksToBuy,
     removeBooksToBuy,

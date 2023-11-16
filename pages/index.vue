@@ -35,7 +35,6 @@ onMounted(async () => {
       errors.value.push(resultBooks.errorData);
     }
   }
-
   globalStore.stopLoading();
 });
 </script>

@@ -8,11 +8,13 @@ import type { UserVM } from "~/types/user/userVM";
 import type { RegisterResponse } from "~/types/registerResponse";
 
 export const useUserStore = defineStore("user", () => {
+  // STORE
   const globalStore = useGlobalStore();
 
+  // STATE
   const user = ref<UserVM | null>(null);
-  const computedUser = computed(() => user.value);
-  const reset = () => {
+  
+  const $reset = () => {
     user.value = null;
   };
 
@@ -88,8 +90,8 @@ export const useUserStore = defineStore("user", () => {
         {
           credentials: "include",
           headers: {
-            Authorization: globalStore.computedJwt
-              ? `Bearer ${globalStore.computedJwt}`
+            Authorization: globalStore.jwt
+              ? `Bearer ${globalStore.jwt}`
               : "",
           },
         }
@@ -221,8 +223,6 @@ export const useUserStore = defineStore("user", () => {
           `Errore non gestito, errore -> ${JSON.stringify(error, null, 4)}`
         );
       }
-    } finally {
-      reset();
     }
   };
 
@@ -231,10 +231,10 @@ export const useUserStore = defineStore("user", () => {
   );
 
   return {
-    computedUser,
+    user,
     authenticate,
     authenticateViaSession,
-    reset,
+    $reset,
     isLogged,
     createUser,
     endSession,

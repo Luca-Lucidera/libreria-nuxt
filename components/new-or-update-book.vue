@@ -21,13 +21,13 @@ const open = computed(() => props.openModal);
 const bookToChange = computed(() => props.book);
 
 const status = computed(() =>
-  tableStore.getFilters?.status.filter((s: string) => s !== "All")
+  tableStore.filters?.status.filter((s: string) => s !== "All")
 );
 const type = computed(() =>
-  tableStore.getFilters?.type.filter((s: string) => s !== "All")
+  tableStore.filters?.type.filter((s: string) => s !== "All")
 );
 const publisher = computed(() =>
-  tableStore.getFilters?.publisher.filter((s: string) => s !== "All")
+  tableStore.filters?.publisher.filter((s: string) => s !== "All")
 );
 const form = ref<InstanceType<typeof VForm> | null>(null as any);
 

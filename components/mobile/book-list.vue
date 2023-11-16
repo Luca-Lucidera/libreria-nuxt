@@ -29,7 +29,7 @@ const closeModal = () => {
 </script>
 
 <template>
-  <template v-if="!globalStore.getIsLoading && booksStore.books.length == 0">
+  <template v-if="!globalStore.isLoading && booksStore.books.length == 0">
     <p>No books found</p>
   </template>
   <template v-else>
@@ -47,7 +47,7 @@ const closeModal = () => {
       :style="{ height: containerHeight + 'px' }"
     >
       <VRow>
-        <VCol v-for="book in booksStore.computedBooks" cols="6">
+        <VCol v-for="book in booksStore.books" cols="6">
           <MobileBookCard
             :book="book"
             @open-modal="(book) => openModal(book)"

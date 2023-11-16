@@ -10,24 +10,25 @@ const filters = useState(() => ["All", "All", "All"]);
   <VRow align="center" class="h-100">
     <VCol cols="2">
       <VProgressCircular
-          v-if="!tableStore.areFiltersReady()"
-          :indeterminate="true"
-          size="100"
+        v-if="!tableStore.areFiltersReady"
+        :indeterminate="true"
+        size="100"
       />
       <CustomFilter
-          v-else
-          v-for="(filterEntries, i) in Object.entries(tableStore.getFilters)"
-          :key="i"
-          :label="filterEntries[0]"
-          :filters="filterEntries[1]"
-          v-model="filters[i]"
+        v-else
+        v-for="(filterEntries, i) in Object.entries(tableStore.filters)"
+        :key="i"
+        :label="filterEntries[0]"
+        :filters="filterEntries[1]"
+        v-model="filters[i]"
       />
     </VCol>
 
     <VCol>
       <BooksTable
-          :books="booksStore.filteredBooks(filters[0], filters[1], filters[2])"
-          :headers="tableStore.getHeaders"
+        v-if="tableStore.areFiltersReady"
+        :books="booksStore.filteredBooks(filters[0], filters[1], filters[2])"
+        :headers="tableStore.headers"
       />
     </VCol>
   </VRow>

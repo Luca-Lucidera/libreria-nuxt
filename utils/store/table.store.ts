@@ -5,8 +5,15 @@ import { FetchError } from "ofetch";
 import type { Result } from "~/types/result";
 
 export const useTableStore = defineStore("table", () => {
+  // STATE
   const headers = ref<TableHeaders[]>([]);
-  const getHeaders = computed(() => headers.value);
+  const filters = ref<BookTableFilter>({ type: [], status: [], publisher: [] });
+  
+  const $reset = () => {
+    headers.value = [];
+    filters.value = { type: [], status: [], publisher: [] };
+  }
+
   const fetchBooksTableHeaders = async (): Promise<Result<null, string>> => {
     try {
       headers.value = await $fetch<TableHeaders[]>("/api/table/headers");
@@ -38,9 +45,7 @@ export const useTableStore = defineStore("table", () => {
       };
     }
   };
-
-  const filters = ref<BookTableFilter>({ type: [], status: [], publisher: [] });
-  const getFilters = computed(() => filters.value);
+  
   const fetchBooksTableFilters = async (): Promise<Result<null, string>> => {
     try {
       const [status, types, publisher] = await Promise.all([
@@ -83,18 +88,20 @@ export const useTableStore = defineStore("table", () => {
       };
     }
   };
-  const areFiltersReady = () =>
-    filters.value.publisher.length > 0 &&
-    filters.value.status.length > 0 &&
-    filters.value.type.length > 0;
+
+  const areFiltersReady = computed(
+    () =>
+      filters.value.publisher.length > 0 &&
+      filters.value.status.length > 0 &&
+      filters.value.type.length > 0
+  );
 
   return {
     filters,
     headers,
-    getHeaders,
     fetchBooksTableHeaders,
-    getFilters,
     fetchBooksTableFilters,
     areFiltersReady,
+    $reset
   };
 });

@@ -72,7 +72,7 @@ const handleCloseDialogDelete = () => {
 
 <template>
   <VDataTable
-    :loading="globalStore.getIsLoading"
+    :loading="globalStore.isLoading"
     :headers="(props.headers as any[])"
     :items="props.books"
     :search="search"
@@ -86,7 +86,7 @@ const handleCloseDialogDelete = () => {
     hover
   >
     <template v-slot:top>
-      <VToolbar>
+      <VToolbar density="comfortable">
         <VTextField
           v-model="search"
           label="Search title"
@@ -94,6 +94,7 @@ const handleCloseDialogDelete = () => {
           hide-details
           append-inner-icon="mdi-magnify"
           class="mr-16"
+          clearable
         />
         <VBtn
           color="primary"
@@ -104,19 +105,19 @@ const handleCloseDialogDelete = () => {
         </VBtn>
       </VToolbar>
     </template>
-    <template v-slot:item.price="{ item }">
-      {{ (item as any).raw.price }} €
+    <template v-slot:item.price="{ value }">
+       {{ value }}€
     </template>
-    <template v-slot:item.rating="{ item }">
+    <template v-slot:item.rating="{ value }">
       <VRating
-        v-model="(item as any).raw.rating"
+        v-model="(value as string)"
         :max="5"
         color="amber"
         half-increments
         :readonly="true"
       />
     </template>
-    <template v-slot:item.comment="{ item }">
+    <template v-slot:item.comment="{ value }">
       <VMenu location="start">
         <template v-slot:activator="{ props }">
           <VBtn
@@ -128,24 +129,24 @@ const handleCloseDialogDelete = () => {
         </template>
         <VCard>
           <VListItem>
-            <VTextarea :readonly="true" v-model="(item as any).raw.comment" />
+            <VTextarea :readonly="true" v-model="(value as string)" />
           </VListItem>
         </VCard>
       </VMenu>
     </template>
-    <template v-slot:item.actions="{ item }">
+    <template v-slot:item.actions="{ value }">
       <VBtnGroup>
         <VBtn
           icon="mdi-pencil"
           color="secondary"
           variant="text"
-          @click="handleOpenDialogNewOrUpdateBook((item as any).raw)"
+          @click="handleOpenDialogNewOrUpdateBook(value)"
         />
         <VBtn
           color="error"
           icon="mdi-delete"
           variant="text"
-          @click="handleOpenDialogDelete((item as any).raw)"
+          @click="handleOpenDialogDelete(value)"
         ></VBtn>
       </VBtnGroup>
     </template>
@@ -175,7 +176,7 @@ const handleCloseDialogDelete = () => {
     </VContainer>
   </VDialog>
   <NewOrUpdateBook
-    v-if="tableStore.getFilters"
+    v-if="tableStore.areFiltersReady"
     :open-modal="openBookModal"
     :book="bookToCreateOrUpdate"
     @create-new-book="(book) => handleCreateBook(book)"
