@@ -3,13 +3,17 @@ import type { TableHeaders } from "@prisma/client";
 import type { Book } from "~/types/book";
 import { useEmptyBook } from "~/composables/empty-book";
 
-interface Props {
-  books: Book[];
-  headers: TableHeaders[];
-}
+// interface Props {
+//   books: Book[];
+//   headers: TableHeaders[];
+// }
+type Props = {
+  filters: string[];
+};
 
-const props = defineProps<Props>();
+const { filters } = defineProps<Props>();
 
+//STORE
 const globalStore = useGlobalStore();
 const tableStore = useTableStore();
 const booksStore = useBooksStore();
@@ -21,44 +25,55 @@ const bookToCreateOrUpdate = useState<Book>(() => ({
   ...useEmptyBook().value,
 }));
 
-//dialog
+//STATE DIALOG
 const deleteBookDialog = useState(() => false);
 const openBookModal = useState(() => false);
 
-//function
+//CRUD BOOK
 const handleCreateBook = async (book: Book) => {
   openBookModal.value = false;
   globalStore.startLoading();
   const result = await booksStore.createBook(book);
+
   if (!result.success) {
-    alert(result?.errorData);
+    globalStore.showSnackbar(result.errorData, "error");
+  } else {
+    globalStore.showSnackbar("Book created successfully", "success");
   }
+
   globalStore.stopLoading();
 };
+
 const handleUpdateBook = async (book: Book) => {
   openBookModal.value = false;
   globalStore.startLoading();
   const result = await booksStore.updateBook(book);
   if (!result.success) {
-    alert(result.errorData);
-  }
-  globalStore.stopLoading();
-};
-const handleDeleteBook = async (bookId: string) => {
-  globalStore.startLoading();
-  const result = await booksStore.removeBook(bookId);
-  if (result.success) {
-    handleCloseDialogDelete();
+    globalStore.showSnackbar(result.errorData, "error");
   } else {
-    alert(result.errorData);
+    globalStore.showSnackbar("Book updated successfully", "success");
   }
   globalStore.stopLoading();
 };
 
+const handleDeleteBook = async (bookId: string) => {
+  globalStore.startLoading();
+  const result = await booksStore.removeBook(bookId);
+  if (!result.success) {
+    globalStore.showSnackbar(result.errorData, "error");
+  } else {
+    handleCloseDialogDelete();
+    globalStore.showSnackbar("Book deleted successfully", "success");
+  }
+  globalStore.stopLoading();
+};
+
+// DIALOG FUNCTION
 const handleOpenDialogNewOrUpdateBook = (book: Book) => {
   bookToCreateOrUpdate.value = { ...book };
   openBookModal.value = true;
 };
+
 const handleOpenDialogDelete = (book: Book) => {
   bookToDelete.value = { ...book };
   deleteBookDialog.value = true;
@@ -73,15 +88,15 @@ const handleCloseDialogDelete = () => {
 <template>
   <VDataTable
     :loading="globalStore.isLoading"
-    :headers="(props.headers as any[])"
-    :items="props.books"
+    :headers="(tableStore.headers as any[])"
+    :items="booksStore.filteredBooks(filters[0], filters[1], filters[2])"
     :search="search"
     loading-text="Caricamento..."
     no-data-text="No books found, please add one"
     height="65vh"
     fixed-header
     fixed-footer
-    :items-per-page="props.books.length > 15 ? 15 : props.books.length"
+    :items-per-page="booksStore.books.length > 15 ? 15 : booksStore.books.length"
     show-current-page
     hover
   >
@@ -105,9 +120,7 @@ const handleCloseDialogDelete = () => {
         </VBtn>
       </VToolbar>
     </template>
-    <template v-slot:item.price="{ value }">
-       {{ value }}€
-    </template>
+    <template v-slot:item.price="{ value }"> {{ value }}€ </template>
     <template v-slot:item.rating="{ value }">
       <VRating
         v-model="(value as string)"

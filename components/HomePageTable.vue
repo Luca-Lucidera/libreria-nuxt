@@ -25,11 +25,7 @@ const filters = useState(() => ["All", "All", "All"]);
     </VCol>
 
     <VCol>
-      <BooksTable
-        v-if="tableStore.areFiltersReady"
-        :books="booksStore.filteredBooks(filters[0], filters[1], filters[2])"
-        :headers="tableStore.headers"
-      />
+      <BooksTable v-if="tableStore.areFiltersReady" :filters="filters" />
     </VCol>
   </VRow>
 </template>
