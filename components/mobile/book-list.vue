@@ -8,6 +8,7 @@ const containerHeight = useState(() => 500);
 const { height: screenHeight } = useDisplay();
 const container = ref(null as any);
 const search = useState(() => "");
+
 watchEffect(() => {
   containerHeight.value =
     screenHeight.value - container.value?.$el.getBoundingClientRect().y - 30;
@@ -22,10 +23,11 @@ const openModal = (book: Book) => {
   bookToShow.value = { ...book };
 };
 
-const closeModal = () => {
-  modal.value = false;
-  bookToShow.value = null;
-};
+const searchBooks = computed(() =>
+  booksStore.books.filter((b) =>
+    b.title.toLowerCase().includes(search.value.toLowerCase())
+  )
+);
 </script>
 
 <template>
@@ -47,7 +49,7 @@ const closeModal = () => {
       :style="{ height: containerHeight + 'px' }"
     >
       <VRow>
-        <VCol v-for="book in booksStore.books" cols="6">
+        <VCol v-for="book in searchBooks" cols="6">
           <MobileBookCard
             :book="book"
             @open-modal="(book) => openModal(book)"
