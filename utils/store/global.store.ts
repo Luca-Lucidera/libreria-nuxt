@@ -1,11 +1,32 @@
 import { defineStore } from "pinia";
+import type { Snackbar } from "~/types/snackbar";
 
-export const useGlobalStore = defineStore('global', () => {
-  const isLoading = ref(false);
-  const theme = ref('dark');
+export const useGlobalStore = defineStore("global", () => {
   
+  // STATE
+  const isLoading = ref(false);
+  const theme = ref("dark");
   const jwt = ref<string | null>(null);
-  const computedJwt = computed(() => jwt.value);
+  const snackbar = ref<Snackbar>({
+    show: false,
+    message: "",
+    color: "",
+    timeout: 3000,
+  });
+
+  const $reset = () => {
+    isLoading.value = false;
+    theme.value = "dark";
+    jwt.value = null;
+    snackbar.value = {
+      show: false,
+      message: "",
+      color: "",
+      timeout: 3000,
+    }
+  }
+
+  //JWT
   const setJwt = (token: string) => {
     jwt.value = token;
   };
@@ -13,31 +34,43 @@ export const useGlobalStore = defineStore('global', () => {
     jwt.value = null;
   };
 
-  const getIsLoading = computed(() => isLoading.value);
-  const getTheme = computed(() => theme.value);
-
+  // LOADING
   const startLoading = () => {
     isLoading.value = true;
   };
   const stopLoading = () => {
     isLoading.value = false;
   };
+
+  // THEME
   const changeTheme = () => {
-    if(theme.value === 'dark') {
-      theme.value = 'light';
+    if (theme.value === "dark") {
+      theme.value = "light";
     } else {
-      theme.value = 'dark';
+      theme.value = "dark";
     }
   };
 
+  // SNACKBAR
+  const showSnackbar = (message = "", color = "secondary") => {
+    snackbar.value.show = true;
+    snackbar.value.message = message;
+    snackbar.value.color = color;
+    /**
+     * Reminder per il futuro, se è presente un timeout la prop show verrà messa automaticamente a false dopo il periodo di tempo indicato
+     */
+  };
+
   return {
-    getIsLoading,
-    getTheme,
+    isLoading,
     startLoading,
     stopLoading,
     changeTheme,
-    computedJwt,
+    jwt,
     clearJwt,
-    setJwt
+    setJwt,
+    snackbar,
+    showSnackbar,
+    $reset
   };
 });

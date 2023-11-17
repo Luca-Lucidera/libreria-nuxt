@@ -3,6 +3,7 @@ import { useDisplay } from "vuetify";
 
 //state
 const errors = useState<string[]>(() => []);
+const display = useDisplay();
 
 //store
 const tableStore = useTableStore();
@@ -34,7 +35,6 @@ onMounted(async () => {
       errors.value.push(resultBooks.errorData);
     }
   }
-
   globalStore.stopLoading();
 });
 </script>
@@ -56,8 +56,8 @@ onMounted(async () => {
     </VTabs>
     <VWindow v-model="tab">
       <VWindowItem value="home">
-        <HomePageTable v-if="!useDisplay().lgAndDown.value" />
-        <MobileBookList v-else />
+        <MobileBookList v-if="display.lgAndDown.value" />
+        <HomePageTable v-else/>
       </VWindowItem>
       <VWindowItem value="next-to-buy">
         <NextToBuy />

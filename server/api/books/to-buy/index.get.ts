@@ -1,4 +1,4 @@
-import { BookToBuy } from "types/book/bookToBuy";
+import type { BookToBuy } from "~/types/book/bookToBuy";
 
 export default defineEventHandler(async (event): Promise<BookToBuy[]> => {
   const result = await handleSecurity(event);

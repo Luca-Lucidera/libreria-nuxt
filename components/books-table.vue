@@ -1,134 +1,143 @@
 <script setup lang="ts">
-import {TableHeaders} from "@prisma/client";
-import {VDataTable} from "vuetify/labs/VDataTable";
-import {Book} from "~/types/book";
-import {useEmptyBook} from "~/composables/empty-book";
+import type { Book } from "~/types/book";
+import { useEmptyBook } from "~/composables/empty-book";
 
-interface Props {
-  books: Book[];
-  headers: TableHeaders[];
-}
+type Props = {
+  filters: string[];
+};
 
-const props = defineProps<Props>();
+const { filters } = defineProps<Props>();
 
+//STORE
 const globalStore = useGlobalStore();
 const tableStore = useTableStore();
 const booksStore = useBooksStore();
 
 //state
 const search = useState(() => "");
-const bookToDelete = useState<Book>(() => ({...useEmptyBook().value}))
-const bookToCreateOrUpdate = useState<Book>(() => ({...useEmptyBook().value}))
+const bookToDelete = useState<Book>(() => ({ ...useEmptyBook().value }));
+const bookToCreateOrUpdate = useState<Book>(() => ({
+  ...useEmptyBook().value,
+}));
 
-//dialog
+//STATE DIALOG
 const deleteBookDialog = useState(() => false);
 const openBookModal = useState(() => false);
 
-//function
+//CRUD BOOK
 const handleCreateBook = async (book: Book) => {
   openBookModal.value = false;
   globalStore.startLoading();
   const result = await booksStore.createBook(book);
+
   if (!result.success) {
-    alert(result?.errorData)
+    globalStore.showSnackbar(result.errorData, "error");
+  } else {
+    globalStore.showSnackbar("Book created successfully", "success");
   }
+
   globalStore.stopLoading();
 };
+
 const handleUpdateBook = async (book: Book) => {
   openBookModal.value = false;
   globalStore.startLoading();
   const result = await booksStore.updateBook(book);
   if (!result.success) {
-    alert(result.errorData)
+    globalStore.showSnackbar(result.errorData, "error");
+  } else {
+    globalStore.showSnackbar("Book updated successfully", "success");
   }
   globalStore.stopLoading();
-}
+};
+
 const handleDeleteBook = async (bookId: string) => {
   globalStore.startLoading();
   const result = await booksStore.removeBook(bookId);
-  if (result.success) {
-    handleCloseDialogDelete();
+  if (!result.success) {
+    globalStore.showSnackbar(result.errorData, "error");
   } else {
-    alert(result.errorData)
+    handleCloseDialogDelete();
+    globalStore.showSnackbar("Book deleted successfully", "success");
   }
   globalStore.stopLoading();
-}
+};
 
+// DIALOG FUNCTION
 const handleOpenDialogNewOrUpdateBook = (book: Book) => {
-  bookToCreateOrUpdate.value = {...book};
+  bookToCreateOrUpdate.value = { ...book };
   openBookModal.value = true;
 };
+
 const handleOpenDialogDelete = (book: Book) => {
-  bookToDelete.value = {...book};
+  bookToDelete.value = { ...book };
   deleteBookDialog.value = true;
 };
 
 const handleCloseDialogDelete = () => {
   deleteBookDialog.value = false;
-  bookToDelete.value = {...useEmptyBook().value};
+  bookToDelete.value = { ...useEmptyBook().value };
 };
 </script>
 
 <template>
   <VDataTable
-      :loading="globalStore.getIsLoading"
-      :headers="(props.headers as any[])"
-      :items="props.books"
-      :search="search"
-      loading-text="Caricamento..."
-      no-data-text="No books found, please add one"
-      height="65vh"
-      fixed-header
-      fixed-footer
-      :items-per-page="props.books.length > 15 ? 15 : props.books.length"
-      show-current-page
-      hover
+    :loading="globalStore.isLoading"
+    :headers="(tableStore.headers as any[])"
+    :items="booksStore.filteredBooks(filters[0], filters[1], filters[2])"
+    :search="search"
+    loading-text="Caricamento..."
+    no-data-text="No books found, please add one"
+    height="65vh"
+    fixed-header
+    fixed-footer
+    :items-per-page="booksStore.books.length > 15 ? 15 : booksStore.books.length"
+    show-current-page
+    hover
   >
     <template v-slot:top>
-      <VToolbar>
+      <VToolbar density="comfortable">
         <VTextField
-            v-model="search"
-            label="Search title"
-            single-line
-            hide-details
-            append-inner-icon="mdi-magnify"
-            class="mr-16"
+          v-model="search"
+          label="Search title"
+          single-line
+          hide-details
+          append-inner-icon="mdi-magnify"
+          class="mr-16"
+          clearable
         />
         <VBtn
-            color="primary"
-            variant="tonal"
-            @click="handleOpenDialogNewOrUpdateBook({ ...useEmptyBook().value })"
-            append-icon="mdi-plus"
-        >New Book
+          color="primary"
+          variant="tonal"
+          @click="handleOpenDialogNewOrUpdateBook({ ...useEmptyBook().value })"
+          append-icon="mdi-plus"
+          >New Book
         </VBtn>
       </VToolbar>
     </template>
-    <template v-slot:item.price="{ item }">
-      {{ (item as any).raw.price }} €
-    </template>
-    <template v-slot:item.rating="{ item }">
+    <template v-slot:item.price="{ value }"> {{ value }}€ </template>
+    <template v-slot:item.rating="{ value }">
       <VRating
-          v-model="(item as any).raw.rating"
-          :max="5"
-          color="amber"
-          half-increments
-          :readonly="true"
+        v-model="(value as string)"
+        :max="5"
+        color="amber"
+        half-increments
+        :readonly="true"
       />
     </template>
-    <template v-slot:item.comment="{ item }">
+    <template v-slot:item.comment="{ value }">
       <VMenu location="start">
         <template v-slot:activator="{ props }">
           <VBtn
-              icon="mdi-comment-outline"
-              color="primary"
-              variant="tonal"
-              v-bind="props"
+            icon="mdi-comment-outline"
+            color="primary"
+            variant="tonal"
+            v-bind="props"
           />
         </template>
         <VCard>
           <VListItem>
-            <VTextarea :readonly="true" v-model="(item as any).raw.comment"
-            />
+            <VTextarea :readonly="true" v-model="(value as string)" />
           </VListItem>
         </VCard>
       </VMenu>
@@ -136,16 +145,16 @@ const handleCloseDialogDelete = () => {
     <template v-slot:item.actions="{ item }">
       <VBtnGroup>
         <VBtn
-            icon="mdi-pencil"
-            color="secondary"
-            variant="text"
-            @click="handleOpenDialogNewOrUpdateBook((item as any).raw)"
+          icon="mdi-pencil"
+          color="secondary"
+          variant="text"
+          @click="handleOpenDialogNewOrUpdateBook(item)"
         />
         <VBtn
-            color="error"
-            icon="mdi-delete"
-            variant="text"
-            @click="handleOpenDialogDelete((item as any).raw)"
+          color="error"
+          icon="mdi-delete"
+          variant="text"
+          @click="handleOpenDialogDelete(item)"
         ></VBtn>
       </VBtnGroup>
     </template>
@@ -155,34 +164,31 @@ const handleCloseDialogDelete = () => {
     <VContainer class="h-screen d-flex justify-center align-center">
       <VCard class="w-25">
         <VCardTitle
-        >Are you sure you want to delete {{ bookToDelete.title }}
-        </VCardTitle
-        >
+          >Are you sure you want to delete {{ bookToDelete.title }}
+        </VCardTitle>
         <VCardActions class="justify-center">
           <VBtn
-              color="success"
-              variant="elevated"
-              @click="handleCloseDialogDelete"
-          >Go back
-          </VBtn
-          >
+            color="success"
+            variant="elevated"
+            @click="handleCloseDialogDelete"
+            >Go back
+          </VBtn>
           <VBtn
-              color="error"
-              variant="outlined"
-              @click="handleDeleteBook(bookToDelete.id)"
-          >Delete
-          </VBtn
-          >
+            color="error"
+            variant="outlined"
+            @click="handleDeleteBook(bookToDelete.id)"
+            >Delete
+          </VBtn>
         </VCardActions>
       </VCard>
     </VContainer>
   </VDialog>
   <NewOrUpdateBook
-      v-if="tableStore.getFilters"
-      :open-modal="openBookModal"
-      :book="bookToCreateOrUpdate"
-      @create-new-book="(book) => handleCreateBook(book)"
-      @update-book="(bookId) => handleUpdateBook(bookId)"
-      @only-close="() => (openBookModal = false)"
+    v-if="tableStore.areFiltersReady"
+    :open-modal="openBookModal"
+    :book="bookToCreateOrUpdate"
+    @create-new-book="(book) => handleCreateBook(book)"
+    @update-book="(bookId) => handleUpdateBook(bookId)"
+    @only-close="() => (openBookModal = false)"
   />
 </template>

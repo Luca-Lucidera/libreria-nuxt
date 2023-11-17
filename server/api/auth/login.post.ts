@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
+import type { UserLoginDTO } from "~/types/user/userLoginDTO";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
+  const body = await readBody<UserLoginDTO>(event, { strict: true});
   if (!body || !body.email || !body.password) {
     throw createError({
       statusCode: 400,

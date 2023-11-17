@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Book } from "~/types/book";
-import { useDisplay } from "vuetify/lib/framework.mjs";
+import type { Book } from "~/types/book";
+import { useDisplay } from "vuetify";
 
 const booksStore = useBooksStore();
 const globalStore = useGlobalStore();
@@ -8,6 +8,7 @@ const containerHeight = useState(() => 500);
 const { height: screenHeight } = useDisplay();
 const container = ref(null as any);
 const search = useState(() => "");
+
 watchEffect(() => {
   containerHeight.value =
     screenHeight.value - container.value?.$el.getBoundingClientRect().y - 30;
@@ -22,14 +23,15 @@ const openModal = (book: Book) => {
   bookToShow.value = { ...book };
 };
 
-const closeModal = () => {
-  modal.value = false;
-  bookToShow.value = null;
-};
+const searchBooks = computed(() =>
+  booksStore.books.filter((b) =>
+    b.title.toLowerCase().includes(search.value.toLowerCase())
+  )
+);
 </script>
 
 <template>
-  <template v-if="!globalStore.getIsLoading && booksStore.books.length == 0">
+  <template v-if="!globalStore.isLoading && booksStore.books.length == 0">
     <p>No books found</p>
   </template>
   <template v-else>
@@ -47,11 +49,15 @@ const closeModal = () => {
       :style="{ height: containerHeight + 'px' }"
     >
       <VRow>
-        <VCol v-for="book in booksStore.computedBooks" cols="6">
+        <VCol v-for="book in searchBooks" cols="6" v-if="searchBooks.length !== 0">
           <MobileBookCard
             :book="book"
             @open-modal="(book) => openModal(book)"
           />
+        </VCol>
+        <VCol v-else>
+          <p>No books found, switch to desktop interface to add a new one</p>
+
         </VCol>
       </VRow>
     </VContainer>

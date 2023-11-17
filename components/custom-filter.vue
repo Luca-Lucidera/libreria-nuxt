@@ -13,6 +13,8 @@ defineEmits(["update:modelValue"]);
     :items="filters"
     :label="label.toUpperCase()"
     :model-value="modelValue"
+    :clearable="modelValue !== 'All'"
     @update:modelValue="(val: string) => $emit('update:modelValue', val)"
+    @click:clear="() => $emit('update:modelValue', 'All')"
   />
 </template>

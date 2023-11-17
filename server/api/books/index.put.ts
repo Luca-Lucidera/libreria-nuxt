@@ -1,4 +1,5 @@
-import { Book, Publisher, Status, Type, User } from "@prisma/client";
+import { Publisher, Status, Type } from "@prisma/client";
+import type { Book } from "@prisma/client";
 
 export default defineEventHandler(async (event) => {
   const result = await handleSecurity(event);

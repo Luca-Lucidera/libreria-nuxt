@@ -1,17 +1,25 @@
-import { TableHeaders } from "@prisma/client";
+import type { TableHeaders } from "@prisma/client";
 import { defineStore } from "pinia";
-import { BookTableFilter } from "~/types/book/bookTableFilter";
+import type { BookTableFilter } from "~/types/book/bookTableFilter";
 import { FetchError } from "ofetch";
-import { Result } from "~/types/result";
+import type { Result } from "~/types/result";
 
 export const useTableStore = defineStore("table", () => {
+  // STATE
   const headers = ref<TableHeaders[]>([]);
-  const getHeaders = computed(() => headers.value);
-  const fetchBooksTableHeaders = async (): Promise<Result<void, string>> => {
+  const filters = ref<BookTableFilter>({ type: [], status: [], publisher: [] });
+  
+  const $reset = () => {
+    headers.value = [];
+    filters.value = { type: [], status: [], publisher: [] };
+  }
+
+  const fetchBooksTableHeaders = async (): Promise<Result<null, string>> => {
     try {
       headers.value = await $fetch<TableHeaders[]>("/api/table/headers");
       return {
         success: true,
+        successData: null,
       };
     } catch (error) {
       if (error instanceof FetchError) {
@@ -20,7 +28,7 @@ export const useTableStore = defineStore("table", () => {
         );
         return {
           success: false,
-          errorData: error.statusMessage,
+          errorData: error.statusMessage!,
         };
       }
       console.error(
@@ -37,10 +45,8 @@ export const useTableStore = defineStore("table", () => {
       };
     }
   };
-
-  const filters = ref<BookTableFilter>({ type: [], status: [], publisher: [] });
-  const getFilters = computed(() => filters.value);
-  const fetchBooksTableFilters = async (): Promise<Result<void, string>> => {
+  
+  const fetchBooksTableFilters = async (): Promise<Result<null, string>> => {
     try {
       const [status, types, publisher] = await Promise.all([
         $fetch<string[]>("/api/filter/status"),
@@ -56,6 +62,7 @@ export const useTableStore = defineStore("table", () => {
 
       return {
         success: true,
+        successData: null,
       };
     } catch (error) {
       if (error instanceof FetchError) {
@@ -64,7 +71,7 @@ export const useTableStore = defineStore("table", () => {
         );
         return {
           success: false,
-          errorData: error.statusMessage,
+          errorData: error.statusMessage!,
         };
       }
       console.error(
@@ -81,18 +88,20 @@ export const useTableStore = defineStore("table", () => {
       };
     }
   };
-  const areFiltersReady = () =>
-    filters.value.publisher.length > 0 &&
-    filters.value.status.length > 0 &&
-    filters.value.type.length > 0;
+
+  const areFiltersReady = computed(
+    () =>
+      filters.value.publisher.length > 0 &&
+      filters.value.status.length > 0 &&
+      filters.value.type.length > 0
+  );
 
   return {
     filters,
     headers,
-    getHeaders,
     fetchBooksTableHeaders,
-    getFilters,
     fetchBooksTableFilters,
     areFiltersReady,
+    $reset
   };
 });

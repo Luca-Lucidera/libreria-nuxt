@@ -1,16 +1,15 @@
-import { BookToBuy } from "types/book/bookToBuy";
+import type { BookToBuy } from "~/types/book/bookToBuy";
 
 export default defineEventHandler(async (event): Promise<BookToBuy[]> => {
-  const {
-    success: ss,
-    errorData: eds,
-    successData: sds,
-  } = await handleSecurity(event);
-  if (!ss) {
-    throw createError({ statusCode: 401, statusMessage: eds });
+  const securityResult = await handleSecurity(event);
+  if (!securityResult.success) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: securityResult.errorData,
+    });
   }
 
-  const userId = sds?.user?.id;
+  const userId = securityResult.successData?.user?.id;
   if (!userId) {
     throw createError({ statusCode: 401, statusMessage: "Token invalid" });
   }
@@ -39,7 +38,7 @@ export default defineEventHandler(async (event): Promise<BookToBuy[]> => {
     },
   });
 
-  const btb =  await prisma.bookToBuy.findMany({
+  const btb = await prisma.bookToBuy.findMany({
     where: {
       userId,
     },

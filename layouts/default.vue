@@ -5,7 +5,7 @@
         <VAppBarTitle class="text-center"
           >Your library
           {{
-            userStore.computedUser ? userStore.computedUser.name : null
+            userStore.user ? userStore.user.name : null
           }}</VAppBarTitle
         >
         <VMenu location="bottom" v-if="userStore.isLogged">
@@ -26,7 +26,7 @@
       </VAppBar>
       <VMain class="h-100">
         <slot />
-        <VDialog v-model="globalStore.getIsLoading" persistent>
+        <VDialog v-model="globalStore.isLoading" persistent>
           <VContainer class="h-screen d-flex justify-center align-center">
             <VCard class="w-25">
               <VCardTitle class="text-center">Loading...</VCardTitle>
@@ -35,6 +35,12 @@
           </VContainer>
         </VDialog>
       </VMain>
+      <VSnackbar
+        v-model="globalStore.snackbar.show"
+        :timeout="globalStore.snackbar.timeout"
+        :color="globalStore.snackbar.color"
+        >{{ globalStore.snackbar.message }}</VSnackbar
+      >
     </VContainer>
   </VLayout>
 </template>
@@ -49,6 +55,10 @@ const handleLogout = async () => {
   try {
     globalStore.startLoading();
     await userStore.endSession();
+    userStore.$reset();
+    globalStore.$reset();
+    useBooksStore().$reset();
+    useTableStore().$reset();
     globalStore.clearJwt();
   } catch (err: any) {
     const error: FetchError = err;
