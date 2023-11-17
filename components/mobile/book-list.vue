@@ -49,11 +49,15 @@ const searchBooks = computed(() =>
       :style="{ height: containerHeight + 'px' }"
     >
       <VRow>
-        <VCol v-for="book in searchBooks" cols="6">
+        <VCol v-for="book in searchBooks" cols="6" v-if="searchBooks.length !== 0">
           <MobileBookCard
             :book="book"
             @open-modal="(book) => openModal(book)"
           />
+        </VCol>
+        <VCol v-else>
+          <p>No books found, switch to desktop interface to add a new one</p>
+
         </VCol>
       </VRow>
     </VContainer>
