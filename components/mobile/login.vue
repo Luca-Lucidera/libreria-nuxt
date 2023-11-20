@@ -36,12 +36,12 @@ const login = async () => {
 </script>
 
 <template>
-  <VContainer class="h-100 d-flex flex-column justify-center">
-    <VContainer class="text-center mb-16">
+  <VContainer class="debug h-100 d-flex flex-column justify-center">
+    <VContainer class="debug text-center mb-16">
       LIBRERIA x <VIcon>mdi-nuxt</VIcon> x <VIcon>$vuetify</VIcon>
     </VContainer>
     <VForm
-      class="d-flex flex-column justify-center pb-12"
+      class="debug d-flex flex-column justify-center pb-12"
       @submit.prevent="login"
       ref="form"
     >
@@ -70,10 +70,16 @@ const login = async () => {
         type="submit"
         >Login</VBtn
       >
-      <VBtn class="rounded-lg mx-14 mt-8" color="secondary" variant="text"
-        >Register</VBtn
-      >
-      <span style="color: red;">{{ error }}</span>
+      <span v-if="error !== ''" style="color: red">{{ error }}</span>
     </VForm>
+    <VBtn
+      class="debug rounded-lg mt-16 mt-8"
+      color="secondary"
+      variant="text"
+      to="/register"
+      >Create a new account</VBtn
+    >
   </VContainer>
 </template>
+
+<style scoped></style>
