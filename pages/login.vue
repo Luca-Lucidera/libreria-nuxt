@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { VForm } from "vuetify/components/VForm";
 import type { UserLoginDTO } from "~/types/user/userLoginDTO";
+import { useDisplay } from 'vuetify'
 
 //page state
 const loginForm = useState<UserLoginDTO>(() => {
@@ -45,7 +46,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <VContainer class="h-100 d-flex justify-center align-center">
+  <VContainer class="h-100 d-flex justify-center align-center" v-if="!useDisplay().xs.value">
     <VCard class="w-50 rounded-xl">
       <VCardTitle class="text-center my-4 text-primary">LOGIN</VCardTitle>
       <VForm @submit.prevent="handleSubmit" ref="form">
@@ -102,4 +103,5 @@ const handleSubmit = async () => {
       </VForm>
     </VCard>
   </VContainer>
+  <MobileLogin v-else />
 </template>
