@@ -8,5 +8,6 @@ export type Book = {
     publisher: string;
     price: number;
     rating: number;
-    comment: string
+    comment: string;
+    image: string;
 }

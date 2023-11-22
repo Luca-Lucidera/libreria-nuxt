@@ -38,6 +38,7 @@ export const useBooksStore = defineStore("books", () => {
             : "",
         },
       });
+      books.value = books.value.map((b) => ({...b, image: "https://upload.wikimedia.org/wikipedia/it/thumb/a/ae/Komi_can%27t_communicate_Volume_1.jpg/1200px-Komi_can%27t_communicate_Volume_1.jpg"}));
       return {
         success: true,
         successData: null,

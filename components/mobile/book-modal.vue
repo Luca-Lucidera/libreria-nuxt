@@ -40,7 +40,7 @@ const open = computed(() => props.openModal);
         <VTimeline density="compact" side="end" truncate-line="both">
           <template v-for="(item, key, i) in props.book">
             <VTimelineItem
-              v-if="key !== 'id' && key !== 'title'"
+              v-if="key !== 'id' && key !== 'title' && key !== 'image'"
               size="x-small"
               :key="i"
               line-inset="6"

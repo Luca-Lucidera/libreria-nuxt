@@ -52,6 +52,7 @@ const searchBooks = computed(() =>
         <VCol v-for="book in searchBooks" cols="6" v-if="searchBooks.length !== 0">
           <MobileBookCard
             :book="book"
+            :test="true"
             @open-modal="(book) => openModal(book)"
           />
         </VCol>
