@@ -13,6 +13,34 @@ type Emits = {
 };
 
 const props = defineProps<Props>();
+const emits = defineEmits<Emits>();
+
+//STORE
+const tableStore = useTableStore();
+
+//COMPUTED
+const status = computed(() =>
+  tableStore.filters?.status.filter((s: string) => s !== "All")
+);
+const type = computed(() =>
+  tableStore.filters?.type.filter((s: string) => s !== "All")
+);
+const publisher = computed(() =>
+  tableStore.filters?.publisher.filter((s: string) => s !== "All")
+);
+
+const open = computed(() => props.openModal);
+
+const modifica = useState(() => false);
+const bookToChange = computed(() => props.book);
+
+const updateOrCreate = () => {
+  if (props.book.id !== "") {
+    emits("updateBook", bookToChange.value);
+  } else {
+    emits("createBook", bookToChange.value);
+  }
+};
 
 const colors = [
   "#03a9f4",
@@ -27,10 +55,6 @@ const colors = [
   "#e91e63",
   "#00bcd4",
 ];
-
-const emits = defineEmits<Emits>();
-
-const open = computed(() => props.openModal);
 </script>
 
 <template>
@@ -70,21 +94,161 @@ const open = computed(() => props.openModal);
   </VDialog>
   <VDialog v-else v-model="open" fullscreen scrollable>
     <VCard>
-      <VCardTitle>
+      <VCardTitle class="elevation-10">
         <VRow>
           <VCol cols="auto">
-            <VBtn variant="text" icon="mdi-arrow-left-circle" color="primary" />
+            <VBtn
+              variant="text"
+              icon="mdi-arrow-left-circle"
+              color="primary"
+              @click="emits('closeModal', false)"
+            />
           </VCol>
           <VCol align-self="center"> {{ props.book.title }}</VCol>
         </VRow>
       </VCardTitle>
-      <VContainer style="border: solid red 2px">
+      <VContainer class="mt-8">
         <VRow>
-          <VInput />
+          <VCol>
+            <VTextField
+              label="Title"
+              v-model="bookToChange.title"
+              :rules="rules.book.title"
+              variant="outlined"
+              :disabled="!modifica"
+            />
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VTextField
+              variant="outlined"
+              label="Purchased"
+              v-model="props.book.purchased"
+              :disabled="!modifica"
+            />
+          </VCol>
+          <VCol>
+            <VTextField
+              variant="outlined"
+              label="Read"
+              v-model="props.book.read"
+              :disabled="!modifica"
+            />
+          </VCol>
+        </VRow>
+        <VRow class="mt-0">
+          <VCol class="text-center">
+            <VBtn icon="mdi-minus" variant="plain" color="secondary" />
+            <VBtn icon="mdi-plus" variant="plain" color="primary" />
+          </VCol>
+          <VCol class="text-center">
+            <VBtn icon="mdi-minus" variant="plain" color="secondary" />
+            <VBtn icon="mdi-plus" variant="plain" color="primary" />
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VSelect
+              label="Status"
+              v-model="bookToChange.status"
+              :items="status"
+              :disabled="!modifica"
+              variant="outlined"
+            />
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VSelect
+              label="Type"
+              v-model="bookToChange.type"
+              :items="type"
+              :disabled="!modifica"
+              variant="outlined"
+            />
+          </VCol>
+          <VCol>
+            <VSelect
+              label="Editor"
+              v-model="bookToChange.publisher"
+              :items="publisher"
+              :disabled="!modifica"
+              variant="outlined"
+            />
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VTextField
+              type="number"
+              label="Price"
+              v-model.number="book.price"
+              :rules="rules.book.price"
+              :disabled="!modifica"
+              variant="outlined"
+              append-inner-icon="mdi-currency-eur"
+            />
+          </VCol>
+          <VCol cols="4">
+            <VBtn icon="mdi-minus" variant="plain" color="secondary" />
+            <VBtn icon="mdi-plus" variant="plain" color="primary" />
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VTextarea
+              label="Comment"
+              v-model="bookToChange.comment"
+              :rules="rules.book.comment"
+              :disabled="!modifica"
+              variant="outlined"
+            />
+          </VCol>
+        </VRow>
+        <VRow class="mt-0">
+          <VCol class="text-center">
+            <VRating
+              v-model="bookToChange.rating"
+              :disabled="!modifica"
+              variant="outlined"
+            />
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol class="text-center">
+            <!-- 
+              La procedura deve essere questa:
+              1) l'utente preme il pulsante
+              2) si apre un piccolo modal dove chiede se il titolo e il numero del volume sono corretti
+              3) l'utente può cambiarli
+              4) tramite il nome e il numero del volume va a fare il fetch dei data da mangadex
+                 [guarda il tuo progetto (mangadex qualcosa nei file di code)]
+              5) l'utente sceglie la copertina o torna indietro e cambia il titolo e il numero del volume
+                 oppure inserisce lui manualmente l'immagine dicendo che l'immagine verrà associata al titolo e al numero del volume
+              6) l'utente preme il pulsante per salvare
+             -->
+            <VBtn>
+              Change image
+            </VBtn>
+          </VCol>
         </VRow>
       </VContainer>
-      <VCardActions>
-        <VBtn>Modifica<VIcon>mdi-pencil</VIcon></VBtn>
+      <VCardActions class="justify-space-evenly mb-8">
+        <VBtn
+          @click="modifica = !modifica"
+          color="secondary"
+          variant="text"
+          icon="mdi-pencil"
+          class="mr-2"
+        />
+        <VBtn
+          :disabled="modifica"
+          icon="mdi-content-save"
+          variant="plain"
+          color="primary"
+          @click="updateOrCreate"
+        />
       </VCardActions>
     </VCard>
   </VDialog>
