@@ -12,11 +12,11 @@ export default defineNuxtConfig({
         jwtSecret: "",
         jwtAud: "",
         jwtIss: "",
-        supabaseUrl: "",
-        supabaseKey: "",
         public: {
             api: "/api",
             env: "development",
+            supabaseUrl: "",
+            supabaseKey: "",
         },
     },
     $development: {

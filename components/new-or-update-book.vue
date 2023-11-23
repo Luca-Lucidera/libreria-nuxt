@@ -12,14 +12,16 @@ type Emits = {
   updateBook: [book: Book];
   onlyClose: [];
 };
+
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+//STORE
 const tableStore = useTableStore();
 
+//COMPUTED
 const open = computed(() => props.openModal);
 const bookToChange = computed(() => props.book);
-
 const status = computed(() =>
   tableStore.filters?.status.filter((s: string) => s !== "All")
 );
@@ -29,11 +31,12 @@ const type = computed(() =>
 const publisher = computed(() =>
   tableStore.filters?.publisher.filter((s: string) => s !== "All")
 );
-const form = ref<InstanceType<typeof VForm> | null>(null as any);
-
 const displayTitle = computed(() =>
   props.book.id === "" ? "New book" : `Changing: ${props.book.title}`
 );
+
+//REF
+const form = ref<InstanceType<typeof VForm> | null>(null as any);
 
 async function handleSave() {
   const { valid } = await form!.value!.validate();

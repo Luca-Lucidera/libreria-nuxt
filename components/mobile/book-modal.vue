@@ -3,6 +3,7 @@ import type { Book } from "~/types/book";
 type Props = {
   book: Book;
   openModal: boolean;
+  test: boolean;
 };
 
 type Emits = {
@@ -33,7 +34,11 @@ const open = computed(() => props.openModal);
 </script>
 
 <template>
-  <VDialog v-model="open" @update:model-value="emits('closeModal', false)">
+  <VDialog
+    v-if="!props.test"
+    v-model="open"
+    @update:model-value="emits('closeModal', false)"
+  >
     <VCard>
       <VCardTitle>{{ props.book.title }}</VCardTitle>
       <VCardText>
@@ -46,7 +51,7 @@ const open = computed(() => props.openModal);
               line-inset="6"
               :dot-color="colors.at(i)"
             >
-            <!-- make key first letter upper case -->
+              <!-- make key first letter upper case -->
               {{ key.charAt(0).toUpperCase() + key.slice(1) }}: {{ item }}
             </VTimelineItem>
           </template>
@@ -63,4 +68,30 @@ const open = computed(() => props.openModal);
       </VCardActions>
     </VCard>
   </VDialog>
+  <VDialog v-else v-model="open" fullscreen scrollable>
+    <VCard>
+      <VCardTitle>
+        <VRow>
+          <VCol cols="auto">
+            <VBtn variant="text" icon="mdi-arrow-left-circle" color="primary" />
+          </VCol>
+          <VCol align-self="center"> {{ props.book.title }}</VCol>
+        </VRow>
+      </VCardTitle>
+      <VContainer style="border: solid red 2px">
+        <VRow>
+          <VInput />
+        </VRow>
+      </VContainer>
+      <VCardActions>
+        <VBtn>Modifica<VIcon>mdi-pencil</VIcon></VBtn>
+      </VCardActions>
+    </VCard>
+  </VDialog>
 </template>
+
+<style scoped>
+.debug {
+  border: 2px solid red;
+}
+</style>

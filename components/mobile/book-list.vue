@@ -67,6 +67,7 @@ const searchBooks = computed(() =>
       v-if="bookToShow"
       :book="bookToShow"
       :open-modal="modal"
+      :test="true"
       @close-modal="(value) => (modal = value)"
       @create-book="(book) => {}"
       @update-book="(book) => {}"
