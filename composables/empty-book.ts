@@ -12,4 +12,5 @@ export const useEmptyBook = () =>
     price: 1,
     rating: 0,
     comment: "",
+    image: "",
   }));

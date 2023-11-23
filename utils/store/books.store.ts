@@ -10,11 +10,11 @@ export const useBooksStore = defineStore("books", () => {
 
   // state
   const books = ref<Book[]>([]);
-  
+  const supabase = useSupabaseClient();
   const $reset = () => {
     books.value = [];
   };
-  
+
   const filteredBooks = (type: string, status: string, publisher: string) => {
     if (type === "All" && publisher === "All" && status === "All") {
       return books.value;
@@ -33,12 +33,33 @@ export const useBooksStore = defineStore("books", () => {
         method: "GET",
         credentials: "include",
         headers: {
-          Authorization: globalStore.jwt
-            ? `Bearer ${globalStore.jwt}`
-            : "",
+          Authorization: globalStore.jwt ? `Bearer ${globalStore.jwt}` : "",
         },
       });
-      books.value = books.value.map((b) => ({...b, image: "https://upload.wikimedia.org/wikipedia/it/thumb/a/ae/Komi_can%27t_communicate_Volume_1.jpg/1200px-Komi_can%27t_communicate_Volume_1.jpg"}));
+
+      books.value = await Promise.all(
+        books.value.map(async (libro) => {
+          const { title } = libro;
+          const { data: listaCopertineDisponibili } = await supabase.storage
+            .from("copertine")
+            .list(`${title.toLowerCase()}`);
+          const copertinaScelta = listaCopertineDisponibili?.find(
+            (copertina) => {
+              return (
+                copertina.name === "1.jpg" || copertina.name === "empty.png"
+              );
+            }
+          );
+          return {
+            ...libro,
+            image: supabase.storage
+              .from("copertine")
+              .getPublicUrl(`${title.toLowerCase()}/${copertinaScelta?.name}`)
+              .data.publicUrl,
+          };
+        })
+      );
+
       return {
         success: true,
         successData: null,
@@ -75,9 +96,7 @@ export const useBooksStore = defineStore("books", () => {
         credentials: "include",
         body: JSON.stringify(book),
         headers: {
-          Authorization: globalStore.jwt
-            ? `Bearer ${globalStore.jwt}`
-            : "",
+          Authorization: globalStore.jwt ? `Bearer ${globalStore.jwt}` : "",
         },
       });
       await fetchBooks();
@@ -117,9 +136,7 @@ export const useBooksStore = defineStore("books", () => {
         credentials: "include",
         body: JSON.stringify(book),
         headers: {
-          Authorization: globalStore.jwt
-            ? `Bearer ${globalStore.jwt}`
-            : "",
+          Authorization: globalStore.jwt ? `Bearer ${globalStore.jwt}` : "",
         },
       });
       await fetchBooks();
@@ -158,9 +175,7 @@ export const useBooksStore = defineStore("books", () => {
         method: "DELETE",
         credentials: "include",
         headers: {
-          Authorization: globalStore.jwt
-            ? `Bearer ${globalStore.jwt}`
-            : "",
+          Authorization: globalStore.jwt ? `Bearer ${globalStore.jwt}` : "",
         },
       });
       await fetchBooks();
@@ -199,9 +214,7 @@ export const useBooksStore = defineStore("books", () => {
         method: "GET",
         credentials: "include",
         headers: {
-          Authorization: globalStore.jwt
-            ? `Bearer ${globalStore.jwt}`
-            : "",
+          Authorization: globalStore.jwt ? `Bearer ${globalStore.jwt}` : "",
         },
       });
       return {
@@ -245,16 +258,14 @@ export const useBooksStore = defineStore("books", () => {
         credentials: "include",
         body: JSON.stringify(books),
         headers: {
-          Authorization: globalStore.jwt
-            ? `Bearer ${globalStore.jwt}`
-            : "",
+          Authorization: globalStore.jwt ? `Bearer ${globalStore.jwt}` : "",
         },
       });
       //!TODO: FIXA STA SCHIFEZZA
       return {
         success: true,
         successData: duplicate,
-      }
+      };
     } catch (error) {
       if (error instanceof FetchError) {
         console.error(
@@ -289,9 +300,7 @@ export const useBooksStore = defineStore("books", () => {
         credentials: "include",
         body: JSON.stringify(btb),
         headers: {
-          Authorization: globalStore.jwt
-            ? `Bearer ${globalStore.jwt}`
-            : "",
+          Authorization: globalStore.jwt ? `Bearer ${globalStore.jwt}` : "",
         },
       });
       return {

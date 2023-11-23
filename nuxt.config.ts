@@ -12,7 +12,8 @@ export default defineNuxtConfig({
         jwtSecret: "",
         jwtAud: "",
         jwtIss: "",
-        supabaseApiKey: "",
+        supabaseUrl: "",
+        supabaseKey: "",
         public: {
             api: "/api",
             env: "development",
