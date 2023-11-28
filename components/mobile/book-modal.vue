@@ -18,6 +18,8 @@ const emits = defineEmits<Emits>();
 //STORE
 const tableStore = useTableStore();
 
+//STATE
+
 //COMPUTED
 const status = computed(() =>
   tableStore.filters?.status.filter((s: string) => s !== "All")
@@ -55,6 +57,22 @@ const colors = [
   "#e91e63",
   "#00bcd4",
 ];
+
+// DIALOG PER LA copertina
+const dialogCopertinaNomeENumero = useState(() => false);
+const dialogCopertine = useState(() => false);
+
+type TitoloENumero = {
+  titolo: string;
+  numero: number;
+};
+
+const titoloENumero = useState<TitoloENumero>(() => ({
+  titolo: props.book.title,
+  numero: props.book.purchased,
+}));
+
+const fetchCopertine = async () => {};
 </script>
 
 <template>
@@ -228,7 +246,10 @@ const colors = [
                  oppure inserisce lui manualmente l'immagine dicendo che l'immagine verrà associata al titolo e al numero del volume
               6) l'utente preme il pulsante per salvare
              -->
-            <VBtn>
+            <VBtn
+              @click="dialogCopertinaNomeENumero = true"
+              :disabled="!modifica"
+            >
               Change image
             </VBtn>
           </VCol>
@@ -251,6 +272,32 @@ const colors = [
         />
       </VCardActions>
     </VCard>
+  </VDialog>
+
+  <!-- DIALOG PER PROCEDURA DELLA COPERTINA -->
+  <VDialog v-model="dialogCopertinaNomeENumero" fullscreen>
+      <VContainer>
+          <VRow>
+            <VCol
+              ><VTextField
+                v-model="titoloENumero.titolo"
+                variant="outlined"
+                label="Title"
+            /></VCol>
+            <VCol
+              ><VTextField
+                type="number"
+                v-model.number="titoloENumero.numero"
+                variant="outlined"
+                label="Number of volume"
+            /></VCol>
+          </VRow>
+          <VRow class="text-center mt-0">
+            <VCol>
+              <VBtn variant="plain"><VIcon>mdi-magnify</VIcon></VBtn>
+            </VCol>
+          </VRow>
+      </VContainer>
   </VDialog>
 </template>
 
