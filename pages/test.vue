@@ -35,6 +35,9 @@ const nextStep = async () => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     globalStore.stopLoading();
     currentStep.value = 1;
+    mangaToShow.value = [];
+    mangadexTitle.value = "";
+    imageList.value = [];
     dialogCopertinaNomeENumero.value = false;
     return;
   }
@@ -113,7 +116,10 @@ const mangaToShow = useState<MangaToShow[]>(() => []);
 const multiManga = useState(() => false);
 const mangadexTitle = useState(() => "");
 const imageList = useState<MangaToShowImage[]>(() => []);
-
+const immagineScelta = useState<MangaToShowImage>(() => ({
+  idCopertina: "",
+  image: "",
+}));
 const titleSelection = async () => {
   const manga: MangaToShow = mangaToShow.value.find(
     (m) => m.title === mangadexTitle.value
@@ -123,15 +129,16 @@ const titleSelection = async () => {
 };
 
 const display = useDisplay();
+
+const scegliCopertina = (copertina: MangaToShowImage) => {
+  immagineScelta.value = copertina;
+  nextStep();
+};
 </script>
 
 <template>
   <VBtn @click="dialogCopertinaNomeENumero = true">Apri</VBtn>
-  <VDialog
-    v-model="dialogCopertinaNomeENumero"
-    fullscreen
-    @update:model-value="currentStep = 1"
-  >
+  <VDialog v-model="dialogCopertinaNomeENumero" fullscreen persistent>
     <VCard class="h-100">
       <VContainer>
         <VRow class="text-center">
@@ -142,7 +149,7 @@ const display = useDisplay();
         <!-- CONTAINER DEGLI STEP -->
         <VRow
           :style="{
-            maxHeight: display.height.value - 150 + 'px',
+            maxHeight: display.height.value - 100 + 'px',
             overflowY: 'scroll',
           }"
           class="mt-4"
@@ -164,15 +171,23 @@ const display = useDisplay();
             v-else-if="currentStep === 2"
             v-for="(image, i) in imageList"
           >
-            <VCard>
+            <VCard link hover elevation="24" @click="scegliCopertina(image)">
               <VImg :src="image.image" />
             </VCard>
           </VCol>
-          <VCol v-else> preview card </VCol>
+          <VCol cols="6" v-else>
+            <VCard>
+              <VImg :src="immagineScelta.image" />
+              <VCardTitle>{{ titoloENumero.titolo }}</VCardTitle>
+            </VCard>
+          </VCol>
         </VRow>
 
         <!-- RIGA DELLE AZIONI -->
-        <VRow class="justify-space-between mt-8">
+        <VRow
+          class="justify-space-between mt-8"
+          :style="{ display: currentStep == 2 ? 'none' : '' }"
+        >
           <VCol cols="4" class="text-center">
             <VBtn
               :disabled="currentStep === 1 || globalStore.isLoading"
