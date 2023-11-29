@@ -24,8 +24,11 @@ export default defineNuxtConfig({
   },
   ssr: false,
   routeRules: {
-    "/api/test": {
+    "/api/proxy/manga": {
       proxy: "https://api.mangadex.org/manga",
+    },
+    "/api/proxy/cover": {
+      proxy: "https://api.mangadex.org/cover",
     },
   },
 });
