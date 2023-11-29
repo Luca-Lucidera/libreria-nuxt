@@ -47,11 +47,10 @@ onMounted(async () => {
     <VTabs v-model="tab" align-tabs="center" class="mb-8">
       <VTab value="home">
         <VIcon>mdi-home</VIcon>
-        Home
       </VTab>
       <VTab value="next-to-buy">
         <VIcon>mdi-book</VIcon>
-        Next to buy
+        <p class="ml-2">Next to buy</p>
       </VTab>
     </VTabs>
     <VWindow v-model="tab">

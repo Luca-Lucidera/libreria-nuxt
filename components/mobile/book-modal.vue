@@ -220,7 +220,11 @@ const dialogCopertina = useState(() => false);
         </VRow>
         <VRow>
           <VCol class="text-center">
-            <VBtn @click="dialogCopertina = true" :disabled="!modifica">
+            <VBtn
+              @click="dialogCopertina = true"
+              :disabled="!modifica"
+              variant="outlined"
+            >
               Change image
             </VBtn>
           </VCol>
@@ -248,5 +252,6 @@ const dialogCopertina = useState(() => false);
     :open="dialogCopertina"
     :number="bookToChange.purchased"
     :title="bookToChange.title"
+    @close-modal="dialogCopertina = false"
   />
 </template>

@@ -12,16 +12,14 @@ type Props = {
   open: boolean;
 };
 
-const props = defineProps<Props>();
-
 type Emits = {
   closeModal: [value: boolean];
 };
-
+const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
-const title = computed(() => props.title);
-const number = computed(() => props.number);
+const title = useState(() => props.title);
+const number = useState(() => props.number);
 const openBaseDialog = computed(() => props.open);
 
 //COMPUTED
@@ -117,7 +115,12 @@ const fetchManga = async () => {
   };
   globalStore.startLoading();
   try {
-    const { data, total } = await $fetch<MangadexManga>(url, { params });
+    const { data, total } = await $fetch<MangadexManga>(url, {
+      params,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
     if (total === 0) {
       globalStore.showSnackbar("Nessun manga trovato", "warn");
       return;
@@ -154,7 +157,12 @@ const fetchCopertine = async (mangaId: string) => {
     mangadexBaseUrlApi + "/cover?" + Object.values(urlParams).join("&");
   try {
     globalStore.startLoading();
-    const { data: coverList } = await $fetch<MangadexCover>(url);
+    //add cors
+    const { data: coverList } = await $fetch<MangadexCover>(url, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
     imageList.value = coverList.map((cover) => {
       return {
         idCopertina: cover.id,
