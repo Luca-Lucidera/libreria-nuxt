@@ -30,5 +30,8 @@ export default defineNuxtConfig({
     "/api/proxy/cover": {
       proxy: "https://api.mangadex.org/cover",
     },
+    "/api/proxy/linkimage": {
+      proxy: "https://uploads.mangadex.org/covers",
+    },
   },
 });
