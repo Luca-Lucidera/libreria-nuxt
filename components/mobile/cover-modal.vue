@@ -108,7 +108,7 @@ const titleSelection = async () => {
 };
 
 const fetchManga = async () => {
-  const url = mangadexBaseUrlApi + "/manga";
+  const url = "/api/test";
   const params = {
     title: title.value,
     limit: 10,
@@ -152,7 +152,7 @@ const fetchCopertine = async (mangaId: string) => {
     order: "order[volume]=asc",
   };
   const url =
-    mangadexBaseUrlApi + "/cover?" + Object.values(urlParams).join("&");
+    mangadexBaseUrlApi + "/api/test/cover?" + Object.values(urlParams).join("&");
   try {
     globalStore.startLoading();
     //add cors
