@@ -116,10 +116,7 @@ const fetchManga = async () => {
   globalStore.startLoading();
   try {
     const { data, total } = await $fetch<MangadexManga>(url, {
-      params,
-      headers: {
-        "Access-Control-Allow-Origin": "no-cors",
-      },
+      params
     });
     if (total === 0) {
       globalStore.showSnackbar("Nessun manga trovato", "warn");
