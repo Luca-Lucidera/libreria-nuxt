@@ -18,8 +18,6 @@ const emits = defineEmits<Emits>();
 //STORE
 const tableStore = useTableStore();
 
-//STATE
-
 //COMPUTED
 const status = computed(() =>
   tableStore.filters?.status.filter((s: string) => s !== "All")
@@ -59,20 +57,7 @@ const colors = [
 ];
 
 // DIALOG PER LA copertina
-const dialogCopertinaNomeENumero = useState(() => false);
-const dialogCopertine = useState(() => false);
-
-type TitoloENumero = {
-  titolo: string;
-  numero: number;
-};
-
-const titoloENumero = useState<TitoloENumero>(() => ({
-  titolo: props.book.title,
-  numero: props.book.purchased,
-}));
-
-const fetchCopertine = async () => {};
+const dialogCopertina = useState(() => false);
 </script>
 
 <template>
@@ -235,21 +220,7 @@ const fetchCopertine = async () => {};
         </VRow>
         <VRow>
           <VCol class="text-center">
-            <!-- 
-              La procedura deve essere questa:
-              1) l'utente preme il pulsante
-              2) si apre un piccolo modal dove chiede se il titolo e il numero del volume sono corretti
-              3) l'utente può cambiarli
-              4) tramite il nome e il numero del volume va a fare il fetch dei data da mangadex
-                 [guarda il tuo progetto (mangadex qualcosa nei file di code)]
-              5) l'utente sceglie la copertina o torna indietro e cambia il titolo e il numero del volume
-                 oppure inserisce lui manualmente l'immagine dicendo che l'immagine verrà associata al titolo e al numero del volume
-              6) l'utente preme il pulsante per salvare
-             -->
-            <VBtn
-              @click="dialogCopertinaNomeENumero = true"
-              :disabled="!modifica"
-            >
+            <VBtn @click="dialogCopertina = true" :disabled="!modifica">
               Change image
             </VBtn>
           </VCol>
@@ -273,36 +244,9 @@ const fetchCopertine = async () => {};
       </VCardActions>
     </VCard>
   </VDialog>
-
-  <!-- DIALOG PER PROCEDURA DELLA COPERTINA -->
-  <VDialog v-model="dialogCopertinaNomeENumero" fullscreen>
-      <VContainer>
-          <VRow>
-            <VCol
-              ><VTextField
-                v-model="titoloENumero.titolo"
-                variant="outlined"
-                label="Title"
-            /></VCol>
-            <VCol
-              ><VTextField
-                type="number"
-                v-model.number="titoloENumero.numero"
-                variant="outlined"
-                label="Number of volume"
-            /></VCol>
-          </VRow>
-          <VRow class="text-center mt-0">
-            <VCol>
-              <VBtn variant="plain"><VIcon>mdi-magnify</VIcon></VBtn>
-            </VCol>
-          </VRow>
-      </VContainer>
-  </VDialog>
+  <MobileCoverModal
+    :open="dialogCopertina"
+    :number="bookToChange.purchased"
+    :title="bookToChange.title"
+  />
 </template>
-
-<style scoped>
-.debug {
-  border: 2px solid red;
-}
-</style>
