@@ -113,6 +113,7 @@ const fetchManga = async () => {
     title: title.value,
     limit: 10,
   };
+  
   globalStore.startLoading();
   try {
     const { data, total } = await $fetch<MangadexManga>(url, {

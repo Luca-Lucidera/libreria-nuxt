@@ -9,9 +9,9 @@
 //   ],
 // });
 const f = async () => {
-  const resp = await useFetch("/api/test")
-  console.log(resp)
-}
+  const { data, error } = await useFetch("/api/test")
+  console.log(data, error)
+};
 </script>
 
 <template>
