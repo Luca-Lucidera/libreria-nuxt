@@ -118,7 +118,7 @@ const fetchManga = async () => {
     const { data, total } = await $fetch<MangadexManga>(url, {
       params,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "no-cors",
       },
     });
     if (total === 0) {
@@ -158,11 +158,7 @@ const fetchCopertine = async (mangaId: string) => {
   try {
     globalStore.startLoading();
     //add cors
-    const { data: coverList } = await $fetch<MangadexCover>(url, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    const { data: coverList } = await $fetch<MangadexCover>(url);
     imageList.value = coverList.map((cover) => {
       return {
         idCopertina: cover.id,
