@@ -11,7 +11,7 @@ import type { MangadexCover } from "~/types/book/Mangadex/cover";
 //   ],
 // });
 
-const cop = ref<any>("");
+const cop = ref("");
 async function fetchListaManga() {
   try {
     const params = {
@@ -28,22 +28,12 @@ async function fetchListaManga() {
 async function fetchCopertina() {
   try {
     const secchanId = "d79f3680-8bae-4950-b7c2-30c339156229";
-    const urlParams = {
-      mangaArray: `manga[]=${secchanId}`,
-      limit: "limit=50",
-      offset: "offset=" + 0,
-      order: "order[volume]=asc",
-    };
-    const responseCopertina = await $fetch<MangadexCover>(
-      mangadexCoverProxyApi + "?" + Object.values(urlParams).join("&")
+    const coverId = "9e7f621a-17f4-4027-9ec9-10964478f47a.jpg";
+    const response2 = await $fetch<Blob>(
+      `/api/proxy/image/${secchanId}/${coverId}.256.jpg`,
+      { responseType: "blob" }
     );
-    console.log("RESPONSE COPERTINA:", responseCopertina);
-
-    const response2 = await $fetch(
-      `${mangadexBaseUrlImageApi}/${secchanId}/${responseCopertina.data[0].attributes.fileName}.256.jpg`
-    );
-    console.log("IMMAGINE PRESA:", response2);
-    cop.value = response2;
+    cop.value = URL.createObjectURL(response2);
   } catch (error) {
     console.log("Errore in fetchCopertina", error);
   }
