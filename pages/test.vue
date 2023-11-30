@@ -40,8 +40,10 @@ async function fetchCopertina() {
 }
 
 const fetchStream = async () => {
-  const respo = await $fetch<ReadableStream>("/api/mangadex/covers", { responseType: 'stream'});
-  cop.value = respo;
+  const response = await $fetch<ReadableStream>("/api/mangadex/covers", { responseType: 'stream'});
+  console.log("RESPONSE FETCH STREAM:", response);
+  console.log(typeof response);
+
 };
 </script>
 
