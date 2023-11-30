@@ -11,7 +11,7 @@ import type { MangadexCover } from "~/types/book/Mangadex/cover";
 //   ],
 // });
 
-const cop = ref<any>("");
+const cop = ref<string>("");
 async function fetchListaManga() {
   try {
     const params = {
@@ -40,10 +40,19 @@ async function fetchCopertina() {
 }
 
 const fetchStream = async () => {
-  const response = await $fetch<ReadableStream>("/api/mangadex/covers", { responseType: 'stream'});
-  console.log("RESPONSE FETCH STREAM:", response);
-  console.log(typeof response);
-
+  const response = await $fetch<ReadableStream>("/api/mangadex/covers", {
+    responseType: "stream",
+  });
+  let chunks = [];
+  const reader = response.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    chunks.push(value);
+  }
+  cop.value = URL.createObjectURL(new Blob(chunks));
 };
 </script>
 
