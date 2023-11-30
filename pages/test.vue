@@ -38,10 +38,15 @@ async function fetchCopertina() {
     console.log("Errore in fetchCopertina", error);
   }
 }
+
+const fetchStream = async () => {
+  const respo = await $fetch("/api/mangadex/covers", { responseType: 'stream'});
+  console.log('response stream', respo)
+};
 </script>
 
 <template>
   <VBtn @click="fetchListaManga">fetch lista manga</VBtn>
-  <VBtn @click="fetchCopertina">fetch copertina</VBtn>
+  <VBtn @click="fetchStream">fetch copertina</VBtn>
   <VImg :src="cop" />
 </template>
