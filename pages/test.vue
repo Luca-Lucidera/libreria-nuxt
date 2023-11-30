@@ -40,13 +40,12 @@ async function fetchCopertina() {
 }
 
 const fetchStream = async () => {
-  const respo = await $fetch("/api/mangadex/covers", { responseType: 'stream'});
-  console.log('response stream', respo)
+  const respo = await $fetch<ReadableStream>("/api/mangadex/covers", { responseType: 'stream'});
 };
 </script>
 
 <template>
   <VBtn @click="fetchListaManga">fetch lista manga</VBtn>
   <VBtn @click="fetchStream">fetch copertina</VBtn>
-  <VImg :src="cop" />
+  <VImg src="/api/mangadex/covers" />
 </template>
