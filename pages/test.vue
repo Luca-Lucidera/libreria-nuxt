@@ -11,7 +11,7 @@ import type { MangadexCover } from "~/types/book/Mangadex/cover";
 //   ],
 // });
 
-const cop = ref("");
+const cop = ref<any>("");
 async function fetchListaManga() {
   try {
     const params = {
@@ -41,11 +41,12 @@ async function fetchCopertina() {
 
 const fetchStream = async () => {
   const respo = await $fetch<ReadableStream>("/api/mangadex/covers", { responseType: 'stream'});
+  cop.value = respo;
 };
 </script>
 
 <template>
   <VBtn @click="fetchListaManga">fetch lista manga</VBtn>
   <VBtn @click="fetchStream">fetch copertina</VBtn>
-  <VImg src="/api/mangadex/covers" />
+  <VImg :src="cop" />
 </template>
