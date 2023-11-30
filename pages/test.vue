@@ -54,10 +54,19 @@ const fetchStream = async () => {
   }
   cop.value = URL.createObjectURL(new Blob(chunks));
 };
+
+const fetchBlob = async () => {
+  const resp = await $fetch<Blob>("/api/mangadex/covers2", {
+    responseType: "blob",
+  });
+
+  cop.value = URL.createObjectURL(resp);
+}
 </script>
 
 <template>
   <VBtn @click="fetchListaManga">fetch lista manga</VBtn>
   <VBtn @click="fetchStream">fetch copertina</VBtn>
+  <VBtn @click="fetchBlob">fetch copertina blob</VBtn>
   <VImg :src="cop" />
 </template>
