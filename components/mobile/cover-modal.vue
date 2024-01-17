@@ -7,22 +7,17 @@ import type {
   MangaToShowImage,
 } from "~/types/book/mangaToShow";
 import { mangadexCoverProxyApi, mangadexMangaProxyApi } from "~/utils/mangadex";
+
 type Props = {
   title: string;
   number: number;
-  open: boolean;
-};
-
-type Emits = {
-  closeModal: [value: boolean];
 };
 
 const props = defineProps<Props>();
-const emits = defineEmits<Emits>();
 
-const title = useState(() => props.title);
-const number = useState(() => props.number);
-const openBaseDialog = computed(() => props.open);
+const title = ref(props.title);
+const number = ref(props.number);
+const openBookCoverModal = defineModel<boolean>();
 
 //COMPUTED
 const maxHeightScrollContainer = computed(() => height.value - 100 + "px");
@@ -115,11 +110,11 @@ const fetchManga = async () => {
     title: title.value,
     limit: 10,
   };
-  
+
   globalStore.startLoading();
   try {
     const { data, total } = await $fetch<MangadexManga>(url, {
-      params
+      params,
     });
     if (total === 0) {
       globalStore.showSnackbar("Nessun manga trovato", "warn");
@@ -153,8 +148,7 @@ const fetchCopertine = async (mangaId: string) => {
     offset: "offset=" + (number.value - 1),
     order: "order[volume]=asc",
   };
-  const url =
-    mangadexCoverProxyApi + "?" + Object.values(urlParams).join("&");
+  const url = mangadexCoverProxyApi + "?" + Object.values(urlParams).join("&");
   try {
     globalStore.startLoading();
     //add cors
@@ -176,10 +170,14 @@ const chooseImage = (image: MangaToShowImage) => {
   imageSelected.value = image;
   nextStep();
 };
+
+const closeModal = () => {
+  openBookCoverModal.value = false;
+};
 </script>
 
 <template>
-  <VDialog v-model="openBaseDialog" fullscreen persistent>
+  <VDialog v-model="openBookCoverModal" fullscreen persistent>
     <VCard class="h-100">
       <VContainer>
         <!-- HEADER -->
@@ -189,7 +187,7 @@ const chooseImage = (image: MangaToShowImage) => {
               variant="text"
               icon="mdi-arrow-left-circle"
               color="primary"
-              @click="emits('closeModal', false)"
+              @click="closeModal"
             />
           </VCol>
           <VCol v-if="currentStep === 1" align-self="center" cols="auto"

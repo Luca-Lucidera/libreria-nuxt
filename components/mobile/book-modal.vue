@@ -1,19 +1,9 @@
 <script setup lang="ts">
 import type { Book } from "~/types/book";
-type Props = {
-  book: Book;
-  openModal: boolean;
-  test: boolean;
-};
 
-type Emits = {
-  closeModal: [value: boolean];
-  updateBook: [book: Book];
-  createBook: [book: Book];
-};
 
-const props = defineProps<Props>();
-const emits = defineEmits<Emits>();
+const props = defineProps<{ book: Book }>();
+const emits = defineEmits(['closeBookModal']);
 
 //STORE
 const tableStore = useTableStore();
@@ -29,74 +19,26 @@ const publisher = computed(() =>
   tableStore.filters?.publisher.filter((s: string) => s !== "All")
 );
 
-const open = computed(() => props.openModal);
+const openBookModal = defineModel<boolean>();
 
 const modifica = useState(() => false);
-const bookToChange = computed(() => ({ ...props.book }));
 
+const bookToShow = ref(props.book);
 
-const updateOrCreate = () => {
-  if (props.book.id !== "") {
-    emits("updateBook", bookToChange.value);
-  } else {
-    emits("createBook", bookToChange.value);
+const onCloseModal = () => {
+  if (modifica.value) {
+    modifica.value = false;
   }
+  openBookModal.value = false;
+  emits("closeBookModal");
 };
 
-const colors = [
-  "#03a9f4",
-  "#009688",
-  "#4caf50",
-  "#8bc34a",
-  "#cddc39",
-  "#ffeb3b",
-  "#ffc107",
-  "#ff9800",
-  "#ff5722",
-  "#e91e63",
-  "#00bcd4",
-];
-
 // DIALOG PER LA copertina
-const dialogCopertina = useState(() => false);
+const openBookCoverModal = useState(() => false);
 </script>
 
 <template>
-  <VDialog
-    v-if="!props.test"
-    v-model="open"
-    @update:model-value="emits('closeModal', false)"
-  >
-    <VCard>
-      <VCardTitle>{{ props.book.title }}</VCardTitle>
-      <VCardText>
-        <VTimeline density="compact" side="end" truncate-line="both">
-          <template v-for="(item, key, i) in props.book">
-            <VTimelineItem
-              v-if="key !== 'id' && key !== 'title' && key !== 'image'"
-              size="x-small"
-              :key="i"
-              line-inset="6"
-              :dot-color="colors.at(i)"
-            >
-              <!-- make key first letter upper case -->
-              {{ key.charAt(0).toUpperCase() + key.slice(1) }}: {{ item }}
-            </VTimelineItem>
-          </template>
-        </VTimeline>
-      </VCardText>
-      <VCardActions class="justify-center">
-        <VBtn
-          @click="emits('closeModal', false)"
-          size="x-large"
-          color="primary"
-        >
-          <VIcon>mdi-close</VIcon>
-        </VBtn>
-      </VCardActions>
-    </VCard>
-  </VDialog>
-  <VDialog v-else v-model="open" fullscreen scrollable>
+  <VDialog v-model="openBookModal" fullscreen scrollable>
     <VCard>
       <VCardTitle class="elevation-10">
         <VRow>
@@ -105,10 +47,10 @@ const dialogCopertina = useState(() => false);
               variant="text"
               icon="mdi-arrow-left-circle"
               color="primary"
-              @click="emits('closeModal', false)"
+              @click="onCloseModal"
             />
           </VCol>
-          <VCol align-self="center"> {{ props.book.title }}</VCol>
+          <VCol align-self="center"> {{ bookToShow.title }}</VCol>
         </VRow>
       </VCardTitle>
       <VContainer class="mt-8">
@@ -116,7 +58,7 @@ const dialogCopertina = useState(() => false);
           <VCol>
             <VTextField
               label="Title"
-              v-model="bookToChange.title"
+              v-model="props.book.title"
               :rules="rules.book.title"
               variant="outlined"
               :disabled="!modifica"
@@ -128,7 +70,7 @@ const dialogCopertina = useState(() => false);
             <VTextField
               variant="outlined"
               label="Purchased"
-              v-model="props.book.purchased"
+              v-model="bookToShow.purchased"
               :disabled="!modifica"
             />
           </VCol>
@@ -136,7 +78,7 @@ const dialogCopertina = useState(() => false);
             <VTextField
               variant="outlined"
               label="Read"
-              v-model="props.book.read"
+              v-model="bookToShow.read"
               :disabled="!modifica"
             />
           </VCol>
@@ -155,7 +97,7 @@ const dialogCopertina = useState(() => false);
           <VCol>
             <VSelect
               label="Status"
-              v-model="bookToChange.status"
+              v-model="bookToShow.status"
               :items="status"
               :disabled="!modifica"
               variant="outlined"
@@ -166,7 +108,7 @@ const dialogCopertina = useState(() => false);
           <VCol>
             <VSelect
               label="Type"
-              v-model="bookToChange.type"
+              v-model="bookToShow.type"
               :items="type"
               :disabled="!modifica"
               variant="outlined"
@@ -175,7 +117,7 @@ const dialogCopertina = useState(() => false);
           <VCol>
             <VSelect
               label="Editor"
-              v-model="bookToChange.publisher"
+              v-model="bookToShow.publisher"
               :items="publisher"
               :disabled="!modifica"
               variant="outlined"
@@ -187,7 +129,7 @@ const dialogCopertina = useState(() => false);
             <VTextField
               type="number"
               label="Price"
-              v-model.number="book.price"
+              v-model.number="bookToShow.price"
               :rules="rules.book.price"
               :disabled="!modifica"
               variant="outlined"
@@ -203,7 +145,7 @@ const dialogCopertina = useState(() => false);
           <VCol>
             <VTextarea
               label="Comment"
-              v-model="bookToChange.comment"
+              v-model="bookToShow.comment"
               :rules="rules.book.comment"
               :disabled="!modifica"
               variant="outlined"
@@ -213,7 +155,7 @@ const dialogCopertina = useState(() => false);
         <VRow class="mt-0">
           <VCol class="text-center">
             <VRating
-              v-model="bookToChange.rating"
+              v-model="bookToShow.rating"
               :disabled="!modifica"
               variant="outlined"
             />
@@ -222,7 +164,7 @@ const dialogCopertina = useState(() => false);
         <VRow>
           <VCol class="text-center">
             <VBtn
-              @click="dialogCopertina = true"
+              @click="openBookCoverModal = true"
               :disabled="!modifica"
               variant="outlined"
             >
@@ -244,15 +186,15 @@ const dialogCopertina = useState(() => false);
           icon="mdi-content-save"
           variant="plain"
           color="primary"
-          @click="updateOrCreate"
+          @click="() => console.log('hello world')"
         />
       </VCardActions>
     </VCard>
   </VDialog>
   <MobileCoverModal
-    :open="dialogCopertina"
-    :number="bookToChange.purchased"
-    :title="bookToChange.title"
-    @close-modal="dialogCopertina = false"
+    v-if="openBookCoverModal"
+    v-model="openBookCoverModal"
+    :number="bookToShow.purchased"
+    :title="bookToShow.title"
   />
 </template>
