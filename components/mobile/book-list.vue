@@ -21,6 +21,7 @@ const bookToShow = useState<Book | null>(() => null);
 const openModal = (book: Book) => {
   modal.value = true;
   bookToShow.value = { ...book };
+  console.log(bookToShow.value);
 };
 
 const searchBooks = computed(() =>

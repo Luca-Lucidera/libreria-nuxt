@@ -16,6 +16,7 @@ type Props = {
 type Emits = {
   closeModal: [value: boolean];
 };
+
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
@@ -161,7 +162,7 @@ const fetchCopertine = async (mangaId: string) => {
     imageList.value = coverList.map((cover) => {
       return {
         idCopertina: cover.id,
-        image: `${mangadexBaseUrlImageApi}/${mangaId}/${cover.attributes.fileName}.256.jpg`,
+        image: `/api/mangadex/covers3?mangaId=${mangaId}&coverId=${cover.attributes.fileName}`,
       };
     });
   } catch (error) {

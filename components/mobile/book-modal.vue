@@ -32,7 +32,8 @@ const publisher = computed(() =>
 const open = computed(() => props.openModal);
 
 const modifica = useState(() => false);
-const bookToChange = computed(() => props.book);
+const bookToChange = computed(() => ({ ...props.book }));
+
 
 const updateOrCreate = () => {
   if (props.book.id !== "") {
