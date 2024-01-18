@@ -15,6 +15,7 @@ type Props = {
 
 const props = defineProps<Props>();
 
+//NON CAMBIARE IL REF PERCHÉ DISTRUGGI LE PROPS https://vuejs.org/guide/components/props.html#one-way-data-flow
 const title = ref(props.title);
 const number = ref(props.number);
 const openBookCoverModal = defineModel<boolean>();
@@ -31,6 +32,19 @@ const buttonText = computed(() => {
       return "CONFIRM";
     default:
       return "NEXT";
+  }
+});
+const colsHeader = computed(() => {
+  switch (currentStep.value) {
+    case 1:
+      return "Titolo e numero";
+    case 2:
+      return "Scegli la copertina";
+    case 3:
+      return "Conferma";
+    default:
+      console.log(`Step non previsto ${currentStep.value}`);
+      return "Errore step non previsto";
   }
 });
 
@@ -51,6 +65,7 @@ const imageList = useState<MangaToShowImage[]>(() => []);
 const imageSelected = useState<MangaToShowImage>(() => ({
   idCopertina: "",
   image: "empty.png",
+  numeroCopertina: 0,
 }));
 
 //METHODS
@@ -69,6 +84,7 @@ const nextStep = async () => {
     imageSelected.value = {
       idCopertina: "",
       image: "empty.png",
+      numeroCopertina: 1,
     };
     return;
   }
@@ -91,6 +107,7 @@ const prevStep = () => {
     imageSelected.value = {
       idCopertina: "",
       image: "empty.png",
+      numeroCopertina: 1,
     };
   }
   currentStep.value--;
@@ -117,7 +134,7 @@ const fetchManga = async () => {
       params,
     });
     if (total === 0) {
-      globalStore.showSnackbar("Nessun manga trovato", "warn");
+      globalStore.showSnackbar("Nessun manga trovato", "error");
       return;
     }
     //se trovo un solo manga skippo il dialog con la scelta del manga (prova con un qualsiasi volume unico)
@@ -157,6 +174,7 @@ const fetchCopertine = async (mangaId: string) => {
       return {
         idCopertina: cover.id,
         image: `/api/mangadex/covers3?mangaId=${mangaId}&coverId=${cover.attributes.fileName}`,
+        numeroCopertina: parseInt(cover.attributes.volume),
       };
     });
   } catch (error) {
@@ -171,8 +189,15 @@ const chooseImage = (image: MangaToShowImage) => {
   nextStep();
 };
 
+const handleErrorLoadImage = (index: number) => {
+  var currentImageUrl = imageList.value.at(index)!.image;
+  imageList.value[index].image = "";
+  setTimeout(() => (imageList.value[index].image = currentImageUrl), 500);
+};
+
 const closeModal = () => {
   openBookCoverModal.value = false;
+  currentStep.value = 1;
 };
 </script>
 
@@ -190,15 +215,8 @@ const closeModal = () => {
               @click="closeModal"
             />
           </VCol>
-          <VCol v-if="currentStep === 1" align-self="center" cols="auto"
-            >Titolo e numero</VCol
-          >
-          <VCol v-else-if="currentStep === 2" align-self="center" cols="auto"
-            >Scegli la copertina</VCol
-          >
-          <VCol v-else align-self="center" cols="auto">Conferma</VCol>
+          <VCol align-self="center" cols="auto"> {{ colsHeader }}</VCol>
         </VRow>
-
         <!-- BODY -->
         <VRow
           :style="{ maxHeight: maxHeightScrollContainer, overflowY: 'scroll' }"
@@ -217,16 +235,17 @@ const closeModal = () => {
           <VCol
             cols="4"
             v-else-if="currentStep === 2"
-            v-for="(image, i) in imageList"
+            v-for="(image, index) in imageList"
           >
             <VCard link hover elevation="24" @click="chooseImage(image)">
-              <VImg :src="image.image" />
+              <VImg :src="image.image" @error="handleErrorLoadImage(index)" />
             </VCard>
           </VCol>
           <VCol v-else cols="6">
             <VCard>
               <VImg :src="imageSelected.image" />
               <VCardTitle>{{ title }}</VCardTitle>
+              <div>{{ imageSelected }}</div>
             </VCard>
           </VCol>
         </VRow>

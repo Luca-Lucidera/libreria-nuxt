@@ -5,5 +5,6 @@ export type MangaToShowTitle = {
 
 export type MangaToShowImage = {
   idCopertina: string;
+  numeroCopertina: number;
   image: string;
 };
