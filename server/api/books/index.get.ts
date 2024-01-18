@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
     const { userId, ...book } = b;
     return {
       ...book,
+      image: book.cover,
       type: parsePrismaEnum(book.type),
       status: parsePrismaEnum(book.status),
       publisher: parsePrismaEnum(book.publisher),

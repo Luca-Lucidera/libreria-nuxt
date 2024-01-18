@@ -126,6 +126,7 @@ const fetchManga = async () => {
   const params = {
     title: title.value,
     limit: 10,
+    'contentRating[]': ["safe", "suggestive", "erotica", "pornographic"]
   };
 
   globalStore.startLoading();
@@ -232,7 +233,11 @@ const uploadImage = async () => {
   //const file = new File([blob], `${imageSelected.value.numeroCopertina}.jpg`, { type: "image/jpeg" });
   await supabase.storage
     .from("copertine")
-    .upload(`${props.title.toLowerCase()}/${imageSelected.value.numeroCopertina}.jpg`, blob);
+    .upload(
+      `${props.title.toLowerCase()}/${imageSelected.value.numeroCopertina}.jpg`,
+      blob,
+      { upsert: true }
+    );
 };
 
 const closeModal = () => {

@@ -44,11 +44,7 @@ export const useBooksStore = defineStore("books", () => {
             .from("copertine")
             .list(`${title.toLowerCase()}`);
           const copertinaScelta = listaCopertineDisponibili?.find(
-            (copertina) => {
-              return (
-                copertina.name === "1.jpg" || copertina.name === "empty.png"
-              );
-            }
+            (c) => c.name === libro.image
           );
           return {
             ...libro,
