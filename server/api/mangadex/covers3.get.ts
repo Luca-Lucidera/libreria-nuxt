@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid parameters",
     });
   }
-  return await $fetch(
+  return await $fetch<Blob>(
     `https://uploads.mangadex.org/covers/${mangaId}/${coverId}.256.jpg`,
     { responseType: "blob" }
   );

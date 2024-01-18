@@ -1,9 +1,27 @@
-import type { MangaToShowImage } from "~/types/book/mangaToShow";
-
+type Body = {
+  numeroCopertina: number;
+  mangaTitle: string;
+};
 export default defineEventHandler(async (event) => {
-  const body = await readBody<MangaToShowImage>(event);
-  console.log(body.idCopertina);
-  console.log(body.image);
-  console.log(body.numeroCopertina);
-  return "ciao";
+  const { mangaTitle, numeroCopertina } = await readBody<Body>(event, {
+    strict: true,
+  });
+
+  const book = await prisma.book.findFirst({ where: { title: mangaTitle } });
+  if (!book) {
+    throw createError({ statusCode: 404, statusMessage: "Book not found" });
+  }
+
+  const { id } = book;
+
+  await prisma.book.update({
+    where: {
+      id,
+    },
+    data: {
+      cover: `${numeroCopertina}.jpg`,
+    },
+  });
+
+  return;
 });

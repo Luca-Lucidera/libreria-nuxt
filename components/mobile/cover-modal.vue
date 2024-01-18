@@ -20,6 +20,8 @@ const title = ref(props.title);
 const number = ref(props.number);
 const openBookCoverModal = defineModel<boolean>();
 
+const supabase = useSupabaseClient();
+
 //COMPUTED
 const maxHeightScrollContainer = computed(() => height.value - 100 + "px");
 const buttonText = computed(() => {
@@ -72,13 +74,9 @@ const imageSelected = useState<MangaToShowImage>(() => ({
 const nextStep = async () => {
   //procedura per chiudere il dialog e salvare i dati
   if (currentStep.value === 3) {
-    //globalStore.startLoading();
-    //await new Promise((resolve) => setTimeout(resolve, 2000));
-    //globalStore.stopLoading();
-    await updateImage()
-
+    await updateImage();
+    await uploadImage();
     //FULL RESET
-    currentStep.value = 1;
     listAvailableTitle.value = [];
     defaultMangadexTitle.value = "";
     imageList.value = [];
@@ -87,6 +85,7 @@ const nextStep = async () => {
       image: "empty.png",
       numeroCopertina: 1,
     };
+    closeModal();
     return;
   }
   currentStep.value++;
@@ -200,9 +199,40 @@ const updateImage = async () => {
   globalStore.startLoading();
   await $fetch("/api/books/cover", {
     method: "PUT",
-    body: JSON.stringify(imageSelected.value),
+    body: JSON.stringify({
+      numeroCopertina: imageSelected.value.numeroCopertina,
+      mangaTitle: props.title,
+    }),
   });
   globalStore.stopLoading();
+};
+
+const uploadImage = async () => {
+  const listaCopertine = await supabase.storage
+    .from("copertine")
+    .list(`${props.title.toLocaleLowerCase()}`);
+
+  if (!listaCopertine.data) {
+    //TODO! Gestisci il fatto che non ci sia la cartella
+    return;
+  }
+  const copertine = listaCopertine.data;
+  const copertina = copertine.find(
+    (c) => c.name === `${imageSelected.value.numeroCopertina}.jpg`
+  );
+  if (copertina !== undefined) {
+    //la copertina è già presente quindi non devo caricarla
+    return;
+  }
+
+  const blob = await $fetch<Blob>(imageSelected.value.image, {
+    responseType: "blob",
+  });
+
+  //const file = new File([blob], `${imageSelected.value.numeroCopertina}.jpg`, { type: "image/jpeg" });
+  await supabase.storage
+    .from("copertine")
+    .upload(`${props.title.toLowerCase()}/${imageSelected.value.numeroCopertina}.jpg`, blob);
 };
 
 const closeModal = () => {
