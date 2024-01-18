@@ -72,9 +72,10 @@ const imageSelected = useState<MangaToShowImage>(() => ({
 const nextStep = async () => {
   //procedura per chiudere il dialog e salvare i dati
   if (currentStep.value === 3) {
-    globalStore.startLoading();
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    globalStore.stopLoading();
+    //globalStore.startLoading();
+    //await new Promise((resolve) => setTimeout(resolve, 2000));
+    //globalStore.stopLoading();
+    await updateImage()
 
     //FULL RESET
     currentStep.value = 1;
@@ -195,6 +196,15 @@ const handleErrorLoadImage = (index: number) => {
   setTimeout(() => (imageList.value[index].image = currentImageUrl), 500);
 };
 
+const updateImage = async () => {
+  globalStore.startLoading();
+  await $fetch("/api/books/cover", {
+    method: "PUT",
+    body: JSON.stringify(imageSelected.value),
+  });
+  globalStore.stopLoading();
+};
+
 const closeModal = () => {
   openBookCoverModal.value = false;
   currentStep.value = 1;
@@ -245,7 +255,6 @@ const closeModal = () => {
             <VCard>
               <VImg :src="imageSelected.image" />
               <VCardTitle>{{ title }}</VCardTitle>
-              <div>{{ imageSelected }}</div>
             </VCard>
           </VCol>
         </VRow>
