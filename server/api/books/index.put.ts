@@ -1,5 +1,5 @@
 import { Publisher, Status, Type } from "@prisma/client";
-import type { Book } from "@prisma/client";
+import type { Book } from "~/types/book";
 
 export default defineEventHandler(async (event) => {
   const result = await handleSecurity(event);
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: "Token invalid" });
   }
 
-  const bookToUpdate = (await readBody(event)) as Book;
+  const { image, ...bookToUpdate } = await readBody<Book>(event);
   if (
     !bookToUpdate ||
     !bookToUpdate.title ||
@@ -41,14 +41,15 @@ export default defineEventHandler(async (event) => {
   const bookChanged = await prisma.book.update({
     where: {
       id: bookToUpdate.id,
+      userId: result.successData.user.id,
     },
     data: {
       ...parsedBook,
       status,
       type,
       publisher,
-      userId: result.successData.user.id,
     },
   });
+
   return bookChanged;
 });
