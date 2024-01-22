@@ -20,9 +20,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const books: Book[] = userBooks.map((b) => {
-    const { userId, ...book } = b;
+    const { userId, cover, ...book } = b;
     return {
       ...book,
+      image: cover,
       type: parsePrismaEnum(book.type),
       status: parsePrismaEnum(book.status),
       publisher: parsePrismaEnum(book.publisher),

@@ -27,7 +27,14 @@
       <VMain class="h-100">
         <slot />
         <VDialog v-model="globalStore.isLoading" persistent>
-          <VContainer class="h-screen d-flex justify-center align-center">
+          <VContainer v-if="useDisplay().lgAndDown.value" class="h-screen d-flex align-center">
+            <VRow justify="center">
+              <VCol cols="2">
+                <VProgressCircular indeterminate color="primary" size="large"/>
+              </VCol>
+            </VRow>
+          </VContainer>
+          <VContainer class="h-screen d-flex justify-center align-center" v-else>
             <VCard class="w-25">
               <VCardTitle class="text-center">Loading...</VCardTitle>
               <VProgressLinear indeterminate color="primary" />
@@ -47,7 +54,7 @@
 
 <script setup lang="ts">
 import { FetchError } from "ofetch";
-
+import { useDisplay } from "vuetify/lib/framework.mjs";
 const userStore = useUserStore();
 const globalStore = useGlobalStore();
 

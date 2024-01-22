@@ -1,24 +1,37 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    typescript: {
-        strict: true
+  typescript: {
+    strict: true,
+  },
+  css: ["vuetify/lib/styles/main.sass"],
+  build: {
+    transpile: ["vuetify"],
+  },
+  modules: ["@pinia/nuxt", "@vite-pwa/nuxt"],
+  runtimeConfig: {
+    jwtSecret: "",
+    jwtAud: "",
+    jwtIss: "",
+    public: {
+      api: "/api",
+      env: "development",
+      supabaseUrl: "",
+      supabaseKey: "",
     },
-    css: ["vuetify/lib/styles/main.sass"],
-    build: {
-        transpile: ["vuetify"],
+  },
+  $development: {
+    sourcemap: true,
+  },
+  ssr: false,
+  routeRules: {
+    "/api/proxy/manga": {
+      proxy: { to: "https://api.mangadex.org/manga" },
     },
-    modules: ["@pinia/nuxt"],
-    runtimeConfig: {
-        jwtSecret: "",
-        jwtAud: "",
-        jwtIss: "",
-        public: {
-            api: "/api",
-            env: "development",
-        },
+    "/api/proxy/cover": {
+      proxy: { to: "https://api.mangadex.org/cover" },
     },
-    $development: {
-        sourcemap: true,
+    "/api/proxy/image": {
+      proxy: { to: "https://uploads.mangadex.org/covers" },
     },
-    ssr: false,
+  },
 });

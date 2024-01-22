@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const tableStore = useTableStore();
-const booksStore = useBooksStore();
 
 //type, status, publisher
 const filters = useState(() => ["All", "All", "All"]);

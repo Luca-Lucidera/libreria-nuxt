@@ -2,11 +2,15 @@
 import type { Book } from "~/types/book";
 import { useDisplay } from "vuetify";
 
+//STORE
 const booksStore = useBooksStore();
 const globalStore = useGlobalStore();
+
+//STATE
 const containerHeight = useState(() => 500);
-const { height: screenHeight } = useDisplay();
 const container = ref(null as any);
+const { height: screenHeight } = useDisplay();
+
 const search = useState(() => "");
 
 watchEffect(() => {
@@ -14,20 +18,23 @@ watchEffect(() => {
     screenHeight.value - container.value?.$el.getBoundingClientRect().y - 30;
 });
 
-const modal = useState(() => false);
-
-const bookToShow = useState<Book | null>(() => null);
-
-const openModal = (book: Book) => {
-  modal.value = true;
-  bookToShow.value = { ...book };
-};
-
 const searchBooks = computed(() =>
   booksStore.books.filter((b) =>
     b.title.toLowerCase().includes(search.value.toLowerCase())
   )
 );
+
+const openBookModal = useState(() => false);
+const clickedBook = useState<Book | null>(() => null);
+
+const onOpenBookModal = (book: Book) => {
+  clickedBook.value = { ...book };
+  openBookModal.value = true
+};
+
+const onCloseBookModal = () => {
+  clickedBook.value = null;
+}
 </script>
 
 <template>
@@ -49,26 +56,23 @@ const searchBooks = computed(() =>
       :style="{ height: containerHeight + 'px' }"
     >
       <VRow>
-        <VCol v-for="book in searchBooks" cols="6" v-if="searchBooks.length !== 0">
-          <MobileBookCard
-            :book="book"
-            @open-modal="(book) => openModal(book)"
-          />
+        <VCol
+          v-for="book in searchBooks"
+          cols="6"
+          v-if="searchBooks.length !== 0"
+        >
+          <MobileBookCard :book="book" @open-book-modal="(book) => onOpenBookModal(book)" />
         </VCol>
         <VCol v-else>
           <p>No books found, switch to desktop interface to add a new one</p>
-
         </VCol>
       </VRow>
     </VContainer>
-
     <MobileBookModal
-      v-if="bookToShow"
-      :book="bookToShow"
-      :open-modal="modal"
-      @close-modal="(value) => (modal = value)"
-      @create-book="(book) => {}"
-      @update-book="(book) => {}"
+      v-if="clickedBook !== null"
+      v-model="openBookModal"
+      :book="clickedBook"
+      @close-book-modal="onCloseBookModal"
     />
   </template>
 </template>

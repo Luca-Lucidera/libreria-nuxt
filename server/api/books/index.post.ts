@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: "Token invalid" });
   }
 
-  const { id, ...bookToCreate } = (await readBody(event)) as Book;
+  const { id, image, ...bookToCreate } = (await readBody(event)) as Book;
   if (
     !bookToCreate ||
     !bookToCreate.title ||

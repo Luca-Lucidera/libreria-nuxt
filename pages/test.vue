@@ -1,51 +1,72 @@
 <script setup lang="ts">
-import { useDisplay } from "vuetify";
-const globalStore = useGlobalStore();
-const simulateFetch = async () => {
+import type { MangadexCover } from "~/types/book/Mangadex/cover";
+
+// definePageMeta({
+//   middleware: [
+//     () => {
+//       if (process.env.NODE_ENV === "production") {
+//         return "/";
+//       }
+//     },
+//   ],
+// });
+
+const cop = ref<string>("");
+async function fetchListaManga() {
   try {
-    globalStore.startLoading();
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    globalStore.showSnackbar("This is a snackbar message", "success");
-  } finally {
-    globalStore.stopLoading();
+    const params = {
+      title: "secchan",
+      limit: 10,
+    };
+    const response = await $fetch(mangadexMangaProxyApi, { params });
+    console.log("RESPONSE FETCH MANGA LIST:", response);
+  } catch (error) {
+    console.log(error);
   }
+}
+
+async function fetchCopertina() {
+  try {
+    const secchanId = "d79f3680-8bae-4950-b7c2-30c339156229";
+    const coverId = "9e7f621a-17f4-4027-9ec9-10964478f47a.jpg";
+    const response2 = await $fetch<Blob>(
+      `/api/proxy/image/${secchanId}/${coverId}.256.jpg`,
+      { responseType: "blob" }
+    );
+    cop.value = URL.createObjectURL(response2);
+  } catch (error) {
+    console.log("Errore in fetchCopertina", error);
+  }
+}
+
+const fetchStream = async () => {
+  const response = await $fetch<ReadableStream>("/api/mangadex/covers", {
+    responseType: "stream",
+  });
+  let chunks = [];
+  const reader = response.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    chunks.push(value);
+  }
+  cop.value = URL.createObjectURL(new Blob(chunks));
 };
 
-const display = useDisplay();
+const fetchBlob = async () => {
+  const resp = await $fetch<Blob>("/api/mangadex/covers2", {
+    responseType: "blob",
+  });
 
-const env = process.env.NODE_ENV;
-definePageMeta({
-  middleware: [
-    () => {
-      if (process.env.NODE_ENV === "production") {
-        return "/";
-      }
-    },
-  ],
-});
+  cop.value = URL.createObjectURL(resp);
+}
 </script>
 
 <template>
-  <VBtn @click="simulateFetch">Test snackbar</VBtn>
-  <p>Env '{{ env }}'</p>
-  <p>{{ globalStore.snackbar }}</p>
-
-  
-  <p>smAndDown {{ display.smAndDown }}</p>
-  <p>smAndUp {{ display.smAndUp }}</p>
-  <p>sm {{ display.sm }}</p>
-  <hr>
-  <p>md {{ display.md }}</p>
-  <p>mdAndDown {{ display.mdAndDown }}</p>
-  <p>mdAndUp {{ display.mdAndUp }}</p>
-  <hr>
-  <p>lg {{ display.lg }}</p>
-  <p>lgAndDown {{ display.lgAndDown }}</p>
-  <p>lgAndUp {{ display.lgAndUp }}</p>
-  <hr>
-  <p>xl {{ display.xl }}</p>
-  <p>xlAndDown {{ display.xlAndDown }}</p>
-  <p>xlAndUp {{ display.xlAndUp }}</p>
-  <hr>
-  <p>width * height {{ display.width }}x{{ display.height }} </p>
+  <VBtn @click="fetchListaManga">fetch lista manga</VBtn>
+  <VBtn @click="fetchStream">fetch copertina</VBtn>
+  <VBtn @click="fetchBlob">fetch copertina blob</VBtn>
+  <VImg :src="cop" />
 </template>

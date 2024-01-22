@@ -10,7 +10,8 @@
   },
   "devDependencies": {
     "@mdi/font": "^7.3.67",
-    "nuxt": "^3.8.1",
+    "@vite-pwa/nuxt": "^0.2.3",
+    "nuxt": "^3.9.3",
     "prisma": "^5.6.0",
     "typescript": "^5.2.2",
     "vue-tsc": "^1.8.22"
@@ -18,9 +19,11 @@
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
     "@prisma/client": "^5.6.0",
+    "@supabase/supabase-js": "^2.38.5",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/uuid": "^9.0.7",
+    "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2",
     "pinia": "^2.1.7",

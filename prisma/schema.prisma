@@ -35,6 +35,7 @@ model Book {
   publisher Publisher
   price     Float     @default(1)
   rating    Float     @default(0)
+  cover     String    @default("empty.png")
   comment   String    @default("")
   userId    String
   user      User      @relation(fields: [userId], references: [id])
